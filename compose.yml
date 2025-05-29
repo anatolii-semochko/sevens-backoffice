@@ -6,7 +6,7 @@ services:
       - default
       - blockchain.dev
     ports:
-      - "8080:80"
+      - "8090:80"
     volumes:
       - ./web-interface:/app
 
@@ -15,7 +15,7 @@ services:
       context: web-interface/docker/development/node
     environment:
       WDS_SOCKET_PORT: 0
-      REACT_APP_AUTH_URL: http://api.localhost
+      REACT_APP_AUTH_URL: http://localhost:8089
     command: sh -c "until [ -f .ready ] ; do sleep 1 ; done && yarn start"
     volumes:
       - ./web-interface:/app
@@ -37,7 +37,7 @@ services:
       - default
       - blockchain.dev
     ports:
-      - "8008:80"
+      - "8089:80"
     depends_on:
       - api-php-fpm
 
@@ -65,20 +65,6 @@ services:
     volumes:
       - ./api:/app
 
-  api-mysql:
-    image: mysql:9.3
-    environment:
-      MYSQL_USER: app
-      MYSQL_DATABASE: app
-      MYSQL_PASSWORD_FILE: /run/secrets/api_db_password
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/api_db_password
-    networks:
-      - default
-    secrets:
-      - api_db_password
-    volumes:
-      - api-mysql:/var/lib/mysql
-
 secrets:
   api_db_password:
     file: ./docker/development/secrets/api_db_password
@@ -96,10 +82,8 @@ secrets:
     file: ./docker/development/secrets/backup_aws_secret_access_key
 
 volumes:
-  api-mysql:
-  api-mysql-backup:
   backup-storage:
 
 networks:
   blockchain.dev:
-    name: blockchain.dev
+    name: tokens-backoffice.dev
