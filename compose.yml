@@ -5,6 +5,7 @@ services:
     networks:
       - default
       - blockchain.dev
+      - proxy
     ports:
       - "8090:80"
     volumes:
@@ -33,9 +34,11 @@ services:
       dockerfile: development/nginx/Dockerfile
     volumes:
       - ./api:/app
+      - ./api/docker/common/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - default
       - blockchain.dev
+      - proxy
     ports:
       - "8089:80"
     depends_on:
@@ -87,3 +90,6 @@ volumes:
 networks:
   blockchain.dev:
     name: tokens-backoffice.dev
+  proxy:
+    external: true
+    name: tokens-proxy

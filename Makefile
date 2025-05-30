@@ -194,7 +194,7 @@ rollback:
 ###
 
 bash:
-	docker compose run --rm ${APP_PHP_CLI} bash
+	docker compose run --rm --user root ${APP_PHP_CLI} bash
 
 node:
 	docker compose run --rm ${APP_NODE_CLI} bash
