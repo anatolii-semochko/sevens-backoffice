@@ -13,6 +13,11 @@ import {
   cilPuzzle,
   cilSpeedometer,
   cilStar,
+  cilUser,
+  cilFlagAlt,
+  cilLibrary,
+  cilFork,
+  cilInfo,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -26,6 +31,40 @@ const _nav = [
       color: 'info',
       text: 'NEW',
     },
+  },
+  {
+    component: CNavTitle,
+    name: 'Content',
+  },
+  {
+    component: CNavItem,
+    name: 'Languages',
+    to: '/content/languages',
+    icon: <CIcon icon={cilFlagAlt} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Users',
+    to: '/content/users',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Pages',
+    to: '/content/pages',
+    icon: <CIcon icon={cilLibrary} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Categories',
+    to: '/content/pages',
+    icon: <CIcon icon={cilFork} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Help',
+    to: '/content/pages',
+    icon: <CIcon icon={cilInfo} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
