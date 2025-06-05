@@ -1,3 +1,6 @@
+import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { fetchLanguages, createLanguage, patchLanguage, deleteLanguage } from 'src/api/languages'
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
@@ -8,10 +11,9 @@ import {
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { flagSet } from '@coreui/icons'
-import React, { useEffect, useState } from 'react'
-import { fetchLanguages, createLanguage, patchLanguage, deleteLanguage } from 'src/api/languages'
 
 const Languages = () => {
+  const dispatch = useDispatch()
   const [rawItems, setRawItems] = useState([])
   const [items, setItems] = useState([])
   const [visible, setVisible] = useState(false)
@@ -20,6 +22,7 @@ const Languages = () => {
   const fetchAndSetLanguages = async () => {
     const data = await fetchLanguages()
     setRawItems(data)
+    dispatch({ type: 'set', languages: data })
 
     const mapped = data.map((item) => {
       const code = item.code.toLowerCase()
@@ -83,8 +86,8 @@ const Languages = () => {
     } else {
       await createLanguage(editingItem)
     }
+    await fetchAndSetLanguages()
     setVisible(false)
-    fetchAndSetLanguages()
   }
 
   const toggleActive = async (item) => {

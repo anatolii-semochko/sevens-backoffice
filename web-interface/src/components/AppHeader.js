@@ -27,6 +27,7 @@ import {
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
+import { LanguageSelector } from './AppLanguageSelector'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -133,6 +134,7 @@ const AppHeader = () => {
       </CContainer>
       <CContainer className="px-4" fluid>
         <AppBreadcrumb />
+        <LanguageSelector />
       </CContainer>
     </CHeader>
   )
