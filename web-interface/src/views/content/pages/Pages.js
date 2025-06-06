@@ -20,13 +20,13 @@ const Pages = () => {
   const selectedLanguage = useSelector(state => state.selectedLanguage)
   const langId = selectedLanguage?.id
 
-  const fetchAndSetPages = async () => {
+  const fetchData = async () => {
     const data = await fetchPages()
     setItems(data)
   }
 
   useEffect(() => {
-    fetchAndSetPages()
+    fetchData()
   }, [])
 
   const handleEdit = (item) => {
@@ -35,8 +35,9 @@ const Pages = () => {
   }
 
   const handleRemove = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this page?')) return
     await deletePage(id)
-    fetchAndSetPages()
+    fetchData()
   }
 
   const handleAdd = () => {
@@ -51,7 +52,7 @@ const Pages = () => {
       await createPage(editingItem)
     }
     setVisible(false)
-    fetchAndSetPages()
+    fetchData()
   }
 
   const handleEditText = (item) => {
@@ -64,7 +65,7 @@ const Pages = () => {
     const updated = { ...textEditingItem }
     await patchPage(updated.id, updated)
     setTextModalVisible(false)
-    fetchAndSetPages()
+    fetchData()
   }
 
   const handleTextChange = (field, value) => {

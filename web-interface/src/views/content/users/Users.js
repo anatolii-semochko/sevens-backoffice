@@ -30,6 +30,7 @@ const Users = () => {
   }
 
   const handleRemove = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return
     await deleteUser(id)
     fetchAndSetUsers()
   }
