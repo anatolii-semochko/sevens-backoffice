@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository\PagesContent;
+namespace App\Repository;
 
-use App\Entity\PagesContent\Language;
+use App\Entity\Language;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Entity\PagesContent;
+namespace App\Entity;
 
-use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: \App\Repository\PagesContent\LanguageRepository::class)]
+#[ORM\Entity(repositoryClass: \App\Repository\LanguageRepository::class)]
 #[ORM\Table(name: 'languages')]
 class Language
 {
@@ -22,6 +22,10 @@ class Language
     #[ORM\Column(type: 'string', length: 16, unique: true)]
     #[Groups(['language:read'])]
     private string $name;
+
+    #[ORM\Column(name: '`order`', type: 'integer', length: 3, unique: true)]
+    #[Groups(['language:read'])]
+    private int $order;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(['language:read'])]
@@ -40,11 +44,14 @@ class Language
     public function setId(string $id): void { $this->id = $id; }
 
     public function getCode(): string { return $this->code; }
-    public function setCode(string $code): void { $this->code = $code; }
+    public function setCode(string $code): void { $this->code = trim($code); }
 
     public function getName(): string { return $this->name; }
-    public function setName(string $name): void { $this->name = $name; }
+    public function setName(string $name): void { $this->name = trim($name); }
 
+    public function getOrder(): int { return $this->order; }
+    public function setOrder(int $order): void { $this->order = $order; }
+    
     public function isActive(): bool { return $this->active; }
     public function setActive(bool $active): void { $this->active = $active; }
 

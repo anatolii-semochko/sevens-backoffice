@@ -2,8 +2,9 @@
 
 namespace App\Entity\PagesContent;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use App\Entity\Language;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: \App\Repository\PagesContent\PageContentTranslationRepository::class)]

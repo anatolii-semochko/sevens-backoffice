@@ -33,7 +33,7 @@ const LanguageSelector = ({ size = 'xl', selected, onChange }) => {
   // ✅ Set default main language if none selected
   useEffect(() => {
     if (!currentLang && languages.length) {
-      const mainLang = languages.find((lang) => lang.main === 1)
+      const mainLang = languages.find((lang) => lang.main === true)
       if (mainLang) {
         handleLanguageChange(mainLang)
       }

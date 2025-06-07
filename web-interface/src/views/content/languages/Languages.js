@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { fetchLanguages, createLanguage, patchLanguage, deleteLanguage } from 'src/api/languages'
+import {
+  fetchLanguages,
+  createLanguage,
+  patchLanguage,
+  deleteLanguage,
+  swapLanguageOrder,
+} from 'src/api/languages'
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
   CCard, CCardHeader, CCardBody
 } from '@coreui/react'
-import {
-  cilXCircle, cilCheckCircle, cilPencil, cilTrash, cilPlus
-} from '@coreui/icons'
+import { cilXCircle, cilCheckCircle, cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { flagSet } from '@coreui/icons'
 
@@ -21,6 +25,7 @@ const Languages = () => {
 
   const fetchAndSetLanguages = async () => {
     const data = await fetchLanguages()
+    data.sort((a, b) => a.order - b.order)
     setRawItems(data)
     dispatch({ type: 'set', languages: data })
 
@@ -74,7 +79,8 @@ const Languages = () => {
   }
 
   const handleAdd = () => {
-    setEditingItem({ id: null, name: '', code: '', active: 0, main: 0 })
+    const maxOrder = Math.max(0, ...rawItems.map(i => i.order || 0))
+    setEditingItem({ id: null, name: '', code: '', active: 0, main: 0, order: maxOrder + 1 })
     setVisible(true)
   }
 
@@ -109,6 +115,15 @@ const Languages = () => {
     fetchAndSetLanguages()
   }
 
+  const handleOrderUp = async (index) => {
+    if (index === 0) return
+    const current = rawItems[index]
+    const above = rawItems[index - 1]
+
+    await swapLanguageOrder(current.id, above.id)
+    fetchAndSetLanguages()
+  }
+
   return (
     <CCard className="mb-4">
       <CCardHeader className="d-flex justify-content-between align-items-center">
@@ -130,7 +145,7 @@ const Languages = () => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {items.map((item) => (
+            {items.map((item, index) => (
               <CTableRow key={item.id}>
                 <CTableDataCell>{item.flag}</CTableDataCell>
                 <CTableDataCell>{item.name}</CTableDataCell>
@@ -138,6 +153,16 @@ const Languages = () => {
                 <CTableDataCell>{item.active}</CTableDataCell>
                 <CTableDataCell>{item.main}</CTableDataCell>
                 <CTableDataCell>
+                  <CButton
+                    size="sm"
+                    color={index <= 0 ? 'secondary' : 'info'}
+                    className="me-2"
+                    title="Move Up"
+                    disabled={index <= 0}
+                    onClick={() => handleOrderUp(index)}
+                  >
+                    <CIcon icon={cilArrowTop} />
+                  </CButton>
                   <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)}>
                     <CIcon icon={cilPencil} />
                   </CButton>
@@ -170,12 +195,8 @@ const Languages = () => {
           />
         </CModalBody>
         <CModalFooter>
-          <CButton color="secondary" onClick={() => setVisible(false)}>
-            Cancel
-          </CButton>
-          <CButton color="primary" onClick={handleSave}>
-            Save
-          </CButton>
+          <CButton color="secondary" onClick={() => setVisible(false)}>Cancel</CButton>
+          <CButton color="primary" onClick={handleSave}>Save</CButton>
         </CModalFooter>
       </CModal>
     </CCard>
