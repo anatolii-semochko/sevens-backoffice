@@ -18,11 +18,11 @@ class PageContent
     private string $id;
 
     #[ORM\ManyToOne(targetEntity: Page::class, inversedBy: 'contents')]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'RESTRICT')]
     #[Groups(['page-content:read'])]
     private ?Page $page = null;
 
-    #[ORM\Column(type: 'string', length: 64)]
+    #[ORM\Column(type: 'string', length: 64, unique: true)]
     #[Groups(['page-content:read'])]
     private string $term;
 

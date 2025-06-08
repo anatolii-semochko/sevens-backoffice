@@ -160,15 +160,15 @@ const Languages = () => {
   }
 
   return (
-    <CCard className="mb-4">
-      <CCardHeader className="d-flex justify-content-between align-items-center">
-        <span>Languages</span>
-        <CButton color="primary" onClick={handleAdd}>
-          <CIcon icon={cilPlus} className="me-2" />Add
+    <div className="card p-4 pb-0">
+      <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
+        <h4 className="mb-0">Languages</h4>
+        <CButton color="success" size="sm" onClick={handleAdd}>
+          <CIcon icon={cilPlus} className="me-1" /> Add Language
         </CButton>
-      </CCardHeader>
+      </div>
       <CCardBody>
-        <CTable hover responsive>
+        <CTable className="no-border-last" hover responsive>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell>Flag</CTableHeaderCell>
@@ -187,7 +187,7 @@ const Languages = () => {
                 <CTableDataCell>{item.code}</CTableDataCell>
                 <CTableDataCell>{item.active}</CTableDataCell>
                 <CTableDataCell>{item.main}</CTableDataCell>
-                <CTableDataCell>
+                <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
                   <CButton
                     size="sm"
                     color={index <= 0 ? 'secondary' : 'info'}
@@ -237,7 +237,7 @@ const Languages = () => {
           <CButton color="primary" onClick={handleSave}>Save</CButton>
         </CModalFooter>
       </CModal>
-    </CCard>
+    </div>
   )
 }
 

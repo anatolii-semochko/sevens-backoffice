@@ -114,15 +114,15 @@ const PagesContent = () => {
   }
 
   return (
-    <CCard className="mb-4">
-      <CCardHeader className="d-flex justify-content-between align-items-center">
-        <div>Pages Content</div>
+    <div className="card p-4 pb-0">
+      <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
+        <h4 className="mb-0">Pages Content</h4>
         <CButton color="success" size="sm" onClick={handleCreate}>
-          <CIcon icon={cilPlus} className="me-1" /> Create Term
+          <CIcon icon={cilPlus} className="me-1" /> Add Term
         </CButton>
-      </CCardHeader>
+      </div>
       <CCardBody>
-        <CTable hover responsive>
+        <CTable className="no-border-last" hover responsive>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell>Term</CTableHeaderCell>
@@ -143,7 +143,7 @@ const PagesContent = () => {
                     <i className="text-muted">[no translation]</i>
                   )}
                 </CTableDataCell>
-                <CTableDataCell>
+                <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
                   <CButton size="sm" color="info" className="me-2" onClick={() => handleEdit(item)}>
                     <CIcon icon={cilPen} />
                   </CButton>
@@ -208,7 +208,7 @@ const PagesContent = () => {
           <CButton color="primary" onClick={handleSave}>Save</CButton>
         </CModalFooter>
       </CModal>
-    </CCard>
+    </div>
   )
 }
 

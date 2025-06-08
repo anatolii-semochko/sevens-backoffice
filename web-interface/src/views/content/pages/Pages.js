@@ -120,13 +120,13 @@ const Pages = () => {
   }
 
   return (
-    <CCard className="mb-4">
-      <CCardHeader className="d-flex justify-content-between align-items-center">
-        <span>Pages</span>
-        <CButton color="primary" onClick={handleAdd}>
-          <CIcon icon={cilPlus} className="me-2" />Add
+    <div className="card p-4 pb-0">
+      <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
+        <h4 className="mb-0">Pages</h4>
+        <CButton color="success" size="sm" onClick={handleAdd}>
+          <CIcon icon={cilPlus} className="me-1" /> Add page
         </CButton>
-      </CCardHeader>
+      </div>
       <CCardBody>
         <CTable hover responsive>
           <CTableHead>
@@ -149,7 +149,7 @@ const Pages = () => {
                   <CTableDataCell>{seo?.title || <i className="text-muted">[no title]</i>}</CTableDataCell>
                   <CTableDataCell>{seo?.keywords || <i className="text-muted">[no keywords]</i>}</CTableDataCell>
                   <CTableDataCell>{seo?.description || <i className="text-muted">[no description]</i>}</CTableDataCell>
-                  <CTableDataCell>
+                  <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
                     <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)}>
                       <CIcon icon={cilPencil} />
                     </CButton>
@@ -242,7 +242,7 @@ const Pages = () => {
           <CButton color="primary" onClick={handleSaveText}>Save</CButton>
         </CModalFooter>
       </CModal>
-    </CCard>
+    </div>
   )
 }
 
