@@ -1,15 +1,28 @@
-import api from './index'
+import api, { fetchErrorMessage } from './index'
 
-export const fetchLanguages = () => api.get(`/languages`).then(res => res.data)
+const mainUrl = '/languages'
 
-export const fetchLanguageById = (id) => api.get(`/languages/${id}`).then(res => res.data)
+export const fetchLanguages = () => api
+  .get(mainUrl)
+  .then(res => res.data)
 
-export const createLanguage = (data) => api.post('/languages', data)
+export const fetchLanguageById = (id) => api
+  .get(`${mainUrl}/${id}`)
+  .then(res => res.data)
 
-export const updateLanguage = (id, data) => api.put(`/languages/${id}`, data)
+export const createLanguage = (data) => api
+  .post(mainUrl, data)
 
-export const patchLanguage = (id, data) => api.patch(`/languages/${id}`, data)
+export const updateLanguage = (id, data) => api
+  .put(`${mainUrl}/${id}`, data)
 
-export const deleteLanguage = (id) => api.delete(`/languages/${id}`)
+export const patchLanguage = (id, data) => api
+  .patch(`${mainUrl}/${id}`, data)
 
-export const swapLanguageOrder = async (id, swapId) => await api.patch(`/languages/${id}/swap`, {swapId})
+export const deleteLanguage = (id) => api
+  .delete(`${mainUrl}/${id}`)
+
+export const swapLanguageOrder = (id, swapId) => api
+  .patch(`${mainUrl}/${id}/swap`, {swapId})
+
+export const fetchError = (error) => fetchErrorMessage(error)

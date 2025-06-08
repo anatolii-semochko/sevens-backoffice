@@ -6,11 +6,12 @@ import {
   patchLanguage,
   deleteLanguage,
   swapLanguageOrder,
+  fetchError,
 } from 'src/api/languages'
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
-  CCard, CCardHeader, CCardBody
+  CCard, CCardHeader, CCardBody, CAlert
 } from '@coreui/react'
 import { cilXCircle, cilCheckCircle, cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
@@ -22,9 +23,15 @@ const Languages = () => {
   const [items, setItems] = useState([])
   const [visible, setVisible] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const fetchAndSetLanguages = async () => {
-    const data = await fetchLanguages()
+    let data = []
+    try {
+      data = await fetchLanguages()
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
     data.sort((a, b) => a.order - b.order)
     setRawItems(data)
     dispatch({ type: 'set', languages: data })
@@ -68,60 +75,88 @@ const Languages = () => {
   }, [])
 
   const handleEdit = (item) => {
+    setErrorMessage('')
     setEditingItem(item)
     setVisible(true)
   }
 
   const handleRemove = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this language?')) return
-    await deleteLanguage(id)
-    fetchAndSetLanguages()
+    try {
+      if (!window.confirm('Are you sure you want to delete this language?')) return
+      await deleteLanguage(id)
+      fetchAndSetLanguages()
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
   }
 
   const handleAdd = () => {
+    setErrorMessage('')
     const maxOrder = Math.max(0, ...rawItems.map(i => i.order || 0))
     setEditingItem({ id: null, name: '', code: '', active: 0, main: 0, order: maxOrder + 1 })
     setVisible(true)
   }
 
   const handleSave = async () => {
-    if (editingItem.id) {
-      await patchLanguage(editingItem.id, {
-        name: editingItem.name,
-        code: editingItem.code,
-      })
-    } else {
-      await createLanguage(editingItem)
+    setErrorMessage('')
+    if (!editingItem.name || !editingItem.code) {
+      setErrorMessage('Both Language Name and Code are required.')
+      return
     }
-    await fetchAndSetLanguages()
-    setVisible(false)
+
+    try {
+      if (editingItem.id) {
+        await patchLanguage(editingItem.id, {
+          name: editingItem.name,
+          code: editingItem.code,
+        })
+      } else {
+        await createLanguage(editingItem)
+      }
+      await fetchAndSetLanguages()
+      setVisible(false)
+      setEditingItem(null)
+    } catch (error) {
+      setErrorMessage(fetchError(error))
+    }
   }
 
   const toggleActive = async (item) => {
-    await patchLanguage(item.id, {
-      active: item.active ? 0 : 1,
-    })
-    fetchAndSetLanguages()
+    try {
+      await patchLanguage(item.id, {
+        active: item.active ? 0 : 1,
+      })
+      fetchAndSetLanguages()
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
   }
 
   const handleSetMain = async (itemsList, id) => {
-    await Promise.all(
-      itemsList.map((item) =>
-        patchLanguage(item.id, {
-          main: item.id === id ? 1 : 0,
-        })
+    try {
+      await Promise.all(
+        itemsList.map((item) =>
+          patchLanguage(item.id, {
+            main: item.id === id ? 1 : 0,
+          })
+        )
       )
-    )
-    fetchAndSetLanguages()
+      fetchAndSetLanguages()
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
   }
 
   const handleOrderUp = async (index) => {
-    if (index === 0) return
-    const current = rawItems[index]
-    const above = rawItems[index - 1]
-
-    await swapLanguageOrder(current.id, above.id)
-    fetchAndSetLanguages()
+    try {
+      if (index === 0) return
+      const current = rawItems[index]
+      const above = rawItems[index - 1]
+      await swapLanguageOrder(current.id, above.id)
+      fetchAndSetLanguages()
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
   }
 
   return (
@@ -193,6 +228,9 @@ const Languages = () => {
             value={editingItem?.code || ''}
             onChange={(e) => setEditingItem({ ...editingItem, code: e.target.value })}
           />
+          {errorMessage && (
+            <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>
+          )}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setVisible(false)}>Cancel</CButton>

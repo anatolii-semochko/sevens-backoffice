@@ -18,7 +18,7 @@ class PageContent
     private string $id;
 
     #[ORM\ManyToOne(targetEntity: Page::class, inversedBy: 'contents')]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     #[Groups(['page-content:read'])]
     private ?Page $page = null;
 
@@ -37,6 +37,8 @@ class PageContent
     }
 
     public function getId(): ?string { return $this->id; }
+    public function setId(string $id): void { $this->id = $id; }
+    
     public function getPage(): ?Page { return $this->page; }
     public function setPage(?Page $page): void { $this->page = $page; }
 

@@ -28,6 +28,7 @@ import {
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { LanguageSelector } from './AppLanguageSelector'
+import { AppToaster } from '../views/utils/AppToaster'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -135,6 +136,7 @@ const AppHeader = () => {
       <CContainer className="px-4" fluid>
         <AppBreadcrumb />
         <LanguageSelector />
+        <AppToaster />
       </CContainer>
     </CHeader>
   )

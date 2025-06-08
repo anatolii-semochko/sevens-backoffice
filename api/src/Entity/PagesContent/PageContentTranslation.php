@@ -18,7 +18,6 @@ class PageContentTranslation
 
     #[ORM\ManyToOne(targetEntity: PageContent::class, inversedBy: 'translations')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    #[Groups(['page-content-translations:read'])]
     private ?PageContent $pageContent = null;
 
     #[ORM\ManyToOne(targetEntity: Language::class)]

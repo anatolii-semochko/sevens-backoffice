@@ -25,22 +25,17 @@ class Page
     #[Groups(['page:read'])]
     private Collection $seo;
 
-    #[ORM\OneToMany(mappedBy: 'page', targetEntity: PageContent::class, cascade: ['persist', 'remove'])]
-    #[Groups(['page:read'])]
-    private Collection $contents;
-
     public function __construct()
     {
         $this->id = Uuid::v4()->toRfc4122();
         $this->seo = new ArrayCollection();
-        $this->contents = new ArrayCollection();
     }
 
     public function getId(): ?string { return $this->id; }
     public function setId(string $id): void { $this->id = $id; }
 
     public function getUrl(): string { return $this->url; }
-    public function setUrl(string $url): void { $this->url = $url; }
+    public function setUrl(string $url): void { $this->url = trim($url); }
 
     public function getSeo(): Collection { return $this->seo; }
 

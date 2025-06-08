@@ -1,107 +1,102 @@
 <?php
 namespace App\Controller\PagesContent;
 
-use App\Entity\PagesContent\PageContent;
+use App\Controller\BaseController;
 use App\Repository\PagesContent\PageContentRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\PagesContent\PageContentService;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/pages-content')]
-class PageContentController extends AbstractController
+class PageContentController extends BaseController
 {
+    public const array CONTENT_GROUPS = ['groups' => [
+        'page:read',
+        'page-content:read',
+        'page-content-translations:read',
+        'language:read',
+    ]];
+
     public function __construct(
-        private EntityManagerInterface $em,
         private PageContentRepository $repository,
+        private PageContentService $service,
     ) {}
 
     #[Route('', methods: ['GET'])]
     public function fetch(Request $request): Response
     {
-        $criteria = [];
-        if ($term = $request->query->get('term')) {
-            $criteria['term'] = $term;
-        }
-        if ($pageId = $request->query->get('page_id')) {
-            $criteria['page'] = $pageId;
+        try {
+            $criteria = $request->query->all() ?? [];
+            $terms = $this->repository->findBy($criteria);
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $items = $this->repository->findBy($criteria);
-
-        return $this->json($items, 200, [], ['groups' => 'page-content:read']);
+        return $this->json($terms, context: self::CONTENT_GROUPS);
     }
 
     #[Route('/{id}', methods: ['GET'])]
     public function get(string $id): Response
     {
-        $item = $this->repository->find($id);
-        if (!$item) {
-            return $this->json(['error' => 'PageContent not found'], 404);
+        try {
+            $pageContent = $this->repository->get($id);
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
-        return $this->json($item, 200, [], ['groups' => 'page-content:read']);
+
+        return $this->json($pageContent, context: self::CONTENT_GROUPS);
     }
 
     #[Route('', methods: ['POST'])]
     public function post(Request $request): Response
     {
-        $data = json_decode($request->getContent(), true);
-        $pageContent = new PageContent();
+        try {
+            $data = $this->getData($request);
+            $pageContent = $this->service->create($data);
+            $this->service->patch($pageContent, $data);
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
 
-        // Встановлення Page треба реалізувати, наприклад, через репозиторій Page
-        $pageContent->setTerm($data['term'] ?? '');
-
-        $this->em->persist($pageContent);
-        $this->em->flush();
-
-        return $this->json($pageContent, 201, [], ['groups' => 'page-content:read']);
+        return $this->json(null);
     }
 
     #[Route('/{id}', methods: ['PUT'])]
     public function put(string $id, Request $request): Response
     {
-        $pageContent = $this->repository->find($id);
-        if (!$pageContent) {
-            return $this->json(['error' => 'PageContent not found'], 404);
+        try {
+            $this->service->patch($this->repository->get($id), $this->getData($request));
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $data = json_decode($request->getContent(), true);
-        if (isset($data['term'])) $pageContent->setTerm($data['term']);
-        // Встановлення Page за потребою
-
-        $this->em->flush();
-
-        return $this->json($pageContent, 200, [], ['groups' => 'page-content:read']);
+        return $this->json(null);
     }
 
     #[Route('/{id}', methods: ['PATCH'])]
     public function patch(string $id, Request $request): Response
     {
-        $pageContent = $this->repository->find($id);
-        if (!$pageContent) {
-            return $this->json(['error' => 'PageContent not found'], 404);
+        try {
+            $pageContent = $this->repository->get($id);
+            $this->service->patch($pageContent, $this->getData($request));
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $data = json_decode($request->getContent(), true);
-        if (isset($data['term'])) $pageContent->setTerm($data['term']);
-
-        $this->em->flush();
-
-        return $this->json($pageContent, 200, [], ['groups' => 'page-content:read']);
+        return $this->json(null);
     }
 
     #[Route('/{id}', methods: ['DELETE'])]
     public function delete(string $id): Response
     {
-        $pageContent = $this->repository->find($id);
-        if (!$pageContent) {
-            return $this->json(['error' => 'PageContent not found'], 404);
+        try {
+            $this->service->delete($this->repository->get($id));
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $this->em->remove($pageContent);
-        $this->em->flush();
-
-        return $this->json(null, 204);
+        return $this->json(null);
     }
 }

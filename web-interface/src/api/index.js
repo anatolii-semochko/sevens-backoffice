@@ -11,8 +11,13 @@ const api = axios.create({
 
 export default api;
 
+export const fetchErrorMessage = (error) => error?.response?.data?.detail ||
+  error?.response?.data?.message ||
+  error.message ||
+  'Unknown API error'
 
-// export const handleApiError = (error) => {
-//   console.error(error);
-//   return error.response?.data?.message || 'Unknown API error';
-// };
+export const handleApiError = (error) => {
+  const message = fetchErrorMessage(error)
+  window.toast.error(message)
+  return message;
+};

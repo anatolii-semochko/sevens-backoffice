@@ -1,12 +1,12 @@
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput, CFormLabel,
-  CCard, CCardHeader, CCardBody, CFormTextarea
+  CCard, CCardHeader, CCardBody, CFormTextarea, CAlert
 } from '@coreui/react'
 import { cilPencil, cilTrash, cilPlus, cilPen } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import React, { useEffect, useState } from 'react'
-import { fetchPages, createPage, patchPage, deletePage } from 'src/api/pages'
+import { fetchPages, createPage, patchPage, deletePage, fetchError } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 
@@ -17,12 +17,17 @@ const Pages = () => {
   const [editLang, setEditLang] = useState(null)
   const [textModalVisible, setTextModalVisible] = useState(false)
   const [textEditingItem, setTextEditingItem] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
   const selectedLanguage = useSelector(state => state.selectedLanguage)
   const langId = selectedLanguage?.id
 
   const fetchData = async () => {
-    const data = await fetchPages()
-    setItems(data)
+    try {
+      const data = await fetchPages()
+      setItems(data)
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
   }
 
   useEffect(() => {
@@ -35,60 +40,83 @@ const Pages = () => {
 
   const handleEdit = (item) => {
     setEditingItem(item)
+    setErrorMessage(null)
     setVisible(true)
   }
 
   const handleRemove = async (id) => {
     if (!window.confirm('Are you sure you want to delete this page?')) return
-    await deletePage(id)
-    fetchData()
+    try {
+      await deletePage(id)
+      fetchData()
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
   }
 
   const handleAdd = () => {
     setEditingItem({ id: null, url: '', seo: [], contents: [] })
+    setErrorMessage(null)
     setVisible(true)
   }
 
   const handleSave = async () => {
-    if (editingItem.id) {
-      await patchPage(editingItem.id, editingItem)
-    } else {
-      await createPage(editingItem)
+    if (!editingItem.url) {
+      setErrorMessage('Url is required.')
+      return
     }
-    setVisible(false)
-    fetchData()
+    try {
+      if (editingItem.id) {
+        await patchPage(editingItem.id, editingItem)
+      } else {
+        await createPage(editingItem)
+      }
+      setVisible(false)
+      fetchData()
+    } catch (error) {
+      setErrorMessage(fetchError(error))
+    }
   }
 
   const handleEditText = (item) => {
     setTextEditingItem({ ...item })
     setEditLang(selectedLanguage)
+    setErrorMessage(null)
     setTextModalVisible(true)
   }
 
   const handleSaveText = async () => {
-    const updated = { ...textEditingItem }
+    try {
+      const updated = { ...textEditingItem }
 
-    const existingSeoIndex = updated.seo.findIndex(seo => seo.language?.id === editLang?.id)
-    if (existingSeoIndex === -1) {
-      updated.seo.push({ language: editLang, breadcrumbs: '', title: '', keywords: '', description: '' })
+      const existingSeoIndex = updated.seo.findIndex(seo => seo.language?.id === editLang?.id)
+      if (existingSeoIndex === -1) {
+        updated.seo.push({ language: editLang, breadcrumbs: '', title: '', keywords: '', description: '' })
+      }
+
+      await patchPage(updated.id, updated)
+      setTextModalVisible(false)
+      fetchData()
+    } catch (error) {
+      setErrorMessage(fetchError(error))
     }
-
-    await patchPage(updated.id, updated)
-    setTextModalVisible(false)
-    fetchData()
   }
 
   const handleTextChange = (field, value) => {
-    setTextEditingItem((prev) => {
-      const updatedSeo = [...prev.seo]
-      const idx = updatedSeo.findIndex(seo => seo.language?.id === editLang?.id)
-      if (idx !== -1) {
-        updatedSeo[idx] = { ...updatedSeo[idx], [field]: value }
-      } else {
-        updatedSeo.push({ language: editLang, [field]: value })
-      }
-      return { ...prev, seo: updatedSeo }
-    })
+    try {
+      setTextEditingItem((prev) => {
+        const updatedSeo = [...prev.seo]
+        const idx = updatedSeo.findIndex(seo => seo.language?.id === editLang?.id)
+        if (idx !== -1) {
+          updatedSeo[idx] = { ...updatedSeo[idx], [field]: value }
+        } else {
+          updatedSeo.push({ language: editLang, [field]: value })
+        }
+        return { ...prev, seo: updatedSeo }
+      })
+    } catch (error) {
+      setErrorMessage(fetchError(error))
+    }
   }
 
   return (
@@ -151,6 +179,9 @@ const Pages = () => {
             value={editingItem?.url || ''}
             onChange={(e) => setEditingItem({ ...editingItem, url: e.target.value })}
           />
+          {errorMessage && (
+            <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>
+          )}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setVisible(false)}>Cancel</CButton>
@@ -204,6 +235,7 @@ const Pages = () => {
               </>
             )
           })()}
+          {errorMessage && <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setTextModalVisible(false)}>Cancel</CButton>

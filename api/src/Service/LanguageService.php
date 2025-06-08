@@ -8,9 +8,7 @@ use Symfony\Component\Uid\Uuid;
 
 class LanguageService
 {
-    public function __construct(
-        private EntityManagerInterface $em,
-    ) {}
+    public function __construct(private EntityManagerInterface $em) {}
 
     public function create(array $data): Language
     {

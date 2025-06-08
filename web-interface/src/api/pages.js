@@ -1,13 +1,25 @@
-import api from './index'
+import api, { fetchErrorMessage } from './index'
 
-export const fetchPages = () => api.get('/pages').then(res => res.data)
+const mainUrl = '/pages'
 
-export const fetchPageById = (id) => api.get(`/pages/${id}`).then(res => res.data)
+export const fetchPages = () => api
+  .get(mainUrl)
+  .then(res => res.data)
 
-export const createPage = (data) => api.post('/pages', data)
+export const fetchPageById = (id) => api
+  .get(`${mainUrl}/${id}`)
+  .then(res => res.data)
 
-export const updatePage = (id, data) => api.put(`/pages/${id}`, data)
+export const createPage = (data) => api
+  .post(mainUrl, data)
 
-export const patchPage = (id, data) => api.patch(`/pages/${id}`, data)
+export const updatePage = (id, data) => api
+  .put(`${mainUrl}/${id}`, data)
 
-export const deletePage = (id) => api.delete(`/pages/${id}`)
+export const patchPage = (id, data) => api
+  .patch(`${mainUrl}/${id}`, data)
+
+export const deletePage = (id) => api
+  .delete(`${mainUrl}/${id}`)
+
+export const fetchError = (error) => fetchErrorMessage(error)
