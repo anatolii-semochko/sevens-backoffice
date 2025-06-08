@@ -14,11 +14,10 @@ class PageSeo
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 36, unique: true)]
     #[Groups(['page-seo:read'])]
-    private Uuid $id;
+    private string $id;
 
     #[ORM\ManyToOne(targetEntity: Page::class, inversedBy: 'seo')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    #[Groups(['page-seo:read'])]
     private ?Page $page = null;
 
     #[ORM\ManyToOne(targetEntity: Language::class)]
@@ -26,28 +25,29 @@ class PageSeo
     #[Groups(['page-seo:read'])]
     private ?Language $language = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 100, nullable: true)]
     #[Groups(['page-seo:read'])]
     private string $breadcrumbs;
 
-    #[ORM\Column(length: 70)]
+    #[ORM\Column(length: 70, nullable: true)]
     #[Groups(['page-seo:read'])]
     private string $title;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['page-seo:read'])]
     private string $keywords;
 
-    #[ORM\Column(length: 160)]
+    #[ORM\Column(length: 160, nullable: true)]
     #[Groups(['page-seo:read'])]
     private string $description;
     
     public function __construct()
     {
-        $this->id = Uuid::v4();
+        $this->id = Uuid::v4()->toRfc4122();
     }
 
-    public function getId(): ?Uuid { return $this->id; }
+    public function getId(): ?string { return $this->id; }
+    public function setId(string $id): void { $this->id = $id; }
     public function getPage(): ?Page { return $this->page; }
     public function setPage(?Page $page): void { $this->page = $page; }
 

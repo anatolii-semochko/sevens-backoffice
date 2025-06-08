@@ -2,68 +2,81 @@
 
 namespace App\Controller\PagesContent;
 
-use App\Entity\PagesContent\Page;
 use App\Repository\PagesContent\PageRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\PagesContent\PageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/pages')]
 class PageController extends AbstractController
 {
+    private const array PAGE_GROUPS = ['groups' => ['page:read', 'page-seo:read', 'language:read']];
+    
     public function __construct(
-        private EntityManagerInterface $em,
         private PageRepository $repository,
-        private SerializerInterface $serializer,
+        private PageService $service,
     ) {}
 
     #[Route('', name: 'pages_fetch', methods: ['GET'])]
-    public function fetch(Request $request, SerializerInterface $serializer): JsonResponse
+    public function fetch(Request $request): JsonResponse
     {
         $criteria = $request->query->all();
         $pages = $this->repository->findBy($criteria);
-        return $this->json($pages, 200, [], ['groups' => 'page:read']);
+        return $this->json($pages, 200, [], self::PAGE_GROUPS);
     }
 
     #[Route('/{id}', name: 'pages_get', methods: ['GET'])]
-    public function get(Page $page): JsonResponse
+    public function get(string $id): JsonResponse
     {
-        return $this->json($page, 200, [], ['groups' => 'page:read']);
+        $page = $this->repository->find($id);
+        return $page
+            ? $this->json($page, Response::HTTP_OK, [], self::PAGE_GROUPS)
+            : $this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND);
     }
 
     #[Route('', name: 'pages_post', methods: ['POST'])]
     public function post(Request $request): JsonResponse
-    {
-        $page = $this->serializer->deserialize($request->getContent(), Page::class, 'json');
-        $this->em->persist($page);
-        $this->em->flush();
+    {   
+        $page = $this->service->create($this->getData($request));
         return $this->json($page, 201, [], ['groups' => 'page:read']);
     }
 
     #[Route('/{id}', name: 'pages_put', methods: ['PUT'])]
-    public function put(Request $request, Page $page): JsonResponse
+    public function put(string $id, Request $request): JsonResponse
     {
-        $this->serializer->deserialize($request->getContent(), Page::class, 'json', ['object_to_populate' => $page]);
-        $this->em->flush();
-        return $this->json($page, 200, [], ['groups' => 'page:read']);
+        if (!$page = $this->repository->find($id)) {
+            return $this->json(['error' => 'Page not found'], Response::HTTP_NOT_FOUND);
+        }
+        $this->service->patch($page, $this->getData($request));
+        return $this->json($page, Response::HTTP_OK, [], self::PAGE_GROUPS);
     }
 
     #[Route('/{id}', name: 'pages_patch', methods: ['PATCH'])]
-    public function patch(Request $request, Page $page): JsonResponse
+    public function patch(string $id, Request $request): JsonResponse
     {
-        $this->serializer->deserialize($request->getContent(), Page::class, 'json', ['object_to_populate' => $page]);
-        $this->em->flush();
-        return $this->json($page, 200, [], ['groups' => 'page:read']);
+        if (!$page = $this->repository->find($id)) {
+            return $this->json(['error' => 'Page not found'], Response::HTTP_NOT_FOUND);
+        }
+        $this->service->patch($page, $this->getData($request));
+        return $this->json($page, Response::HTTP_OK, [], self::PAGE_GROUPS);
     }
 
     #[Route('/{id}', name: 'pages_delete', methods: ['DELETE'])]
-    public function delete(Page $page): JsonResponse
+    public function delete(string $id): JsonResponse
     {
-        $this->em->remove($page);
-        $this->em->flush();
-        return $this->json(null, 204);
+        if (!$page = $this->repository->find($id)) {
+            return $this->json(['error' => 'Page not found'], Response::HTTP_NOT_FOUND);
+        }
+        $this->service->delete($page);
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    private function getData(Request $request): array
+    {
+        return json_decode($request->getContent(), true) ?? [];
     }
 }
