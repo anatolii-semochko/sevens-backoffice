@@ -133,7 +133,7 @@ const Categories = () => {
 
   const handleNameClick = (item) => {
     const translation = findTranslationByLang(item.translations || [], langId)
-    const name = translation?.name || item.name || '[no name]'
+    const name = translation?.name || item.name || 'no name'
     const newPath = [...breadcrumb, { id: item.id, name }]
     fetchData(item.id, newPath)
   }

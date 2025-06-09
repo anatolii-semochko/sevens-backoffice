@@ -145,10 +145,10 @@ const Pages = () => {
               return (
                 <CTableRow key={item.id}>
                   <CTableDataCell>{item.url || <i className="text-muted">[empty]</i>}</CTableDataCell>
-                  <CTableDataCell>{seo?.breadcrumbs || <i className="text-muted">[no breadcrumbs]</i>}</CTableDataCell>
-                  <CTableDataCell>{seo?.title || <i className="text-muted">[no title]</i>}</CTableDataCell>
-                  <CTableDataCell>{seo?.keywords || <i className="text-muted">[no keywords]</i>}</CTableDataCell>
-                  <CTableDataCell>{seo?.description || <i className="text-muted">[no description]</i>}</CTableDataCell>
+                  <CTableDataCell>{seo?.breadcrumbs || <i className="text-muted">no breadcrumbs</i>}</CTableDataCell>
+                  <CTableDataCell>{seo?.title || <i className="text-muted">no title</i>}</CTableDataCell>
+                  <CTableDataCell>{seo?.keywords || <i className="text-muted">no keywords</i>}</CTableDataCell>
+                  <CTableDataCell>{seo?.description || <i className="text-muted">no description</i>}</CTableDataCell>
                   <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
                     <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)}>
                       <CIcon icon={cilPencil} />

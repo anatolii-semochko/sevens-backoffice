@@ -43,7 +43,7 @@ const LanguageSelector = ({ size = 'xl', selected, onChange }) => {
   const getIconKey = (code) => `cif${code[0].toUpperCase()}${code.slice(1).toLowerCase()}`
 
   return (
-    <div className="d-flex align-items-center gap-3">
+    <div className="d-flex align-items-center gap-3 mx-3">
       {languages.map((lang) => {
         const iconKey = getIconKey(lang.code)
         const isSelected = currentLang?.code === lang.code

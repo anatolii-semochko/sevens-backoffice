@@ -134,13 +134,13 @@ const PagesContent = () => {
           <CTableBody>
             {items.map((item) => (
               <CTableRow key={item.id}>
-                <CTableDataCell>{item.term || <i className="text-muted">[no term]</i>}</CTableDataCell>
+                <CTableDataCell>{item.term || <i className="text-muted">no term</i>}</CTableDataCell>
                 <CTableDataCell>{item.page?.url || <i className="text-muted"></i>}</CTableDataCell>
                 <CTableDataCell>
                   {findTranslation(item.translations, langId) ? (
                     <span dangerouslySetInnerHTML={{ __html: findTranslation(item.translations, langId) }} />
                   ) : (
-                    <i className="text-muted">[no translation]</i>
+                    <i className="text-muted">no translation</i>
                   )}
                 </CTableDataCell>
                 <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
