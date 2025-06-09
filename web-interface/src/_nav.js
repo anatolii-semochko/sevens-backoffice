@@ -63,13 +63,13 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Categories',
-    to: '/content/pages',
+    to: '/content/categories',
     icon: <CIcon icon={cilFork} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'Help',
-    to: '/content/pages',
+    to: '/content/help',
     icon: <CIcon icon={cilInfo} customClassName="nav-icon" />,
   },
   {
