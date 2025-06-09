@@ -54,6 +54,16 @@ class CategoryService
 
     public function patch(object $category, array $data): void
     {
+        // TODO - організувати правильний patch
+        if (isset($data['active'])) {
+            $category->setActive($data['active']);
+            $this->em->persist($category);
+            $this->em->flush();
+        }
+    }
+
+    public function put(object $category, array $data): void
+    {
         $category->setUrl($data['url']);
         $category->setParentId($data['parentId']);
         $category->setName($data['name']);

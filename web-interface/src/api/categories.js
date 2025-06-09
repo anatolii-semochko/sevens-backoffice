@@ -13,7 +13,7 @@ export const fetchCategoryById = (id) => api
 export const createCategory = (data) => api
   .post(mainUrl, data)
 
-export const updateCategory = (id, data) => api
+export const putCategory = (id, data) => api
   .put(`${mainUrl}/${id}`, data)
 
 export const patchCategory = (id, data) => api

@@ -5,11 +5,11 @@ import {
   CFormInput, CFormLabel, CAlert, CCardBody, CFormTextarea
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash, cilPlus, cilPen, cilArrowTop } from '@coreui/icons'
+import { cilPencil, cilTrash, cilPlus, cilPen, cilArrowTop, cilCheckCircle, cilXCircle } from '@coreui/icons'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import {
-  fetchCategories, createCategory, patchCategory, deleteCategory, swapCategoryOrder, fetchError
+  fetchCategories, createCategory, putCategory, patchCategory, deleteCategory, swapCategoryOrder, fetchError
 } from 'src/api/categories'
 
 const Categories = () => {
@@ -84,7 +84,7 @@ const Categories = () => {
     }
     try {
       editingItem.id
-        ? await patchCategory(editingItem.id, editingItem)
+        ? await putCategory(editingItem.id, editingItem)
         : await createCategory(editingItem)
       setVisible(false)
       fetchData(currentParent, breadcrumb)
@@ -107,7 +107,7 @@ const Categories = () => {
       if (idx === -1) {
         updated.translations.push({ language: editLang, name: '' })
       }
-      await patchCategory(updated.id, updated)
+      await putCategory(updated.id, updated)
       setTextModalVisible(false)
       fetchData(currentParent, breadcrumb)
     } catch (error) {
@@ -179,6 +179,17 @@ const Categories = () => {
     </div>
   )
 
+  const toggleActive = async (item) => {
+    try {
+      await patchCategory(item.id, {
+        active: item.active ? 0 : 1,
+      })
+      fetchData(currentParent, breadcrumb)
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
+  }
+
   return (
     <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
@@ -198,6 +209,7 @@ const Categories = () => {
               <CTableHeaderCell>Title</CTableHeaderCell>
               <CTableHeaderCell>URL</CTableHeaderCell>
               <CTableHeaderCell>Short Description</CTableHeaderCell>
+              <CTableHeaderCell>Status</CTableHeaderCell>
               <CTableHeaderCell>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -216,6 +228,15 @@ const Categories = () => {
                   <CTableDataCell>{translation?.title || empty('title')}</CTableDataCell>
                   <CTableDataCell>{item.url || empty('url')}</CTableDataCell>
                   <CTableDataCell>{translation?.shortDescription || empty('description')}</CTableDataCell>
+                  <CTableDataCell>
+                    <CIcon
+                      icon={item.active ? cilCheckCircle : cilXCircle}
+                      className={item.active ? 'text-success' : 'text-danger'}
+                      title="Toggle status"
+                      onClick={() => toggleActive(item)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </CTableDataCell>
                   <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
                     <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)}>
                       <CIcon icon={cilPencil} />

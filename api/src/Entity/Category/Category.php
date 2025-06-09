@@ -32,6 +32,10 @@ class Category
     #[Groups(['category:read'])]
     private ?string $activityParentId = null;
 
+    #[ORM\Column(name: "active", type: "integer", length: 1, nullable: false, options: ["unsigned" => true, "default" => 0])]
+    #[Groups(['category:read'])]
+    private int $active = 0;
+
     #[ORM\Column(name: "`order`", type: "integer", options: ["unsigned" => true])]
     #[Groups(['category:read'])]
     private int $order = 0;
@@ -89,6 +93,9 @@ class Category
 
     public function getActivityParentId(): ?string { return $this->activityParentId; }
     public function setActivityParentId(?string $activityParentId): void { $this->activityParentId = $activityParentId; }
+
+    public function getActive(): int { return $this->active; }
+    public function setActive(int $active): void { $this->active = $active; }
 
     public function getOrder(): int { return $this->order; }
     public function setOrder(int $order): void { $this->order = $order; }

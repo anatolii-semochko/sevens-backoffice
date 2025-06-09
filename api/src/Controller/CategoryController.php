@@ -55,6 +55,18 @@ class CategoryController extends BaseController
         return $this->json(null);
     }
 
+    #[Route('/{id}', name: 'category_put', methods: ['PUT'])]
+    public function put(string $id, Request $request): JsonResponse
+    {
+        try {
+            $this->service->put($this->repository->get($id), $this->getData($request));
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $this->json(null);
+    }
+
     #[Route('/{id}', name: 'category_patch', methods: ['PATCH'])]
     public function patch(string $id, Request $request): JsonResponse
     {
