@@ -18,37 +18,44 @@ class CategoryService
     
     public function fetchByFilter(array $criteria): array
     {
-        $criteria['parent'] = $criteria['parent'] === 'root' ? null : $criteria['parent'];
-
+        if (!empty($criteria['parentId'])) {
+            $criteria['parentId'] = $criteria['parentId'] === 'root' ? null : $criteria['parentId'];
+        }
+        
         return $this->repository->findBy($criteria, ['order' => 'ASC']);
     }
-    
 
     public function create(array $data): Category
     {
+        // TODO Пофіксати перевірку, чи можна створити
+        // TODO сворити метод валідації для create nd patch
         $exists = $this->em->getRepository(Category::class)->findOneBy([
             'name' => $data['name'],
-            'parent' => null,
+            'parentId' => $data['parentId'] ?? null,
         ]);
         if ($exists) {
             throw new \RuntimeException('Category with the same name and parent already exists.');
         }
+        // TODO Дана перевірка невірна
 
         $category = new Category();
         $category->setId(Uuid::v4()->toRfc4122());
         $category->setUrl($data['url']);
-        $category->setParent($this->getParentCategory($data));
+        $category->setParentId($data['parentId'] ?? null);
         $category->setName($data['name']);
+        $category->setOrder($data['order']);
         $this->em->persist($category);
         $this->em->flush();
 
+        $this->indexCategories();
+        
         return $category;
     }
 
     public function patch(object $category, array $data): void
     {
         $category->setUrl($data['url']);
-        $category->setParent($this->getParentCategory($data));
+        $category->setParentId($data['parentId']);
         $category->setName($data['name']);
 
         $existingTranslations = $category->getTranslations()->toArray();
@@ -95,23 +102,22 @@ class CategoryService
             }
         }
         
-        
-        
-        
         $this->em->persist($category);
         $this->em->flush();
-    }
-    
-    private function getParentCategory(array $data): ?Object
-    {
-        $parentCategory = null;
-        if (!empty($data['parent']['id'])) {
-            $parentCategory = $this->repository->findOneBy([
-                'id' => $data['parent']['id'],
-            ]);
-        }
         
-        return $parentCategory;
+        $this->indexCategories();
+    }
+
+    public function swapCategory(Object $currentCategory, Object $swapCategory): void
+    {
+        $currentOrder = $currentCategory->getOrder();
+        $swapOrder = $swapCategory->getOrder();
+        $currentCategory->setOrder(0);
+        $this->em->flush();
+        $swapCategory->setOrder($currentOrder);
+        $this->em->flush();
+        $currentCategory->setOrder($swapOrder);
+        $this->em->flush();
     }
     
     public function delete(Object $page): void
@@ -120,127 +126,107 @@ class CategoryService
         $this->em->flush();
     }
 
+    public function indexCategories(?string $filterMainParentId = null): int
+    {
+        // 1. Завантаження всіх категорій (можна додати фільтр)
+        $qb = $this->em->createQueryBuilder()
+            ->select('c')
+            ->from(Category::class, 'c');
 
+        if ($filterMainParentId) {
+            $qb->where('c.mainParentId = :mainParentId')
+                ->setParameter('mainParentId', $filterMainParentId);
+        }
 
+        /** @var Category[] $allCategories */
+        $allCategories = $qb->getQuery()->getResult();
 
+        // 2. Побудова дерева для зручності
+        $categories = [];
+        foreach ($allCategories as $cat) {
+            $categories[$cat->getId()] = $cat;
+        }
 
-//    public static function getCategoryPath ($category, $root = 'Root') {
-//        @ $path = json_decode($category->path);
-//        $path = [];
-//        if (is_array($path)) foreach ($path as $step) {
-//            $path[] = $step->title;
-//        }
-//        if ($root) $path[] = $root;
-//        return implode(' > ', array_reverse($path));
-//    }
+        foreach ($categories as $id => $category) {
+            $category->setChildren(null);
+            $category->setChildrenInside(null);
+            $category->setPath(null);
+            $category->setParents(null);
+        }
 
-//    // Admin Path Line Links
-//    public static function getCategoriesAdminPathLinks ($service_category, $root_title) {
-//        if ($service_category) {
-//            $path[] = $service_category->title;
-//            @ $path = json_decode($service_category->path);
-//            if (is_array($path)) foreach ($path as $step) {
-//                $path[] = '<a href="'.Url::to(['index','parent_id'=>$step->id]).'">'.$step->title.'</a>';
-//            }
-//            $path[] = '<a href="'.Url::to(['index']).'">'.$root_title.'</a>';
-//            return implode(' > ', array_reverse($path));
-//        } else {
-//            return $root_title;
-//        }
-//    }
+        // 3. Розрахунок залежностей
+        foreach ($categories as $category) {
+            $id = $category->getId();
+            $parentId = $category->getParentId();
 
-//    // Indexed Categories
-//    static function indexing_categories ($main_parent_id = null) {
-//        # All Categories
-//        $query = "
-//            SELECT `id`, `name`, `url`, `parent_id`
-//            FROM ".Categories::tableName()."
-//        ";
-//        if ($main_parent_id = intval($main_parent_id)) $query.= "
-//            WHERE main_parent_id = ".$main_parent_id."
-//        ";
-//        $all_categories = Yii::$app->db->createCommand($query)->queryAll();
-//        # Обнуляем в массиве расчитываемые параметры
-//        foreach ($all_categories as $category) {
-//            $category['children'] = null;
-//            $category['children_inside'] = null;
-//            $category['path'] = [];
-//            $categories[$category['id']] = $category;
-//        }
-//        foreach ($categories as $id=>$category) {
-//            # Заполняем "parents"
-//            $parents = [];
-//            $parent_cat_id = $category['parent_id'];
-//            while ($parent_cat_id != 0) {
-//                $parents[] = $parent_cat_id;
-//                $parent_cat = $categories[$parent_cat_id];
-//                $parent_cat_id = $parent_cat['parent_id'];
-//            }
-//            @ $main_parent_id = intval($parent_cat['id']);
-//            if (!$main_parent_id) $main_parent_id = $category['id'];
-//            $categories[$id]['main_parent_id'] = $main_parent_id;
-//            $parents = array_filter(array_reverse($parents));
-//            $categories[$id]['parents']=implode(',',$parents);
-//            // Activity Parent Category
-//            if (count($parents) == 1) {
-//                $categories[$id]['activity_parent_id'] = $category['id'];
-//            } else if (count($parents) > 1) {
-//                $categories[$id]['activity_parent_id'] = $parents[1];
-//            } else {
-//                $categories[$id]['activity_parent_id'] = 0;
-//            }
-//            # Заполняем поля "children"
-//            foreach ($categories as $key=>$cat) {
-//                if ($cat['id'] == $category['parent_id']) {
-//                    $children = $categories[$key]['children'];
-//                    $children = array_filter(explode(',',$children));
-//                    $children[] = $category['id'];
-//                    $children = implode(',',$children);
-//                    $categories[$key]['children'] = $children;
-//                }
-//            }
-//            # Заполняем "children_inside"
-//            $parent_cat_id = $category['parent_id'];
-//            while ($parent_cat_id != 0) {
-//                $parent_cat = $categories[$parent_cat_id];
-//                $children_inside = array_filter(explode(',',$parent_cat['children_inside']));
-//                $children_inside[] = $category['id'];
-//                $children_inside = implode(',',$children_inside);
-//                $categories[$parent_cat_id]['children_inside'] = $children_inside;
-//                $parent_cat_id = $parent_cat['parent_id'];
-//            }
-//            # Заполняем "path"
-//            $parent_cat_id = $category['parent_id'];
-//            while ($parent_cat_id!=0) {
-//                $parent_cat = $categories[$parent_cat_id];
-//                $path = $categories[$category['id']]['path'];
-//                $path[] = [
-//                    'id'   => $parent_cat['id'],
-//                    'url'  => $parent_cat['url'],
-//                    'name' => $parent_cat['name']
-//                ];
-//                $categories[$category['id']]['path'] = $path;
-//                $parent_cat_id = $parent_cat['parent_id'];
-//            }
-//        }
-//        # Записываем индексные изменения
-//        foreach ($categories as $category) {
-//            # Записываем изменения
-//            $command = "
-//                  main_parent_id     = '".$category['main_parent_id']."',
-//                  activity_parent_id = ".($category['activity_parent_id'] ? "'".$category['activity_parent_id']."'" : 'null').",
-//                  level              = ".(count(array_filter(explode(',',$category['parents'])))+1).",
-//                  children           = '".$category['children']."',
-//                  parents            = '".$category['parents']."',
-//                  children_inside    = '".$category['children_inside']."',
-//                  path               = '".json_encode($category['path'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE)."'
-//            ";
-//            Yii::$app->db->createCommand("
-//                UPDATE ".Categories::tableName()."
-//                SET ".$command."
-//                WHERE id = ".$category['id']."
-//            ")->execute();
-//        }
-//        return count($categories);
-//    }
+            $parents = [];
+            $path = [];
+            $currentParentId = $parentId;
+            $mainParentId = null;
+
+            // Побудова ланцюжка батьків
+            while ($currentParentId && isset($categories[$currentParentId])) {
+                $parent = $categories[$currentParentId];
+                $parents[] = $currentParentId;
+                $path[] = [
+                    'id' => $parent->getId(),
+                    'url' => $parent->getUrl(),
+                    'name' => $parent->getName(),
+                ];
+                $mainParentId = $parent->getId();
+                $currentParentId = $parent->getParentId();
+            }
+
+            // Основна батьківська категорія
+            if (!$mainParentId) {
+                $mainParentId = $id;
+            }
+
+            $category->setMainParentId($mainParentId);
+
+            $parents = array_reverse($parents);
+            $category->setParents(implode(',', $parents));
+            $category->setPath(json_encode($path, JSON_UNESCAPED_UNICODE));
+
+            // Activity parent
+            if (count($parents) === 1) {
+                $category->setActivityParentId($category->getId());
+            } elseif (count($parents) > 1) {
+                $category->setActivityParentId($parents[1]);
+            } else {
+                $category->setActivityParentId(null);
+            }
+
+            // Заповнення children
+            foreach ($categories as $c) {
+                if ($c->getParentId() === $category->getId()) {
+                    $currentChildren = array_filter(explode(',', $category->getChildren() ?? ''));
+                    $currentChildren[] = $c->getId();
+                    $category->setChildren(implode(',', array_unique($currentChildren)));
+                }
+            }
+
+            // Заповнення children_inside
+            $ancestorId = $category->getParentId();
+            while ($ancestorId && isset($categories[$ancestorId])) {
+                $ancestor = $categories[$ancestorId];
+                $childrenInside = array_filter(explode(',', $ancestor->getChildrenInside() ?? ''));
+                $childrenInside[] = $category->getId();
+                $ancestor->setChildrenInside(implode(',', array_unique($childrenInside)));
+                $ancestorId = $ancestor->getParentId();
+            }
+
+            // Level (глибина)
+            $category->setLevel(count($parents) + 1);
+        }
+
+        // 4. Збереження всіх змін
+        foreach ($categories as $category) {
+            $this->em->persist($category);
+        }
+
+        $this->em->flush();
+
+        return count($categories);
+    }
 }

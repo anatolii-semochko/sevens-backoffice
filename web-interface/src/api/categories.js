@@ -2,18 +2,9 @@ import api, { fetchErrorMessage } from './index'
 
 const mainUrl = '/categories'
 
-// export const fetchCategories = (criteria) => api
-//   .get(mainUrl, criteria)
-//   .then(res => res.data)
-
-export const fetchCategories = (criteria) => {
-
-  console.log({criteria})
-
-  return api
-    .get(mainUrl,{ params: criteria })
-    .then(res => res.data)
-}
+export const fetchCategories = (criteria) => api
+  .get(mainUrl,{ params: criteria })
+  .then(res => res.data)
 
 export const fetchCategoryById = (id) => api
   .get(`${mainUrl}/${id}`)
@@ -30,5 +21,8 @@ export const patchCategory = (id, data) => api
 
 export const deleteCategory = (id) => api
   .delete(`${mainUrl}/${id}`)
+
+export const swapCategoryOrder = (id, swapId) => api
+  .patch(`${mainUrl}/${id}/swap`, {swapId})
 
 export const fetchError = (error) => fetchErrorMessage(error)

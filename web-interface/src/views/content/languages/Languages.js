@@ -160,7 +160,7 @@ const Languages = () => {
   }
 
   return (
-    <div className="card p-4 pb-0">
+    <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
         <h4 className="mb-0">Languages</h4>
         <CButton color="success" size="sm" onClick={handleAdd}>

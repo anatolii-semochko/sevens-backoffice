@@ -120,7 +120,7 @@ const Pages = () => {
   }
 
   return (
-    <div className="card p-4 pb-0">
+    <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
         <h4 className="mb-0">Pages</h4>
         <CButton color="success" size="sm" onClick={handleAdd}>
@@ -128,7 +128,7 @@ const Pages = () => {
         </CButton>
       </div>
       <CCardBody>
-        <CTable hover responsive>
+        <CTable className="no-border-last" hover responsive>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell>URL</CTableHeaderCell>

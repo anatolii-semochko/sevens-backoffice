@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity]
 #[ORM\Table(name: "categories")]
@@ -19,20 +20,17 @@ class Category
     #[Groups(['category:read'])]
     private string $id;
 
-    #[ORM\ManyToOne(targetEntity: self::class)]
-    #[ORM\JoinColumn(name: "parent_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+    #[ORM\Column(name: "parent_id", type: "string", length: 36, nullable: true)]
     #[Groups(['category:read'])]
-    private ?Category $parent = null;
+    private ?string $parentId = null;
 
-    #[ORM\ManyToOne(targetEntity: self::class)]
-    #[ORM\JoinColumn(name: "main_parent_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+    #[ORM\Column(name: "main_parent_id", type: "string", length: 36, nullable: true)]
     #[Groups(['category:read'])]
-    private ?Category $mainParent = null;
+    private ?string $mainParentId = null;
 
-    #[ORM\ManyToOne(targetEntity: self::class)]
-    #[ORM\JoinColumn(name: "activity_parent_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+    #[ORM\Column(name: "activity_parent_id", type: "string", length: 36, nullable: true)]
     #[Groups(['category:read'])]
-    private ?Category $activityParent = null;
+    private ?string $activityParentId = null;
 
     #[ORM\Column(name: "`order`", type: "integer", options: ["unsigned" => true])]
     #[Groups(['category:read'])]
@@ -71,6 +69,7 @@ class Category
     private ?string $path = null;
 
     #[ORM\OneToMany(mappedBy: "category", targetEntity: CategoryLanguages::class, cascade: ["persist", "remove"])]
+    #[MaxDepth(1)]
     #[Groups(['category:read'])]
     private Collection $translations;
 
@@ -82,14 +81,14 @@ class Category
     public function getId(): string { return $this->id; }
     public function setId(string $id): void { $this->id = $id; }
 
-    public function getParent(): ?Category { return $this->parent; }
-    public function setParent(?Category $parent): void { $this->parent = $parent; }
+    public function getParentId(): ?string { return $this->parentId; }
+    public function setParentId(?string $parentId): void { $this->parentId = $parentId; }
 
-    public function getMainParent(): ?Category { return $this->mainParent; }
-    public function setMainParent(?Category $mainParent): void { $this->mainParent = $mainParent; }
+    public function getMainParentId(): ?string { return $this->mainParentId; }
+    public function setMainParentId(?string $mainParentId): void { $this->mainParentId = $mainParentId; }
 
-    public function getActivityParent(): ?Category { return $this->activityParent; }
-    public function setActivityParent(?Category $activityParent): void { $this->activityParent = $activityParent; }
+    public function getActivityParentId(): ?string { return $this->activityParentId; }
+    public function setActivityParentId(?string $activityParentId): void { $this->activityParentId = $activityParentId; }
 
     public function getOrder(): int { return $this->order; }
     public function setOrder(int $order): void { $this->order = $order; }

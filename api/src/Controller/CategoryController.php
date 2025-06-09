@@ -79,17 +79,17 @@ class CategoryController extends BaseController
         return $this->json(null);
     }
 
-//    #[Route('/{id}/swap', name: 'category_order_swap', methods: ['PATCH'])]
-//    public function swapOrder(string $id, Request $request): JsonResponse
-//    {
-//        try {
-//            $currentLanguage = $this->repository->get($id);
-//            $swapLanguage = $this->repository->get($this->getData($request)['swapId'] ?? null);
-//            $this->service->swapOrder($currentLanguage, $swapLanguage);
-//        } catch (\Exception $e) {
-//            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
-//        }
-//
-//        return $this->json(null);
-//    }
+    #[Route('/{id}/swap', name: 'category_order_swap', methods: ['PATCH'])]
+    public function swapCategory(string $id, Request $request): JsonResponse
+    {
+        try {
+            $currentCategory = $this->repository->get($id);
+            $swapCategory = $this->repository->get($this->getData($request)['swapId'] ?? null);
+            $this->service->swapCategory($currentCategory, $swapCategory);
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $this->json(null);
+    }
 }
