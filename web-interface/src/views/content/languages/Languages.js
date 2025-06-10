@@ -174,7 +174,7 @@ const Languages = () => {
               <CTableHeaderCell>Flag</CTableHeaderCell>
               <CTableHeaderCell>Language</CTableHeaderCell>
               <CTableHeaderCell>Code</CTableHeaderCell>
-              <CTableHeaderCell>Status</CTableHeaderCell>
+              <CTableHeaderCell>Active</CTableHeaderCell>
               <CTableHeaderCell>Main</CTableHeaderCell>
               <CTableHeaderCell>Actions</CTableHeaderCell>
             </CTableRow>

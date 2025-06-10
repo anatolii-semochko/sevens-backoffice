@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react'
 import { fetchPages, createPage, patchPage, deletePage, fetchError } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
+import { CompletedChart } from "src/components//Table/Row/CompletedChart";
 
 const Pages = () => {
   const [items, setItems] = useState([])
@@ -18,6 +19,7 @@ const Pages = () => {
   const [textModalVisible, setTextModalVisible] = useState(false)
   const [textEditingItem, setTextEditingItem] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const languages = useSelector(state => state.languages)
   const selectedLanguage = useSelector(state => state.selectedLanguage)
   const langId = selectedLanguage?.id
 
@@ -119,6 +121,23 @@ const Pages = () => {
     }
   }
 
+  const getCompletedValue = (seoArray) => {
+    const totalFields = 4 * languages.length
+    if (totalFields === 0) return 0
+
+    let filledFields = 0
+    for (const lang of languages) {
+      const entry = seoArray.find(seo => seo.language?.id === lang.id)
+      if (!entry) continue
+      if (entry.breadcrumbs?.trim()) filledFields++
+      if (entry.title?.trim()) filledFields++
+      if (entry.keywords?.trim()) filledFields++
+      if (entry.description?.trim()) filledFields++
+    }
+
+    return Math.round((filledFields / totalFields) * 100)
+  }
+
   return (
     <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
@@ -136,6 +155,7 @@ const Pages = () => {
               <CTableHeaderCell>Title</CTableHeaderCell>
               <CTableHeaderCell>Keywords</CTableHeaderCell>
               <CTableHeaderCell>Description</CTableHeaderCell>
+              <CTableHeaderCell>Completed</CTableHeaderCell>
               <CTableHeaderCell>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -149,6 +169,7 @@ const Pages = () => {
                   <CTableDataCell>{seo?.title || <i className="text-muted">no title</i>}</CTableDataCell>
                   <CTableDataCell>{seo?.keywords || <i className="text-muted">no keywords</i>}</CTableDataCell>
                   <CTableDataCell>{seo?.description || <i className="text-muted">no description</i>}</CTableDataCell>
+                  <CTableDataCell><CompletedChart value={getCompletedValue(item.seo)} /></CTableDataCell>
                   <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
                     <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)}>
                       <CIcon icon={cilPencil} />
