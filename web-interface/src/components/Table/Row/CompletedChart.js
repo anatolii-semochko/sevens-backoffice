@@ -19,7 +19,7 @@ const CompletedChart = ({ value }) => {
         }}
         height={50}
         width={50}
-        style={{ width: '35px', height: '35px', marginTop: '-5px' }}
+        style={{ width: '35px', height: '35px', marginTop: '-6px' }}
       />
   )
 }

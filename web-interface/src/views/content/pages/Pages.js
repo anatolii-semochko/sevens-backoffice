@@ -1,15 +1,16 @@
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput, CFormLabel,
-  CCard, CCardHeader, CCardBody, CFormTextarea, CAlert
+  CCardBody, CFormTextarea, CAlert,
 } from '@coreui/react'
-import { cilPencil, cilTrash, cilPlus, cilPen } from '@coreui/icons'
+import { cilPencil, cilTrash, cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import React, { useEffect, useState } from 'react'
 import { fetchPages, createPage, patchPage, deletePage, fetchError } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
-import { CompletedChart } from "src/components//Table/Row/CompletedChart";
+import { CompletedChart } from "src/components//Table/Row/CompletedChart"
+import { PaginatorInfo, PaginatorControls } from "../../../components/Table/Paginator"
 
 const Pages = () => {
   const [items, setItems] = useState([])
@@ -23,10 +24,15 @@ const Pages = () => {
   const selectedLanguage = useSelector(state => state.selectedLanguage)
   const langId = selectedLanguage?.id
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalItems, setTotalItems] = useState(0)
+
   const fetchData = async () => {
     try {
-      const data = await fetchPages()
-      setItems(data)
+      const response = await fetchPages({ page: currentPage, limit: pageSize })
+      setItems(response.items)
+      setTotalItems(response.total)
     } catch (error) {
       window.toast.error(fetchError(error))
     }
@@ -34,7 +40,7 @@ const Pages = () => {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [currentPage, pageSize])
 
   const findSeoByLang = (seoArray, langId) => {
     return seoArray.find(seo => seo.language?.id === langId)
@@ -142,8 +148,17 @@ const Pages = () => {
     <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
         <h4 className="mb-0">Pages</h4>
+        <PaginatorInfo
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setCurrentPage(1);
+          }}
+        />
         <CButton color="success" size="sm" onClick={handleAdd}>
-          <CIcon icon={cilPlus} className="me-1" /> Add page
+          <CIcon icon={cilPlus} className="me-1 pt-1" /> Add page
         </CButton>
       </div>
       <CCardBody>
@@ -155,7 +170,7 @@ const Pages = () => {
               <CTableHeaderCell>Title</CTableHeaderCell>
               <CTableHeaderCell>Keywords</CTableHeaderCell>
               <CTableHeaderCell>Description</CTableHeaderCell>
-              <CTableHeaderCell>Completed</CTableHeaderCell>
+              <CTableHeaderCell style={{ width: 60 }}></CTableHeaderCell>
               <CTableHeaderCell>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -175,7 +190,7 @@ const Pages = () => {
                       <CIcon icon={cilPencil} />
                     </CButton>
                     <CButton size="sm" color="info" className="me-2" onClick={() => handleEditText(item)}>
-                      <CIcon icon={cilPen} />
+                      SEO
                     </CButton>
                     <CButton size="sm" color="danger" onClick={() => handleRemove(item.id)}>
                       <CIcon icon={cilTrash} />
@@ -186,6 +201,16 @@ const Pages = () => {
             })}
           </CTableBody>
         </CTable>
+        <PaginatorControls
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={(page) => setCurrentPage(page)}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize)
+            setCurrentPage(1)
+          }}
+        />
       </CCardBody>
 
       {/* Modal: URL Add/Edit */}

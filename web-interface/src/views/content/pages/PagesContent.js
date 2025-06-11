@@ -10,6 +10,7 @@ import { fetchContent, patchContent, deleteContent, createContent, fetchError } 
 import { fetchPages } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
+import { CompletedChart } from "src/components//Table/Row/CompletedChart"
 
 const PagesContent = () => {
   const [items, setItems] = useState([])
@@ -18,6 +19,7 @@ const PagesContent = () => {
   const [editingItem, setEditingItem] = useState(null)
   const [editLang, setEditLang] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const languages = useSelector(state => state.languages)
   const selectedLanguage = useSelector((state) => state.selectedLanguage)
   const langId = selectedLanguage?.id
 
@@ -33,7 +35,7 @@ const PagesContent = () => {
   const fetchPagesData = async () => {
     try {
       const data = await fetchPages()
-      setPages(data)
+      setPages(data.items)
     } catch (e) {
       window.toast.error(fetchError(e))
     }
@@ -112,13 +114,28 @@ const PagesContent = () => {
       window.toast.error(fetchError(e))
     }
   }
+  const getCompletedValue = (translationsArray) => {
+    if (!languages?.length) return 0
+
+    const totalFields = languages.length
+    let filledFields = 0
+
+    for (const lang of languages) {
+      const entry = translationsArray.find(translation => translation.language?.id === lang.id)
+      if (entry?.translation?.trim()) {
+        filledFields++
+      }
+    }
+
+    return Math.round((filledFields / totalFields) * 100)
+  }
 
   return (
     <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
         <h4 className="mb-0">Pages Content</h4>
         <CButton color="success" size="sm" onClick={handleCreate}>
-          <CIcon icon={cilPlus} className="me-1" /> Add Term
+          <CIcon icon={cilPlus} className="me-1 pt-1" /> Add Term
         </CButton>
       </div>
       <CCardBody>
@@ -128,6 +145,7 @@ const PagesContent = () => {
               <CTableHeaderCell>Term</CTableHeaderCell>
               <CTableHeaderCell>Page URL</CTableHeaderCell>
               <CTableHeaderCell>Translation</CTableHeaderCell>
+              <CTableHeaderCell style={{ width: 60 }}></CTableHeaderCell>
               <CTableHeaderCell>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -143,6 +161,7 @@ const PagesContent = () => {
                     <i className="text-muted">no translation</i>
                   )}
                 </CTableDataCell>
+                <CTableDataCell><CompletedChart value={getCompletedValue(item.translations)} /></CTableDataCell>
                 <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
                   <CButton size="sm" color="info" className="me-2" onClick={() => handleEdit(item)}>
                     <CIcon icon={cilPen} />

@@ -23,14 +23,20 @@ class PageController extends BaseController
     #[Route('', name: 'pages_fetch', methods: ['GET'])]
     public function fetch(Request $request): JsonResponse
     {
-        try {           
-            $criteria = $request->query->all();
-            $pages = $this->repository->findBy($criteria);
+        try {
+            $criteria = array_diff_key($request->query->all(), array_flip(['page', 'limit', 'offset']));
+            $page = $request->query->getInt('page', 1);
+            $limit = $request->query->getInt('limit', 10);
+            $offset = ($page - 1) * $limit;
+            $result = [
+                'items' => $this->repository->findBy($criteria, null, $limit, $offset),
+                'total' => $this->repository->count($criteria),
+            ];
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
 
-        return $this->json($pages, context: self::PAGE_GROUPS);
+        return $this->json($result, context: self::PAGE_GROUPS);
     }
 
     #[Route('/{id}', name: 'pages_get', methods: ['GET'])]

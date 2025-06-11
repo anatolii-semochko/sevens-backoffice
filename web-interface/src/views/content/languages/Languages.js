@@ -11,7 +11,7 @@ import {
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
-  CCard, CCardHeader, CCardBody, CAlert
+  CCardBody, CAlert,
 } from '@coreui/react'
 import { cilXCircle, cilCheckCircle, cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
@@ -164,7 +164,7 @@ const Languages = () => {
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
         <h4 className="mb-0">Languages</h4>
         <CButton color="success" size="sm" onClick={handleAdd}>
-          <CIcon icon={cilPlus} className="me-1" /> Add Language
+          <CIcon icon={cilPlus} className="me-1 pt-1" /> Add Language
         </CButton>
       </div>
       <CCardBody>
@@ -188,6 +188,9 @@ const Languages = () => {
                 <CTableDataCell>{item.active}</CTableDataCell>
                 <CTableDataCell>{item.main}</CTableDataCell>
                 <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
+                  <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)} title="Edit">
+                    <CIcon icon={cilPencil} />
+                  </CButton>
                   <CButton
                     size="sm"
                     color={index <= 0 ? 'secondary' : 'info'}
@@ -198,10 +201,7 @@ const Languages = () => {
                   >
                     <CIcon icon={cilArrowTop} />
                   </CButton>
-                  <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)}>
-                    <CIcon icon={cilPencil} />
-                  </CButton>
-                  <CButton size="sm" color="danger" onClick={() => handleRemove(item.id)}>
+                  <CButton size="sm" color="danger" onClick={() => handleRemove(item.id)} title="Remove">
                     <CIcon icon={cilTrash} />
                   </CButton>
                 </CTableDataCell>

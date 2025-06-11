@@ -2,8 +2,8 @@ import api, { fetchErrorMessage } from './index'
 
 const mainUrl = '/pages'
 
-export const fetchPages = () => api
-  .get(mainUrl)
+export const fetchPages = (params) => api
+  .get(mainUrl, {params})
   .then(res => res.data)
 
 export const fetchPageById = (id) => api
