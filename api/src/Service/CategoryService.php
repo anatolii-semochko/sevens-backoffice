@@ -6,7 +6,10 @@ use App\Entity\Category\Category;
 use App\Entity\Category\CategoryLanguages;
 use App\Entity\Language;
 use App\Repository\CategoryRepository;
+use App\Service\File\FileService;
+use App\Service\File\LogoService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Uid\Uuid;
 
 class CategoryService
@@ -14,6 +17,7 @@ class CategoryService
     public function __construct(
         private EntityManagerInterface $em,
         private CategoryRepository $repository,
+        private LogoService $logoService,
     ) {}
     
     public function fetchByFilter(array $criteria): array
@@ -25,6 +29,9 @@ class CategoryService
         return $this->repository->findBy($criteria, ['order' => 'ASC']);
     }
 
+    /**
+     * @throws Exception
+     */
     public function create(array $data): Category
     {
         // TODO Пофіксати перевірку, чи можна створити
@@ -48,6 +55,17 @@ class CategoryService
         $this->em->flush();
 
         $this->indexCategories();
+
+        $category->setLogo(
+            $this->logoService->saveLogo(
+                FileService::CATEGORY_LOGO,
+                $category->getId(),
+                $category->getLogo(),
+                $data['logo'],
+            ),
+        );
+        $this->em->persist($category);
+        $this->em->flush();
         
         return $category;
     }
@@ -61,6 +79,7 @@ class CategoryService
             $this->em->flush();
         }
     }
+    
 
     public function put(object $category, array $data): void
     {
@@ -116,6 +135,17 @@ class CategoryService
         $this->em->flush();
         
         $this->indexCategories();
+        
+        $category->setLogo(
+            $this->logoService->saveLogo(
+                FileService::CATEGORY_LOGO,
+                $category->getId(),
+                $category->getLogo(),
+                $data['logo'],
+            ),
+        );
+        $this->em->persist($category);
+        $this->em->flush();
     }
 
     public function swapCategory(Object $currentCategory, Object $swapCategory): void

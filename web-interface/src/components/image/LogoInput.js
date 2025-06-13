@@ -3,7 +3,13 @@ import { CFormLabel, CFormInput, CButton, CAlert } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilX } from '@coreui/icons'
 
-const LogoInput = ({ path = '', value, onChange, maxSize = 1024 }) => {
+const LogoInput = ({
+  path = '',
+  prefix = '',
+  value,
+  onChange,
+  maxSize = 1024
+}) => {
   const [initialValue, setInitialValue] = useState(null)
   const [preview, setPreview] = useState(null)
   const [error, setError] = useState(null)
@@ -18,7 +24,7 @@ const LogoInput = ({ path = '', value, onChange, maxSize = 1024 }) => {
       if (value.startsWith('data:')) {
         setPreview(value)
       } else {
-        setPreview(path + value)
+        setPreview(path + prefix + value)
       }
     } else if (typeof value === 'object' && value !== null) {
       setPreview(value)
@@ -27,7 +33,7 @@ const LogoInput = ({ path = '', value, onChange, maxSize = 1024 }) => {
     }
 
     setError(null) // clear error on value change
-  }, [value, path, initialValue])
+  }, [value, path, prefix, initialValue])
 
   const fileToBase64 = (file) =>
     new Promise((resolve, reject) => {

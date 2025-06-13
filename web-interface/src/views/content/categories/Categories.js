@@ -192,7 +192,7 @@ const Categories = () => {
           <span key={b.id}>
             {' / '}
             {i === breadcrumb.length - 1 ? (
-              <strong>{b.name}</strong>
+              <span>{b.name}</span>
             ) : (
               <a className="text-link-active" onClick={() => fetchData(b.id, breadcrumb.slice(0, i + 1))}>{b.name}</a>
             )}
@@ -289,6 +289,7 @@ const Categories = () => {
           />
           <LogoInput
             path={logoPath}
+            prefix={'large-'}
             value={editingItem?.logo || null}
             onChange={(file) => setEditingItem({ ...editingItem, logo: file })}
           />
