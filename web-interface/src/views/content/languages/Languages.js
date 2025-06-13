@@ -13,9 +13,10 @@ import {
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
   CCardBody, CAlert,
 } from '@coreui/react'
-import { cilXCircle, cilCheckCircle, cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
+import { cilCheckCircle, cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { flagSet } from '@coreui/icons'
+import { BooleanTrigger } from "src/components/table/row/BooleanTrigger";
 
 const Languages = () => {
   const dispatch = useDispatch()
@@ -25,7 +26,7 @@ const Languages = () => {
   const [editingItem, setEditingItem] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
 
-  const fetchAndSetLanguages = async () => {
+  const fetchData = async () => {
     let data = []
     try {
       data = await fetchLanguages()
@@ -44,17 +45,6 @@ const Languages = () => {
         flag: flagSet[iconKey]
           ? <CIcon icon={flagSet[iconKey]} size="xl" title={item.code} />
           : item.code,
-
-        active: (
-          <CIcon
-            icon={item.active ? cilCheckCircle : cilXCircle}
-            className={item.active ? 'text-success' : 'text-danger'}
-            title="Toggle status"
-            onClick={() => toggleActive(item)}
-            style={{ cursor: 'pointer' }}
-          />
-        ),
-
         main: item.main
           ? <CIcon icon={cilCheckCircle} className="text-success" title="Main" />
           : <CIcon
@@ -71,7 +61,7 @@ const Languages = () => {
   }
 
   useEffect(() => {
-    fetchAndSetLanguages()
+    fetchData()
   }, [])
 
   const handleEdit = (item) => {
@@ -84,7 +74,7 @@ const Languages = () => {
     try {
       if (!window.confirm('Are you sure you want to delete this language?')) return
       await deleteLanguage(id)
-      fetchAndSetLanguages()
+      fetchData()
     } catch (error) {
       window.toast.error(fetchError(error))
     }
@@ -113,7 +103,7 @@ const Languages = () => {
       } else {
         await createLanguage(editingItem)
       }
-      await fetchAndSetLanguages()
+      await fetchData()
       setVisible(false)
       setEditingItem(null)
     } catch (error) {
@@ -126,7 +116,7 @@ const Languages = () => {
       await patchLanguage(item.id, {
         active: item.active ? 0 : 1,
       })
-      fetchAndSetLanguages()
+      fetchData()
     } catch (error) {
       window.toast.error(fetchError(error))
     }
@@ -141,7 +131,7 @@ const Languages = () => {
           })
         )
       )
-      fetchAndSetLanguages()
+      fetchData()
     } catch (error) {
       window.toast.error(fetchError(error))
     }
@@ -153,7 +143,7 @@ const Languages = () => {
       const current = rawItems[index]
       const above = rawItems[index - 1]
       await swapLanguageOrder(current.id, above.id)
-      fetchAndSetLanguages()
+      fetchData()
     } catch (error) {
       window.toast.error(fetchError(error))
     }
@@ -174,8 +164,8 @@ const Languages = () => {
               <CTableHeaderCell>Flag</CTableHeaderCell>
               <CTableHeaderCell>Language</CTableHeaderCell>
               <CTableHeaderCell>Code</CTableHeaderCell>
-              <CTableHeaderCell>Active</CTableHeaderCell>
-              <CTableHeaderCell>Main</CTableHeaderCell>
+              <CTableHeaderCell><div className="row-cell-center-50">Active</div></CTableHeaderCell>
+              <CTableHeaderCell><div className="row-cell-center-50">Main</div></CTableHeaderCell>
               <CTableHeaderCell>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -185,8 +175,17 @@ const Languages = () => {
                 <CTableDataCell>{item.flag}</CTableDataCell>
                 <CTableDataCell>{item.name}</CTableDataCell>
                 <CTableDataCell>{item.code}</CTableDataCell>
-                <CTableDataCell>{item.active}</CTableDataCell>
-                <CTableDataCell>{item.main}</CTableDataCell>
+                <CTableDataCell>
+                  <BooleanTrigger
+                    item={item}
+                    isActive={(i) => i.active}
+                    onToggle={async (i) => {
+                      await patchLanguage(i.id, { active: i.active ? 0 : 1 })
+                      fetchData()
+                    }}
+                  />
+                </CTableDataCell>
+                <CTableDataCell><div className="row-cell-center-50">{item.main}</div></CTableDataCell>
                 <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
                   <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)} title="Edit">
                     <CIcon icon={cilPencil} />

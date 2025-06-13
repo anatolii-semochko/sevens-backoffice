@@ -52,7 +52,7 @@ class Category
     #[Groups(['category:read'])]
     private ?string $url = null;
 
-    #[ORM\Column(type: "string", length: 32, nullable: true)]
+    #[ORM\Column(type: "string", length: 64, nullable: true)]
     #[Groups(['category:read'])]
     private ?string $logo = null;
 

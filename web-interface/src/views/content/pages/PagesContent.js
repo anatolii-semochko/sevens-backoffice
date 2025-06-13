@@ -10,7 +10,7 @@ import { fetchContent, patchContent, deleteContent, createContent, fetchError } 
 import { fetchPages } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
-import { CompletedChart } from "src/components//Table/Row/CompletedChart"
+import { CompletedChart } from "src/components//table/row/CompletedChart"
 
 const PagesContent = () => {
   const [items, setItems] = useState([])

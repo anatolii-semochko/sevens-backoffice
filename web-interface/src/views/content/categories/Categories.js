@@ -5,14 +5,18 @@ import {
   CFormInput, CFormLabel, CAlert, CCardBody, CFormTextarea
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash, cilPlus, cilPen, cilArrowTop, cilCheckCircle, cilXCircle } from '@coreui/icons'
+import { cilPencil, cilTrash, cilPlus, cilArrowTop, cilCheckCircle, cilXCircle } from '@coreui/icons'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
+import { LogoInput } from 'src/components/image/LogoInput'
+import { LogoCell } from 'src/components/table/row/LogoCell'
+import { BooleanTrigger } from "src/components/table/row/BooleanTrigger";
 import {
   fetchCategories, createCategory, putCategory, patchCategory, deleteCategory, swapCategoryOrder, fetchError
 } from 'src/api/categories'
 
 const Categories = () => {
+  const logoPath = '/src/assets/images/categories/logo/' // TODO - move to environment constants
   const [items, setItems] = useState([])
   const [visible, setVisible] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
@@ -179,23 +183,12 @@ const Categories = () => {
     </div>
   )
 
-  const toggleActive = async (item) => {
-    try {
-      await patchCategory(item.id, {
-        active: item.active ? 0 : 1,
-      })
-      fetchData(currentParent, breadcrumb)
-    } catch (error) {
-      window.toast.error(fetchError(error))
-    }
-  }
-
   return (
     <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
         <h4 className="mb-0">Categories</h4>
         <CButton color="success" size="sm" onClick={handleAdd}>
-          <CIcon icon={cilPlus} className="me-1" /> Add category
+          <CIcon icon={cilPlus} className="me-1 pt-1" /> Add category
         </CButton>
       </div>
       <CCardBody>
@@ -203,13 +196,13 @@ const Categories = () => {
         <CTable className="no-border-last" hover responsive>
           <CTableHead>
             <CTableRow>
-              <CTableHeaderCell>Logo</CTableHeaderCell>
+              <CTableHeaderCell><div className="row-cell-center-50">Logo</div></CTableHeaderCell>
               <CTableHeaderCell>Category</CTableHeaderCell>
               <CTableHeaderCell>Name</CTableHeaderCell>
               <CTableHeaderCell>Title</CTableHeaderCell>
               <CTableHeaderCell>URL</CTableHeaderCell>
               <CTableHeaderCell>Short Description</CTableHeaderCell>
-              <CTableHeaderCell>Status</CTableHeaderCell>
+              <CTableHeaderCell><div className="row-cell-center-50">Active</div></CTableHeaderCell>
               <CTableHeaderCell>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -218,7 +211,7 @@ const Categories = () => {
               const translation = findTranslation(item.translations || [], langId)
               return (
                 <CTableRow key={item.id}>
-                  <CTableDataCell><i className="text-muted">Logo</i></CTableDataCell>
+                  <CTableDataCell><LogoCell path={logoPath} value={item.logo} /></CTableDataCell>
                   <CTableDataCell>
                     <a href="#" className="text-link-active" onClick={(e) => { e.preventDefault(); handleNameClick(item) }}>
                       {item.name}
@@ -229,25 +222,24 @@ const Categories = () => {
                   <CTableDataCell>{item.url || empty('url')}</CTableDataCell>
                   <CTableDataCell>{translation?.shortDescription || empty('description')}</CTableDataCell>
                   <CTableDataCell>
-                    <CIcon
-                      icon={item.active ? cilCheckCircle : cilXCircle}
-                      className={item.active ? 'text-success' : 'text-danger'}
-                      title="Toggle status"
-                      onClick={() => toggleActive(item)}
-                      style={{ cursor: 'pointer' }}
+                    <BooleanTrigger
+                      item={item}
+                      isActive={(i) => i.active}
+                      onToggle={async (i) => {
+                        await patchCategory(i.id, { active: i.active ? 0 : 1 })
+                        fetchData()
+                      }}
                     />
                   </CTableDataCell>
                   <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
-                    <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)}>
+                    <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)} title="Edit">
                       <CIcon icon={cilPencil} />
                     </CButton>
-                    <CButton color="info" size="sm" className="me-2" onClick={() => handleEditText(item)}>
-                      <CIcon icon={cilPen} />
-                    </CButton>
+                    <CButton color="info" size="sm" className="me-2" onClick={() => handleEditText(item)} title="Translations">T</CButton>
                     <CButton color="secondary" size="sm" className="me-2" onClick={() => handleOrderUp(index)} title="Move Up">
                       <CIcon icon={cilArrowTop} />
                     </CButton>
-                    <CButton color="danger" size="sm" onClick={() => handleRemove(item.id)}>
+                    <CButton color="danger" size="sm" onClick={() => handleRemove(item.id)} title="Remove">
                       <CIcon icon={cilTrash} />
                     </CButton>
                   </CTableDataCell>
@@ -273,6 +265,11 @@ const Categories = () => {
             className="mb-2"
             value={editingItem?.url || ''}
             onChange={(e) => setEditingItem({ ...editingItem, url: e.target.value })}
+          />
+          <LogoInput
+            path={logoPath}
+            value={editingItem?.logo || null}
+            onChange={(file) => setEditingItem({ ...editingItem, logo: file })}
           />
           {errorMessage && <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>}
         </CModalBody>

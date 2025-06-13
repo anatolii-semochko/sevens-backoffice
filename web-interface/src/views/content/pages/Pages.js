@@ -9,8 +9,8 @@ import React, { useEffect, useState } from 'react'
 import { fetchPages, createPage, patchPage, deletePage, fetchError } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
-import { CompletedChart } from "src/components//Table/Row/CompletedChart"
-import { PaginatorInfo, PaginatorControls } from "../../../components/Table/Paginator"
+import { CompletedChart } from "src/components//table/row/CompletedChart"
+import { PaginatorInfo, PaginatorControls } from "../../../components/table/Paginator"
 
 const Pages = () => {
   const [items, setItems] = useState([])

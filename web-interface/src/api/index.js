@@ -9,7 +9,21 @@ const api = axios.create({
   },
 });
 
-export default api;
+export const objectToFormData = (obj, form = new FormData(), namespace = '') => {
+  for (let key in obj) {
+    if (obj[key] === undefined || obj[key] === null) continue;
+    const formKey = namespace ? `${namespace}[${key}]` : key;
+
+    if (obj[key] instanceof File) {
+      form.append(formKey, obj[key]);
+    } else if (typeof obj[key] === 'object' && !(obj[key] instanceof Date)) {
+      objectToFormData(obj[key], form, formKey);
+    } else {
+      form.append(formKey, obj[key]);
+    }
+  }
+  return form;
+};
 
 export const fetchErrorMessage = (error) => error?.response?.data?.detail ||
   error?.response?.data?.message ||
@@ -21,3 +35,5 @@ export const handleApiError = (error) => {
   window.toast.error(message)
   return message;
 };
+
+export default api;

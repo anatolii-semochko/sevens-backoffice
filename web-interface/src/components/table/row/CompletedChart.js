@@ -16,6 +16,7 @@ const CompletedChart = ({ value }) => {
         options={{
           responsive: false,
           maintainAspectRatio: false,
+          animation: false,
         }}
         height={50}
         width={50}
