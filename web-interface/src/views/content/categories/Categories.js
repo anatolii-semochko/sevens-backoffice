@@ -5,12 +5,13 @@ import {
   CFormInput, CFormLabel, CAlert, CCardBody, CFormTextarea
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash, cilPlus, cilArrowTop, cilCheckCircle, cilXCircle } from '@coreui/icons'
+import { cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { LogoInput } from 'src/components/image/LogoInput'
 import { LogoCell } from 'src/components/table/row/LogoCell'
-import { BooleanTrigger } from "src/components/table/row/BooleanTrigger";
+import { BooleanTrigger } from 'src/components/table/row/BooleanTrigger'
+import { CompletedChart } from 'src/components//table/row/CompletedChart'
 import {
   fetchCategories, createCategory, putCategory, patchCategory, deleteCategory, swapCategoryOrder, fetchError
 } from 'src/api/categories'
@@ -26,7 +27,7 @@ const Categories = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [currentParent, setCurrentParent] = useState(null)
   const [breadcrumb, setBreadcrumb] = useState([])
-
+  const languages = useSelector(state => state.languages)
   const selectedLanguage = useSelector(state => state.selectedLanguage)
   const langId = selectedLanguage?.id
 
@@ -157,6 +158,24 @@ const Categories = () => {
     }
   }
 
+  const getCompletedValue = (translations) => {
+    const totalFields = 5 * languages.length
+    if (totalFields === 0) return 0
+
+    let filledFields = 0
+    for (const lang of languages) {
+      const entry = translations.find(seo => seo.language?.id === lang.id)
+      if (!entry) continue
+      if (entry.name?.trim()) filledFields++
+      if (entry.title?.trim()) filledFields++
+      if (entry.logoAlt?.trim()) filledFields++
+      if (entry.shortDescription?.trim()) filledFields++
+      if (entry.description?.trim()) filledFields++
+    }
+
+    return Math.round((filledFields / totalFields) * 100)
+  }
+
   const empty = (label) => (<i className="text-muted">no {label}</i>)
 
   const Breadcrumbs = () => (
@@ -203,6 +222,7 @@ const Categories = () => {
               <CTableHeaderCell>URL</CTableHeaderCell>
               <CTableHeaderCell>Short Description</CTableHeaderCell>
               <CTableHeaderCell><div className="row-cell-center-50">Active</div></CTableHeaderCell>
+              <CTableHeaderCell style={{ width: 60 }}></CTableHeaderCell>
               <CTableHeaderCell>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -227,10 +247,11 @@ const Categories = () => {
                       isActive={(i) => i.active}
                       onToggle={async (i) => {
                         await patchCategory(i.id, { active: i.active ? 0 : 1 })
-                        fetchData()
+                        fetchData(currentParent, breadcrumb)
                       }}
                     />
                   </CTableDataCell>
+                  <CTableDataCell><CompletedChart value={getCompletedValue(item.translations)} /></CTableDataCell>
                   <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
                     <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)} title="Edit">
                       <CIcon icon={cilPencil} />
