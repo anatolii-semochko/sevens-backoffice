@@ -2,8 +2,8 @@ import api, { fetchErrorMessage } from './index'
 
 const mainUrl = '/pages-content'
 
-export const fetchContent = () => api
-  .get(mainUrl)
+export const fetchContent = (params) => api
+  .get(mainUrl, {params})
   .then(res => res.data)
 
 export const fetchContentById = (id) => api

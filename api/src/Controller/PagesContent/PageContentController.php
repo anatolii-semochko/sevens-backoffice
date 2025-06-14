@@ -28,13 +28,19 @@ class PageContentController extends BaseController
     public function fetch(Request $request): Response
     {
         try {
-            $criteria = $request->query->all() ?? [];
-            $terms = $this->repository->findBy($criteria);
+            $criteria = array_diff_key($request->query->all(), array_flip(['page', 'limit', 'offset']));
+            $page = $request->query->getInt('page', 1);
+            $limit = $request->query->getInt('limit', 10);
+            $offset = ($page - 1) * $limit;
+            $result = [
+                'items' => $this->repository->findBy($criteria, null, $limit, $offset),
+                'total' => $this->repository->count($criteria),
+            ];
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
 
-        return $this->json($terms, context: self::CONTENT_GROUPS);
+        return $this->json($result, context: self::CONTENT_GROUPS);
     }
 
     #[Route('/{id}', methods: ['GET'])]

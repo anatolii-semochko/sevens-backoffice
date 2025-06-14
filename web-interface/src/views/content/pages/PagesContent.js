@@ -10,7 +10,8 @@ import { fetchContent, patchContent, deleteContent, createContent, fetchError } 
 import { fetchPages } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
-import { CompletedChart } from 'src/components//table/row/CompletedChart'
+import { CompletedChart } from 'src/components/table/CustomTableElements'
+import { PaginatorControls, PaginatorInfo } from '../../../components/table/Paginator'
 
 const PagesContent = () => {
   const [items, setItems] = useState([])
@@ -19,14 +20,20 @@ const PagesContent = () => {
   const [editingItem, setEditingItem] = useState(null)
   const [editLang, setEditLang] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalItems, setTotalItems] = useState(0)
+
   const languages = useSelector(state => state.languages)
   const selectedLanguage = useSelector((state) => state.selectedLanguage)
   const langId = selectedLanguage?.id
 
   const fetchData = async () => {
     try {
-      const data = await fetchContent()
-      setItems(data)
+      const response = await fetchContent({ page: currentPage, limit: pageSize })
+      setItems(response.items)
+      setTotalItems(response.total)
     } catch (e) {
       window.toast.error(fetchError(e))
     }
@@ -44,10 +51,9 @@ const PagesContent = () => {
   useEffect(() => {
     fetchData()
     fetchPagesData()
-  }, [])
+  }, [currentPage, pageSize])
 
-  const findTranslation = (translations, langId) =>
-    translations?.find(t => t.language?.id === langId)?.translation || ''
+  const findTranslation = (translations, langId) => translations?.find(t => t.language?.id === langId)?.translation || ''
 
   const updateTranslation = (translations, langId, value) => {
     const otherTranslations = translations.filter(t => t.language?.id !== langId)
@@ -134,6 +140,15 @@ const PagesContent = () => {
     <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
         <h4 className="mb-0">Pages Content</h4>
+        <PaginatorInfo
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setCurrentPage(1);
+          }}
+        />
         <CButton color="success" size="sm" onClick={handleCreate}>
           <CIcon icon={cilPlus} className="me-1 pt-1" /> Add Term
         </CButton>
@@ -174,6 +189,16 @@ const PagesContent = () => {
             ))}
           </CTableBody>
         </CTable>
+        <PaginatorControls
+          currentPage={currentPage}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={(page) => setCurrentPage(page)}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize)
+            setCurrentPage(1)
+          }}
+        />
       </CCardBody>
 
       <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg">
