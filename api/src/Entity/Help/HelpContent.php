@@ -6,6 +6,7 @@ use App\Entity\Language;
 use App\Repository\Help\HelpContentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: HelpContentRepository::class)]
 #[ORM\Table(name: 'help_content')]
@@ -45,6 +46,11 @@ class HelpContent
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['help-content:read'])]
     private ?string $description = null;
+
+    public function __construct()
+    {
+        $this->id = Uuid::v4()->toRfc4122();
+    }
 
     public function getId(): string { return $this->id; }
     public function setId(string $id): void { $this->id = $id; }

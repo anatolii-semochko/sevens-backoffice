@@ -184,42 +184,39 @@ const PagesContent = () => {
           </div>
         </CModalHeader>
         <CModalBody>
-          <div className="mb-3">
-            <label className="form-label">Term</label>
-            <CFormInput
-              value={editingItem?.term || ''}
-              onChange={(e) => setEditingItem({ ...editingItem, term: e.target.value })}
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Page URL</label>
-            <CFormSelect
-              value={editingItem?.page?.id || ''}
-              onChange={(e) => {
-                const selectedPage = pages.find(p => p.id === e.target.value)
-                setEditingItem({
-                  ...editingItem,
-                  page: selectedPage || { id: '', url: '' },
-                })
-              }}
-            >
-              <option value=""></option>
-              {pages.map(page => (
-                <option key={page.id} value={page.id}>{page.url}</option>
-              ))}
-            </CFormSelect>
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Translation ({editLang?.name || 'No Language'})</label>
-            <CFormTextarea
-              rows={5}
-              value={findTranslation(editingItem?.translations || [], editLang?.id)}
-              onChange={(e) => {
-                const updatedTranslations = updateTranslation(editingItem.translations || [], editLang.id, e.target.value)
-                setEditingItem({ ...editingItem, translations: updatedTranslations })
-              }}
-            />
-          </div>
+          <CFormInput
+            label="Term"
+            className="mb-3"
+            value={editingItem?.term || ''}
+            onChange={(e) => setEditingItem({ ...editingItem, term: e.target.value })}
+          />
+          <CFormSelect
+            label="Page"
+            className="mb-3"
+            value={editingItem?.page?.id || ''}
+            onChange={(e) => {
+              const selectedPage = pages.find(p => p.id === e.target.value)
+              setEditingItem({
+                ...editingItem,
+                page: selectedPage || { id: '', url: '' },
+              })
+            }}
+          >
+            <option value=""></option>
+            {pages.map(page => (
+              <option key={page.id} value={page.id}>{page.url}</option>
+            ))}
+          </CFormSelect>
+          <CFormTextarea
+            label={'Translation ' + (editLang?.name || 'No Language')}
+            className="mb-3"
+            rows={5}
+            value={findTranslation(editingItem?.translations || [], editLang?.id)}
+            onChange={(e) => {
+              const updatedTranslations = updateTranslation(editingItem.translations || [], editLang.id, e.target.value)
+              setEditingItem({ ...editingItem, translations: updatedTranslations })
+            }}
+          />
           {errorMessage && <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>}
         </CModalBody>
         <CModalFooter>

@@ -9,8 +9,8 @@ import React, { useEffect, useState } from 'react'
 import { fetchPages, createPage, patchPage, deletePage, fetchError } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
-import { CompletedChart } from "src/components//table/row/CompletedChart"
-import { PaginatorInfo, PaginatorControls } from "../../../components/table/Paginator"
+import { CompletedChart } from 'src/components/table/CustomTableElements'
+import { PaginatorInfo, PaginatorControls } from '../../../components/table/Paginator'
 
 const Pages = () => {
   const [items, setItems] = useState([])
@@ -220,8 +220,8 @@ const Pages = () => {
         </CModalHeader>
         <CModalBody>
           <CFormInput
-            className="mb-2"
             label="URL"
+            className="mb-3"
             value={editingItem?.url || ''}
             onChange={(e) => setEditingItem({ ...editingItem, url: e.target.value })}
           />
@@ -248,36 +248,32 @@ const Pages = () => {
             const seo = findSeoByLang(textEditingItem?.seo || [], editLang?.id) || {}
             return (
               <>
-                <div className="mb-3">
-                  <CFormLabel>Breadcrumbs</CFormLabel>
-                  <CFormInput
-                    value={seo?.breadcrumbs || ''}
-                    onChange={(e) => handleTextChange('breadcrumbs', e.target.value)}
-                  />
-                </div>
-                <div className="mb-3">
-                  <CFormLabel>Title</CFormLabel>
-                  <CFormInput
-                    value={seo?.title || ''}
-                    onChange={(e) => handleTextChange('title', e.target.value)}
-                  />
-                </div>
-                <div className="mb-3">
-                  <CFormLabel>Keywords</CFormLabel>
-                  <CFormTextarea
-                    value={seo?.keywords || ''}
-                    onChange={(e) => handleTextChange('keywords', e.target.value)}
-                    rows={2}
-                  />
-                </div>
-                <div className="mb-3">
-                  <CFormLabel>Description</CFormLabel>
-                  <CFormTextarea
-                    value={seo?.description || ''}
-                    onChange={(e) => handleTextChange('description', e.target.value)}
-                    rows={3}
-                  />
-                </div>
+                <CFormInput
+                  label="Breadcrumbs"
+                  className="mb-3"
+                  value={seo?.breadcrumbs || ''}
+                  onChange={(e) => handleTextChange('breadcrumbs', e.target.value)}
+                />
+                <CFormInput
+                  label="Title"
+                  className="mb-3"
+                  value={seo?.title || ''}
+                  onChange={(e) => handleTextChange('title', e.target.value)}
+                />
+                <CFormTextarea
+                  label="Keywords"
+                  className="mb-3"
+                  value={seo?.keywords || ''}
+                  onChange={(e) => handleTextChange('keywords', e.target.value)}
+                  rows={2}
+                />
+                <CFormTextarea
+                  label="Description"
+                  className="mb-3"
+                  value={seo?.description || ''}
+                  onChange={(e) => handleTextChange('description', e.target.value)}
+                  rows={3}
+                />
               </>
             )
           })()}

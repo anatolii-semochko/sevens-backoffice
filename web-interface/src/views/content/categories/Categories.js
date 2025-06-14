@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react'
 import {
   CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter,
-  CFormInput, CFormLabel, CAlert, CCardBody, CFormTextarea
+  CFormInput, CAlert, CCardBody, CFormTextarea
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { LogoInput } from 'src/components/image/LogoInput'
-import { BooleanTrigger } from 'src/components/table/row/BooleanTrigger'
+import { BooleanTrigger } from 'src/components/table/CustomTableElements'
 import { EmptyDataRow, LogoCell, CompletedChart } from 'src/components/table/CustomTableElements'
 import {
   fetchCategories, createCategory, putCategory, patchCategory, deleteCategory, swapCategoryOrder, fetchError
@@ -135,8 +135,6 @@ const Categories = () => {
   }
 
   const handleNameClick = (item) => {
-    // const translation = findTranslation(item.translations || [], langId)
-    // const name = translation?.name || item.name || 'no name'
     const newPath = [...breadcrumb, { id: item.id, name: item.name }]
     fetchData(item.id, newPath)
   }
@@ -257,8 +255,17 @@ const Categories = () => {
                     <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)} title="Edit">
                       <CIcon icon={cilPencil} />
                     </CButton>
-                    <CButton color="info" size="sm" className="me-2" onClick={() => handleEditText(item)} title="Translations">T</CButton>
-                    <CButton color="secondary" size="sm" className="me-2" onClick={() => handleOrderUp(index)} title="Move Up">
+                    <CButton color="info" size="sm" className="me-2" onClick={() => handleEditText(item)} title="Translations">
+                      Translations
+                    </CButton>
+                    <CButton
+                      className="me-2"
+                      size="sm"
+                      title="Move Up"
+                      disabled={index <= 0}
+                      color={index <= 0 ? 'secondary' : 'info'}
+                      onClick={() => handleOrderUp(index)}
+                    >
                       <CIcon icon={cilArrowTop} />
                     </CButton>
                     <CButton color="danger" size="sm" onClick={() => handleRemove(item.id)} title="Remove">
@@ -277,24 +284,26 @@ const Categories = () => {
       <CModal visible={visible} onClose={() => setVisible(false)}>
         <CModalHeader closeButton>{editingItem?.id ? 'Edit Category' : 'Add Category'}</CModalHeader>
         <CModalBody>
-          <CFormLabel>Name</CFormLabel>
           <CFormInput
-            className="mb-2"
+            className="mb-3"
+            label="Name"
             value={editingItem?.name || ''}
             onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
           />
-          <CFormLabel>URL</CFormLabel>
           <CFormInput
-            className="mb-2"
+            className="mb-3"
+            label="URL"
             value={editingItem?.url || ''}
             onChange={(e) => setEditingItem({ ...editingItem, url: e.target.value })}
           />
-          <LogoInput
-            path={logoPath}
-            prefix={'large-'}
-            value={editingItem?.logo || null}
-            onChange={(file) => setEditingItem({ ...editingItem, logo: file })}
-          />
+          <div className="mb-3">
+            <LogoInput
+              path={logoPath}
+              prefix={'large-'}
+              value={editingItem?.logo || null}
+              onChange={(file) => setEditingItem({ ...editingItem, logo: file })}
+            />
+          </div>
           {errorMessage && <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>}
         </CModalBody>
         <CModalFooter>
@@ -312,45 +321,38 @@ const Categories = () => {
           </div>
         </CModalHeader>
         <CModalBody>
-          <CFormLabel>Name</CFormLabel>
           <CFormInput
-            value={
-              textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.name || ''
-            }
+            label="Name"
+            className="mb-3"
+            value={textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.name || ''}
             onChange={(e) => handleTextChange('name', e.target.value)}
           />
-          <CFormLabel>Title</CFormLabel>
           <CFormInput
-            value={
-              textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.title || ''
-            }
+            label="Title"
+            className="mb-3"
+            value={textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.title || ''}
             onChange={(e) => handleTextChange('title', e.target.value)}
           />
-          <CFormLabel>Logo Alt</CFormLabel>
           <CFormInput
-            value={
-              textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.logoAlt || ''
-            }
+            label="Logo Alt"
+            className="mb-3"
+            value={textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.logoAlt || ''}
             onChange={(e) => handleTextChange('logoAlt', e.target.value)}
           />
-          <CFormLabel>Short Description</CFormLabel>
           <CFormInput
-            value={
-              textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.shortDescription || ''
-            }
+            label="Short Description"
+            className="mb-3"
+            value={textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.shortDescription || ''}
             onChange={(e) => handleTextChange('shortDescription', e.target.value)}
           />
-          <CFormLabel>Description</CFormLabel>
           <CFormTextarea
+            label="Description"
+            className="mb-3"
             rows={10}
-            value={
-              textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.description || ''
-            }
+            value={textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.description || ''}
             onChange={(e) => handleTextChange('description', e.target.value)}
           />
-          {errorMessage && (
-            <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>
-          )}
+          {errorMessage && (<CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>)}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setTextModalVisible(false)}>Cancel</CButton>

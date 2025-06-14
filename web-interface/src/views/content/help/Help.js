@@ -6,14 +6,10 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
-
+import { useSelector } from 'react-redux'
+import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { EmptyDataRow, CompletedChart } from 'src/components/table/CustomTableElements'
-import {
-  fetchHelps, createHelp, putHelp, patchHelp, deleteHelp, swapHelpOrder, fetchError
-} from 'src/api/help'
-import { useSelector } from "react-redux";
-
-// API-методи: fetchHelps, createHelp, updateHelp, deleteHelp, reorderHelp
+import { fetchHelps, createHelp, putHelp, patchHelp, deleteHelp, swapHelpOrder, fetchError } from 'src/api/help'
 
 const Help = () => {
   const [items, setItems] = useState([])
@@ -21,7 +17,9 @@ const Help = () => {
   const [currentParent, setCurrentParent] = useState(null)
   const [breadcrumb, setBreadcrumb] = useState([])
   const [visible, setVisible] = useState(false)
+  const [contentModalVisible, setContentModalVisible] = useState(false)
   const [editing, setEditing] = useState(null)
+  const [editLang, setEditLang] = useState(null)
   const [error, setError] = useState('')
 
   const languages = useSelector(state => state.languages)
@@ -74,6 +72,41 @@ const Help = () => {
     setVisible(true)
   }
 
+  const handleEditContent = (item) => {
+    setError('')
+    setEditing({ ...item })
+    setEditLang(selectedLanguage)
+    setContentModalVisible(true)
+  }
+
+  const handleSaveContent = async () => {
+    try {
+      const updated = { ...editing }
+      const idx = updated.contents.findIndex(t => t.language?.id === editLang?.id)
+      if (idx === -1) {
+        updated.contents.push({ language: editLang, name: '' })
+      }
+      await putHelp(updated.id, updated)
+      setContentModalVisible(false)
+      loadData(currentParent, breadcrumb)
+    } catch (error) {
+      loadData(fetchError(error))
+    }
+  }
+
+  const handleTextChange = (field, value) => {
+    setEditing((prev) => {
+      const updatedContents = [...prev.contents]
+      const idx = updatedContents.findIndex(t => t.language?.id === editLang?.id)
+      if (idx !== -1) {
+        updatedContents[idx] = { ...updatedContents[idx], [field]: value }
+      } else {
+        updatedContents.push({ language: editLang, [field]: value })
+      }
+      return { ...prev, contents: updatedContents }
+    })
+  }
+
   const handleRemove = async (id) => {
     if (!window.confirm('Ви дійсно хочете видалити?')) return
     await deleteHelp(id)
@@ -85,9 +118,13 @@ const Help = () => {
       setError('Name is required')
       return
     }
+    if (!editing.url) {
+      setError('URL is required')
+      return
+    }
     try {
       editing.id
-        ? await updateHelp(editing.id, editing)
+        ? await putHelp(editing.id, editing)
         : await createHelp(editing)
       setVisible(false)
       loadData(currentParent, breadcrumb)
@@ -107,31 +144,34 @@ const Help = () => {
     loadData(parent, newPath)
   }
 
-  const handleMoveUp = async (index) => {
-    if (index === 0) return
-    await reorderHelp(items[index].id, items[index - 1].id)
-    loadData(currentParent, breadcrumb)
+  const handleOrderUp = async (index) => {
+    try {
+      if (index === 0) return
+      const current = items[index]
+      const above = items[index - 1]
+      await swapHelpOrder(current.id, above.id)
+      loadData(currentParent, breadcrumb)
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
   }
 
-  const getCompletedValue = (translations) => {
+  const getCompletedValue = (contents) => {
+    const totalFields = 5 * languages.length
+    if (totalFields === 0) return 0
 
-    return 20
+    let filledFields = 0
+    for (const lang of languages) {
+      const entry = contents.find(content => content.language?.id === lang.id)
+      if (!entry) continue
+      if (entry.title?.trim()) filledFields++
+      if (entry.seoKeywords?.trim()) filledFields++
+      if (entry.seoDescription?.trim()) filledFields++
+      if (entry.shortDescription?.trim()) filledFields++
+      if (entry.description?.trim()) filledFields++
+    }
 
-    // const totalFields = 5 * languages.length
-    // if (totalFields === 0) return 0
-    //
-    // let filledFields = 0
-    // for (const lang of languages) {
-    //   const entry = translations.find(seo => seo.language?.id === lang.id)
-    //   if (!entry) continue
-    //   if (entry.name?.trim()) filledFields++
-    //   if (entry.title?.trim()) filledFields++
-    //   if (entry.logoAlt?.trim()) filledFields++
-    //   if (entry.shortDescription?.trim()) filledFields++
-    //   if (entry.description?.trim()) filledFields++
-    // }
-    //
-    // return Math.round((filledFields / totalFields) * 100)
+    return Math.round((filledFields / totalFields) * 100)
   }
 
   const empty = (label) => (<i className="text-muted">no {label}</i>)
@@ -192,17 +232,27 @@ const Help = () => {
                     </a>
                   </CTableDataCell>
                   <CTableDataCell>{item.url}</CTableDataCell>
-                  <CTableDataCell>{translation?.title || empty('description')}</CTableDataCell>
+                  <CTableDataCell>{translation?.title || empty('title')}</CTableDataCell>
                   <CTableDataCell>{translation?.shortDescription || empty('description')}</CTableDataCell>
-                  <CTableDataCell><CompletedChart value={getCompletedValue(item.translations)} /></CTableDataCell>
+                  <CTableDataCell><CompletedChart value={getCompletedValue(item.contents)} /></CTableDataCell>
                   <CTableDataCell className="text-nowrap">
                     <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)}>
                       <CIcon icon={cilPencil} />
                     </CButton>
-                    <CButton color="secondary" size="sm" className="me-2" onClick={() => handleMoveUp(index)} title="Move Up">
+                    <CButton color="info" size="sm" className="me-2" onClick={() => handleEditContent(item)}>
+                      Content
+                    </CButton>
+                    <CButton
+                      className="me-2"
+                      title="Move Up"
+                      size="sm"
+                      disabled={idx <= 0}
+                      color={idx <= 0 ? 'secondary' : 'info'}
+                      onClick={() => handleOrderUp(idx)}
+                    >
                       <CIcon icon={cilArrowTop} />
                     </CButton>
-                    <CButton size="sm" color="danger" onClick={() => handleRemove(item.id)}>
+                    <CButton color="danger" size="sm" onClick={() => handleRemove(item.id)}>
                       <CIcon icon={cilTrash} />
                     </CButton>
                   </CTableDataCell>
@@ -217,34 +267,22 @@ const Help = () => {
       <CModal visible={visible} onClose={() => setVisible(false)}>
         <CModalHeader closeButton>
           {editing?.id ? 'Edit Help' : 'Add Help'}
+          <LanguageSelector selected={editLang} onChange={setEditLang} />
         </CModalHeader>
         <CModalBody>
-          {error && <CAlert color="danger">{error}</CAlert>}
-
-          <CFormLabel>Name</CFormLabel>
           <CFormInput
+            className="mb-3"
             value={editing?.name || ''}
             onChange={e => setEditing({ ...editing, name: e.target.value })}
-            className="mb-2"
+            label="Language Name"
           />
-
-          <CFormLabel>URL</CFormLabel>
           <CFormInput
+            className="mb-3"
             value={editing?.url || ''}
             onChange={e => setEditing({ ...editing, url: e.target.value })}
-            className="mb-2"
+            label="URL"
           />
-
-          <CFormLabel>Description</CFormLabel>
-          <CFormTextarea
-            rows={4}
-            value={editing?.contents?.[0]?.description || ''}
-            onChange={e => {
-              const c = { ...editing }
-              c.contents[0].description = e.target.value
-              setEditing(c)
-            }}
-          />
+          {error && <CAlert color="danger" className="show mb-0 mt-3">{error}</CAlert>}
         </CModalBody>
 
         <CModalFooter>
@@ -252,6 +290,54 @@ const Help = () => {
           <CButton color="primary" onClick={handleSave}>Save</CButton>
         </CModalFooter>
       </CModal>
+
+      <CModal visible={contentModalVisible} onClose={() => setContentModalVisible(false)} size="lg">
+        <CModalHeader closeButton>
+          <div className="d-flex justify-content-between align-items-center w-100">
+            <div>Edit Content ({editLang?.name || 'No Language'})</div>
+            <LanguageSelector selected={editLang} onChange={setEditLang} />
+          </div>
+        </CModalHeader>
+        <CModalBody>
+            <CFormInput
+              label="Title"
+              className="mb-3"
+              value={editing?.contents.find(t => t.language?.id === editLang?.id)?.title || ''}
+              onChange={(e) => handleTextChange('title', e.target.value)}
+          />
+          <CFormInput
+            label="Seo Keywords"
+            className="mb-3"
+            value={editing?.contents.find(t => t.language?.id === editLang?.id)?.seoKeywords || ''}
+            onChange={(e) => handleTextChange('seoKeywords', e.target.value)}
+          />
+          <CFormInput
+            label="Seo Description"
+            value={editing?.contents.find(t => t.language?.id === editLang?.id)?.seoDescription || ''}
+            onChange={(e) => handleTextChange('seoDescription', e.target.value)}
+          />
+          <CFormTextarea
+            rows={3}
+            label="Short Description"
+            className="mb-3"
+            value={editing?.contents.find(t => t.language?.id === editLang?.id)?.shortDescription || ''}
+            onChange={(e) => handleTextChange('shortDescription', e.target.value)}
+          />
+          <CFormTextarea
+            rows={5}
+            label="Description"
+            className="mb-3"
+            value={editing?.contents.find(t => t.language?.id === editLang?.id)?.description || ''}
+            onChange={(e) => handleTextChange('description', e.target.value)}
+          />
+          {error && <CAlert color="danger" className="show mb-0 mt-3">{error}</CAlert>}
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setContentModalVisible(false)}>Cancel</CButton>
+          <CButton color="primary" onClick={handleSaveContent}>Save</CButton>
+        </CModalFooter>
+      </CModal>
+
     </div>
   )
 }

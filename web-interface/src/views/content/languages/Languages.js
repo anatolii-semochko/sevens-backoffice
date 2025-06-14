@@ -16,7 +16,7 @@ import {
 import { cilCheckCircle, cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { flagSet } from '@coreui/icons'
-import { BooleanTrigger } from "src/components/table/row/BooleanTrigger";
+import { BooleanTrigger } from 'src/components/table/CustomTableElements'
 
 const Languages = () => {
   const dispatch = useDispatch()
@@ -191,11 +191,11 @@ const Languages = () => {
                     <CIcon icon={cilPencil} />
                   </CButton>
                   <CButton
-                    size="sm"
-                    color={index <= 0 ? 'secondary' : 'info'}
                     className="me-2"
+                    size="sm"
                     title="Move Up"
                     disabled={index <= 0}
+                    color={index <= 0 ? 'secondary' : 'info'}
                     onClick={() => handleOrderUp(index)}
                   >
                     <CIcon icon={cilArrowTop} />
@@ -216,13 +216,13 @@ const Languages = () => {
         </CModalHeader>
         <CModalBody>
           <CFormInput
-            className="mb-2"
+            className="mb-3"
             label="Language Name"
             value={editingItem?.name || ''}
             onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
           />
           <CFormInput
-            className="mb-2"
+            className="mb-3"
             label="Code"
             value={editingItem?.code || ''}
             onChange={(e) => setEditingItem({ ...editingItem, code: e.target.value })}

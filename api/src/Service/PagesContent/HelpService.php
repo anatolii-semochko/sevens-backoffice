@@ -30,7 +30,10 @@ class HelpService
     {
         $help = new Help();
         $help->setId($data['id'] ?? Uuid::v4());
+        $help->setParentId($data['parentId']);
+        $help->setName($data['name']);
         $help->setUrl($data['url']);
+        $help->setOrder($data['order']);
 
         $this->em->persist($help);
         $this->em->flush();
@@ -38,52 +41,54 @@ class HelpService
         return $help;
     }
 
-    public function patch(object $help, array $data): void
+    public function put(object $help, array $data): void
     {
-        if (isset($data['url'])) {
-            $help->setUrl($data['url']);
-        }
+        $help->setName($data['name']);
+        $help->setUrl($data['url']);
 
-        if (isset($data['seo']) && is_array($data['seo'])) {
-            foreach ($data['seo'] as $seoData) {
-                if (empty($seoData['language']['id'])) {
+        if (isset($data['contents']) && is_array($data['contents'])) {
+            foreach ($data['contents'] as $content) {
+                if (empty($content['language']['id'])) {
                     continue;
                 }
 
-                $language = $this->em->getRepository(Language::class)->find($seoData['language']['id']);
+                $language = $this->em->getRepository(Language::class)->find($content['language']['id']);
                 if (!$language) {
                     continue; // unknown language
                 }
 
                 // Check if this $help already has seo for this language
-                $existingSeo = null;
-                foreach ($help->getSeo() as $existing) {
+                $existingContent = null;
+                foreach ($help->getContents() as $existing) {
                     if ($existing->getLanguage()?->getId() === $language->getId()) {
-                        $existingSeo = $existing;
+                        $existingContent = $existing;
                         break;
                     }
                 }
 
                 // If SEO exists, update it, otherwise create new
-                if (!$existingSeo) {
-                    $existingSeo = new HelpContent();
-                    $existingSeo->setPage($help);
-                    $existingSeo->setLanguage($language);
-                    $help->addSeo($existingSeo);
-                    $this->em->persist($existingSeo);
+                if (!$existingContent) {
+                    $existingContent = new HelpContent();
+                    $existingContent->setHelp($help);
+                    $existingContent->setLanguage($language);
+                    $help->addContent($existingContent);
+                    $this->em->persist($existingContent);
                 }
 
-                if (isset($seoData['breadcrumbs'])) {
-                    $existingSeo->setBreadcrumbs($seoData['breadcrumbs']);
+                if (isset($content['title'])) {
+                    $existingContent->setTitle($content['title']);
                 }
-                if (isset($seoData['title'])) {
-                    $existingSeo->setTitle($seoData['title']);
+                if (isset($content['seoKeywords'])) {
+                    $existingContent->setSeoKeywords($content['seoKeywords']);
                 }
-                if (isset($seoData['keywords'])) {
-                    $existingSeo->setKeywords($seoData['keywords']);
+                if (isset($content['seoDescription'])) {
+                    $existingContent->setSeoDescription($content['seoDescription']);
                 }
-                if (isset($seoData['description'])) {
-                    $existingSeo->setDescription($seoData['description']);
+                if (isset($content['shortDescription'])) {
+                    $existingContent->setShortDescription($content['shortDescription']);
+                }
+                if (isset($content['description'])) {
+                    $existingContent->setDescription($content['description']);
                 }
             }
         }
@@ -94,6 +99,18 @@ class HelpService
     public function delete(Object $help): void
     {
         $this->em->remove($help);
+        $this->em->flush();
+    }
+    
+    public function swapHelp(Object $currentHelp, Object $swapHelp): void
+    {
+        $currentOrder = $currentHelp->getOrder();
+        $swapOrder = $swapHelp->getOrder();
+        $currentHelp->setOrder(0);
+        $this->em->flush();
+        $swapHelp->setOrder($currentOrder);
+        $this->em->flush();
+        $currentHelp->setOrder($swapOrder);
         $this->em->flush();
     }
 }

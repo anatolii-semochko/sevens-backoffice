@@ -60,7 +60,7 @@ class HelpController extends BaseController
     public function put(string $id, Request $request): JsonResponse
     {
         try {
-            $this->service->patch($this->repository->get($id), $this->getData($request));
+            $this->service->put($this->repository->get($id), $this->getData($request));
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
@@ -85,6 +85,20 @@ class HelpController extends BaseController
     {
         try {
             $this->service->delete($this->repository->get($id));
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $this->json(null);
+    }
+
+    #[Route('/{id}/swap', name: 'help_order_swap', methods: ['PATCH'])]
+    public function swapHelp(string $id, Request $request): JsonResponse
+    {
+        try {
+            $currentHelp = $this->repository->get($id);
+            $swapHelp = $this->repository->get($this->getData($request)['swapId'] ?? null);
+            $this->service->swapHelp($currentHelp, $swapHelp);
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }

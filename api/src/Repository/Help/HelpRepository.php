@@ -3,6 +3,7 @@
 namespace App\Repository\Help;
 
 use App\Entity\Help\Help;
+use App\Exception\NotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -13,21 +14,31 @@ class HelpRepository extends ServiceEntityRepository
         parent::__construct($registry, Help::class);
     }
 
-    public function save(Help $entity, bool $flush = false): void
+    public function get(string $id): Object
     {
-        $this->getEntityManager()->persist($entity);
-        if ($flush) {
-            $this->getEntityManager()->flush();
+        $help = $this->find($id);
+        if (!$help->getId()) {
+            throw new NotFoundException('Help not found');
         }
+
+        return $help;
     }
 
-    public function remove(Help $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
+//    public function save(Help $entity, bool $flush = false): void
+//    {
+//        $this->getEntityManager()->persist($entity);
+//        if ($flush) {
+//            $this->getEntityManager()->flush();
+//        }
+//    }
+//
+//    public function remove(Help $entity, bool $flush = false): void
+//    {
+//        $this->getEntityManager()->remove($entity);
+//        if ($flush) {
+//            $this->getEntityManager()->flush();
+//        }
+//    }
 
     // Додаткові методи запиту за потреби...
 }

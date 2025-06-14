@@ -56,16 +56,18 @@ class CategoryService
 
         $this->indexCategories();
 
-        $category->setLogo(
-            $this->logoService->saveLogo(
-                FileService::CATEGORY_LOGO,
-                $category->getId(),
-                $category->getLogo(),
-                $data['logo'],
-            ),
-        );
-        $this->em->persist($category);
-        $this->em->flush();
+        if (!empty($data['logo'])) {
+            $category->setLogo(
+                $this->logoService->saveLogo(
+                    FileService::CATEGORY_LOGO,
+                    $category->getId(),
+                    $category->getLogo(),
+                    $data['logo'],
+                ),
+            );
+            $this->em->persist($category);
+            $this->em->flush();
+        }
         
         return $category;
     }

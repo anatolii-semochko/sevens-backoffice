@@ -67,8 +67,8 @@ class Help
     public function getId(): string { return $this->id; }
     public function setId(string $id): void { $this->id = $id; }
 
-    public function getParent(): ?self { return $this->parent; }
-    public function setParent(?self $parent): void { $this->parent = $parent; }
+    public function getParentId(): ?string { return $this->parentId; }
+    public function setParentId(?string $parentId): void { $this->parentId = $parentId; }
 
     public function getChildren(): Collection { return $this->children; }
 

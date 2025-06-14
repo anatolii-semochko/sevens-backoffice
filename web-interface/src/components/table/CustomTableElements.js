@@ -1,6 +1,8 @@
-import { CSpinner, CTableDataCell, CTableRow } from "@coreui/react"
+import { CSpinner } from "@coreui/react"
 import React from "react";
 import { CChartDoughnut } from "@coreui/react-chartjs"
+import CIcon from "@coreui/icons-react";
+import { cilCheckCircle, cilXCircle } from "@coreui/icons";
 
 const EmptyDataRow = ({
   loading = false,
@@ -10,6 +12,36 @@ const EmptyDataRow = ({
     {loading ? <CSpinner /> : text}
   </div>
 )
+
+const BooleanTrigger = ({
+  item,
+  isActive,
+  onToggle,
+  className = '',
+  title = 'Toggle status',
+}) => {
+  const active = typeof isActive === 'function' ? isActive(item) : Boolean(isActive)
+
+  const handleClick = async () => {
+    try {
+      await onToggle(item)
+    } catch (error) {
+      window.toast?.error?.(error.message || 'Error while toggling')
+    }
+  }
+
+  return (
+    <div className={`row-cell-center-50 pt-2 ${className}`}>
+      <CIcon
+        icon={active ? cilCheckCircle : cilXCircle}
+        className={active ? 'text-success' : 'text-danger'}
+        title={title}
+        onClick={handleClick}
+        style={{ cursor: 'pointer' }}
+      />
+    </div>
+  )
+}
 
 const LogoCell = ({path, value}) => (
   <div className="row-cell-center-50">
@@ -44,4 +76,4 @@ const CompletedChart = ({ value }) => {
   )
 }
 
-export { EmptyDataRow, LogoCell, CompletedChart }
+export { EmptyDataRow, BooleanTrigger, LogoCell, CompletedChart }
