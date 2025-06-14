@@ -81,7 +81,6 @@ class CategoryService
             $this->em->flush();
         }
     }
-    
 
     public function put(object $category, array $data): void
     {
