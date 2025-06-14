@@ -10,12 +10,13 @@ import { fetchContent, patchContent, deleteContent, createContent, fetchError } 
 import { fetchPages } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
-import { CompletedChart } from 'src/components/table/CustomTableElements'
+import { CompletedChart, EmptyDataRow } from 'src/components/table/CustomTableElements'
 import { PaginatorControls, PaginatorInfo } from '../../../components/table/Paginator'
 
 const PagesContent = () => {
   const [items, setItems] = useState([])
   const [pages, setPages] = useState([])
+  const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
   const [editLang, setEditLang] = useState(null)
@@ -29,14 +30,45 @@ const PagesContent = () => {
   const selectedLanguage = useSelector((state) => state.selectedLanguage)
   const langId = selectedLanguage?.id
 
+  const [termFilter, setTermFilter] = useState('')
+  const [pageUrlFilter, setPageUrlFilter] = useState('')
+  const [translationFilter, setTranslationFilter] = useState('')
+  const [debouncedTerm, setDebouncedTerm] = useState('')
+  const [debouncedPageUrl, setDebouncedPageUrl] = useState('')
+  const [debouncedTranslation, setDebouncedTranslation] = useState('')
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedTerm(termFilter)
+      setDebouncedPageUrl(pageUrlFilter)
+      setDebouncedTranslation(translationFilter)
+      setCurrentPage(1) // Скинути на першу сторінку при фільтрації
+    }, 500)
+
+    return () => clearTimeout(handler)
+  }, [termFilter, pageUrlFilter, translationFilter])
+  const isFiltered = termFilter || pageUrlFilter || translationFilter
+  const handleClearFilter = () => {
+    setTermFilter('')
+    setPageUrlFilter('')
+    setTranslationFilter('')
+  }
+
   const fetchData = async () => {
     try {
-      const response = await fetchContent({ page: currentPage, limit: pageSize })
+      setLoading(true)
+      const response = await fetchContent({
+        page: currentPage,
+        limit: pageSize,
+        term: debouncedTerm,
+        pageUrl: debouncedPageUrl,
+        translation: debouncedTranslation,
+      })
       setItems(response.items)
       setTotalItems(response.total)
     } catch (e) {
       window.toast.error(fetchError(e))
     }
+    setLoading(false)
   }
 
   const fetchPagesData = async () => {
@@ -51,7 +83,7 @@ const PagesContent = () => {
   useEffect(() => {
     fetchData()
     fetchPagesData()
-  }, [currentPage, pageSize])
+  }, [currentPage, pageSize, debouncedTerm, debouncedPageUrl, debouncedTranslation])
 
   const findTranslation = (translations, langId) => translations?.find(t => t.language?.id === langId)?.translation || ''
 
@@ -149,108 +181,136 @@ const PagesContent = () => {
             setCurrentPage(1);
           }}
         />
-        <CButton color="success" size="sm" onClick={handleCreate}>
-          <CIcon icon={cilPlus} className="me-1 pt-1" /> Add Term
-        </CButton>
-      </div>
-      <CCardBody>
-        <CTable className="no-border-last" hover responsive>
-          <CTableHead>
-            <CTableRow>
-              <CTableHeaderCell>Term</CTableHeaderCell>
-              <CTableHeaderCell>Page URL</CTableHeaderCell>
-              <CTableHeaderCell>Translation</CTableHeaderCell>
-              <CTableHeaderCell style={{ width: 60 }}></CTableHeaderCell>
-              <CTableHeaderCell>Actions</CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {items.map((item) => (
-              <CTableRow key={item.id}>
-                <CTableDataCell>{item.term || <i className="text-muted">no term</i>}</CTableDataCell>
-                <CTableDataCell>{item.page?.url || <i className="text-muted"></i>}</CTableDataCell>
-                <CTableDataCell>
-                  {findTranslation(item.translations, langId) ? (
-                    <span dangerouslySetInnerHTML={{ __html: findTranslation(item.translations, langId) }} />
-                  ) : (
-                    <i className="text-muted">no translation</i>
-                  )}
-                </CTableDataCell>
-                <CTableDataCell><CompletedChart value={getCompletedValue(item.translations)} /></CTableDataCell>
-                <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
-                  <CButton size="sm" color="info" className="me-2" onClick={() => handleEdit(item)}>
-                    <CIcon icon={cilPen} />
-                  </CButton>
-                  <CButton size="sm" color="danger" onClick={() => handleDelete(item.id)}>
-                    <CIcon icon={cilTrash} />
-                  </CButton>
-                </CTableDataCell>
+        <div className="d-flex gap-2">
+          {isFiltered && <CButton color="danger" size="sm" onClick={handleClearFilter}>Clear Filter</CButton>}
+          <CButton color="success" size="sm" onClick={handleCreate}>
+            <CIcon icon={cilPlus} className="me-1 pt-1"/> Add Term
+          </CButton>
+        </div>
+        </div>
+        <CCardBody>
+          <CTable className="no-border-last" hover responsive>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell>
+                  <CFormInput
+                    type="text"
+                    size="sm"
+                    placeholder="Term"
+                    value={termFilter}
+                    onChange={(e) => setTermFilter(e.target.value)}
+                  />
+                </CTableHeaderCell>
+                <CTableHeaderCell>
+                  <CFormInput
+                    type="text"
+                    size="sm"
+                    placeholder="Page URL"
+                    value={pageUrlFilter}
+                    onChange={(e) => setPageUrlFilter(e.target.value)}
+                  />
+                </CTableHeaderCell>
+                <CTableHeaderCell>
+                  <CFormInput
+                    type="text"
+                    size="sm"
+                    placeholder="Translation"
+                    value={translationFilter}
+                    onChange={(e) => setTranslationFilter(e.target.value)}
+                  />
+                </CTableHeaderCell>
+                <CTableHeaderCell style={{width: 60}}></CTableHeaderCell>
+                <CTableHeaderCell>Actions</CTableHeaderCell>
               </CTableRow>
-            ))}
-          </CTableBody>
-        </CTable>
-        <PaginatorControls
-          currentPage={currentPage}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          onPageChange={(page) => setCurrentPage(page)}
-          onPageSizeChange={(newSize) => {
-            setPageSize(newSize)
-            setCurrentPage(1)
-          }}
-        />
-      </CCardBody>
-
-      <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg">
-        <CModalHeader closeButton>
-          <div className="d-flex justify-content-between align-items-center w-100">
-            <div>{editingItem?.id ? 'Edit Term' : 'Create Term'}</div>
-            <LanguageSelector selected={editLang} onChange={setEditLang} />
-          </div>
-        </CModalHeader>
-        <CModalBody>
-          <CFormInput
-            label="Term"
-            className="mb-3"
-            value={editingItem?.term || ''}
-            onChange={(e) => setEditingItem({ ...editingItem, term: e.target.value })}
-          />
-          <CFormSelect
-            label="Page"
-            className="mb-3"
-            value={editingItem?.page?.id || ''}
-            onChange={(e) => {
-              const selectedPage = pages.find(p => p.id === e.target.value)
-              setEditingItem({
-                ...editingItem,
-                page: selectedPage || { id: '', url: '' },
-              })
-            }}
-          >
-            <option value=""></option>
-            {pages.map(page => (
-              <option key={page.id} value={page.id}>{page.url}</option>
-            ))}
-          </CFormSelect>
-          <CFormTextarea
-            label={'Translation ' + (editLang?.name || 'No Language')}
-            className="mb-3"
-            rows={5}
-            value={findTranslation(editingItem?.translations || [], editLang?.id)}
-            onChange={(e) => {
-              const updatedTranslations = updateTranslation(editingItem.translations || [], editLang.id, e.target.value)
-              setEditingItem({ ...editingItem, translations: updatedTranslations })
+            </CTableHead>
+            <CTableBody>
+              {items.map((item) => (
+                <CTableRow key={item.id}>
+                  <CTableDataCell>{item.term || <i className="text-muted">no term</i>}</CTableDataCell>
+                  <CTableDataCell>{item.page?.url || <i className="text-muted"></i>}</CTableDataCell>
+                  <CTableDataCell>
+                    {findTranslation(item.translations, langId) ? (
+                      <span dangerouslySetInnerHTML={{__html: findTranslation(item.translations, langId)}}/>
+                    ) : (
+                      <i className="text-muted">no translation</i>
+                    )}
+                  </CTableDataCell>
+                  <CTableDataCell><CompletedChart value={getCompletedValue(item.translations)}/></CTableDataCell>
+                  <CTableDataCell className="text-nowrap" style={{width: 1}}>
+                    <CButton size="sm" color="info" className="me-2" onClick={() => handleEdit(item)}>
+                      <CIcon icon={cilPen}/>
+                    </CButton>
+                    <CButton size="sm" color="danger" onClick={() => handleDelete(item.id)}>
+                      <CIcon icon={cilTrash}/>
+                    </CButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>
+          {!items.length && <EmptyDataRow loading={loading} text={'No results found.'}/>}
+          <PaginatorControls
+            currentPage={currentPage}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={(page) => setCurrentPage(page)}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize)
+              setCurrentPage(1)
             }}
           />
-          {errorMessage && <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>}
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setModalVisible(false)}>Cancel</CButton>
-          <CButton color="primary" onClick={handleSave}>Save</CButton>
-        </CModalFooter>
-      </CModal>
-    </div>
-  )
-}
+        </CCardBody>
 
-export default PagesContent
+        <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg">
+          <CModalHeader closeButton>
+            <div className="d-flex justify-content-between align-items-center w-100">
+              <div>{editingItem?.id ? 'Edit Term' : 'Create Term'}</div>
+              <LanguageSelector selected={editLang} onChange={setEditLang}/>
+            </div>
+          </CModalHeader>
+          <CModalBody>
+            <CFormInput
+              label="Term"
+              className="mb-3"
+              value={editingItem?.term || ''}
+              onChange={(e) => setEditingItem({...editingItem, term: e.target.value})}
+            />
+            <CFormSelect
+              label="Page"
+              className="mb-3"
+              value={editingItem?.page?.id || ''}
+              onChange={(e) => {
+                const selectedPage = pages.find(p => p.id === e.target.value)
+                setEditingItem({
+                  ...editingItem,
+                  page: selectedPage || {id: '', url: ''},
+                })
+              }}
+            >
+              <option value=""></option>
+              {pages.map(page => (
+                <option key={page.id} value={page.id}>{page.url}</option>
+              ))}
+            </CFormSelect>
+            <CFormTextarea
+              label={'Translation ' + (editLang?.name || 'No Language')}
+              className="mb-3"
+              rows={5}
+              value={findTranslation(editingItem?.translations || [], editLang?.id)}
+              onChange={(e) => {
+                const updatedTranslations = updateTranslation(editingItem.translations || [], editLang.id, e.target.value)
+                setEditingItem({...editingItem, translations: updatedTranslations})
+              }}
+            />
+            {errorMessage && <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>}
+          </CModalBody>
+          <CModalFooter>
+            <CButton color="secondary" onClick={() => setModalVisible(false)}>Cancel</CButton>
+            <CButton color="primary" onClick={handleSave}>Save</CButton>
+          </CModalFooter>
+        </CModal>
+      </div>
+      )
+      }
+
+      export default PagesContent

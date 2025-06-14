@@ -28,14 +28,7 @@ class PageContentController extends BaseController
     public function fetch(Request $request): Response
     {
         try {
-            $criteria = array_diff_key($request->query->all(), array_flip(['page', 'limit', 'offset']));
-            $page = $request->query->getInt('page', 1);
-            $limit = $request->query->getInt('limit', 10);
-            $offset = ($page - 1) * $limit;
-            $result = [
-                'items' => $this->repository->findBy($criteria, null, $limit, $offset),
-                'total' => $this->repository->count($criteria),
-            ];
+            $result = $this->service->fetchByFilter($request->query->all() ?? []);
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }

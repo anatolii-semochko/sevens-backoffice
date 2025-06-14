@@ -5,6 +5,7 @@ namespace App\Service\PagesContent;
 use App\Entity\Language;
 use App\Entity\PagesContent\PageContent;
 use App\Entity\PagesContent\PageContentTranslation;
+use App\Repository\PagesContent\PageContentRepository;
 use App\Repository\PagesContent\PageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
@@ -13,8 +14,112 @@ class PageContentService
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private PageContentRepository $repository,
         private PageRepository $pageRepository,
     ) {}
+
+    public function fetchByFilter(array $criteria): array
+    {
+        $allowedFields = ['term', 'pageUrl', 'translation'];
+        
+        $page = $criteria['page'] ?? 1;
+        $limit = $criteria['limit'] ?? 10;
+        $offset = ($page - 1) * $limit;
+
+        $qb = $this->repository->createQueryBuilder('e')
+            ->leftJoin('e.page', 'p');
+
+        $paramIndex = 0;
+        foreach ($criteria as $field => $value) {
+            if (in_array($field, ['limit', 'offset', 'sort', 'order'])) {
+                continue;
+            }
+
+            if (!in_array($field, $allowedFields)) {
+                continue;
+            }
+
+            if (!empty($value)) {
+                $paramName = 'param' . $paramIndex++;
+                $likeValue = '%' . $value . '%';
+
+                switch ($field) {
+                    case 'pageUrl':
+                        $qb->andWhere("p.url LIKE :$paramName");
+                        $qb->setParameter($paramName, $likeValue);
+                        break;
+
+                    case 'translation':
+                        $qb->andWhere(
+                            "EXISTS (
+                            SELECT 1 FROM App\Entity\PagesContent\PageContentTranslation tr
+                            WHERE tr.pageContent = e.id AND tr.translation LIKE :$paramName
+                        )"
+                        );
+                        $qb->setParameter($paramName, $likeValue);
+                        break;
+
+                    default:
+                        $qb->andWhere("e.$field LIKE :$paramName");
+                        $qb->setParameter($paramName, $likeValue);
+                        break;
+                }
+            }
+        }
+
+        $qb->setFirstResult($offset)->setMaxResults($limit);
+        $items = $qb->getQuery()->getResult();
+
+        // COUNT
+        $countQb = $this->repository->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->leftJoin('e.page', 'p');
+
+        $paramIndex = 0;
+        foreach ($criteria as $field => $value) {
+            if (in_array($field, ['limit', 'offset', 'sort', 'order'])) {
+                continue;
+            }
+
+            if (!in_array($field, $allowedFields)) {
+                continue;
+            }
+
+            if (!empty($value)) {
+                $paramName = 'param' . $paramIndex++;
+                $likeValue = '%' . $value . '%';
+
+                switch ($field) {
+                    case 'pageUrl':
+                        $countQb->andWhere("p.url LIKE :$paramName");
+                        $countQb->setParameter($paramName, $likeValue);
+                        break;
+
+                    case 'translation':
+                        $countQb->andWhere(
+                            "EXISTS (
+                            SELECT 1 FROM App\Entity\PagesContent\PageContentTranslation tr
+                            WHERE tr.pageContent = e.id AND tr.translation LIKE :$paramName
+                        )"
+                        );
+                        $countQb->setParameter($paramName, $likeValue);
+                        break;
+
+                    default:
+                        $countQb->andWhere("e.$field LIKE :$paramName");
+                        $countQb->setParameter($paramName, $likeValue);
+                        break;
+                }
+            }
+        }
+
+        $total = $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'items' => $items,
+            'total' => $total,
+        ];
+    }
 
     public function create(array $data): PageContent
     {
