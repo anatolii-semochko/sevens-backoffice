@@ -5,6 +5,7 @@ const Users  = React.lazy(() => import('./views/content/users/Users'));
 const Pages  = React.lazy(() => import('./views/content/pages/Pages'));
 const PagesContent  = React.lazy(() => import('./views/content/pages/PagesContent'));
 const Categories  = React.lazy(() => import('./views/content/categories/Categories'));
+const Help  = React.lazy(() => import('./views/content/help/Help'));
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -66,6 +67,7 @@ const routes = [
   { path: '/content/pages', name: 'Pages', element: Pages },
   { path: '/content/pages-content', name: 'Pages', element: PagesContent },
   { path: '/content/categories', name: 'Pages', element: Categories },
+  { path: '/content/help', name: 'Help', element: Help },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },

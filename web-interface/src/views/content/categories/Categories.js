@@ -9,9 +9,8 @@ import { cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { LogoInput } from 'src/components/image/LogoInput'
-import { LogoCell } from 'src/components/table/row/LogoCell'
 import { BooleanTrigger } from 'src/components/table/row/BooleanTrigger'
-import { CompletedChart } from 'src/components//table/row/CompletedChart'
+import { EmptyDataRow, LogoCell, CompletedChart } from 'src/components/table/CustomTableElements'
 import {
   fetchCategories, createCategory, putCategory, patchCategory, deleteCategory, swapCategoryOrder, fetchError
 } from 'src/api/categories'
@@ -19,6 +18,7 @@ import {
 const Categories = () => {
   const logoPath = '/src/assets/images/categories/logo/' // TODO - move to environment constants
   const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
   const [textModalVisible, setTextModalVisible] = useState(false)
@@ -37,6 +37,7 @@ const Categories = () => {
 
   const fetchData = async (parent = null, path = []) => {
     try {
+      setLoading(true)
       const filter = { parentId: parent ?? 'root' }
       const data = await fetchCategories(filter)
       setItems(data)
@@ -45,10 +46,10 @@ const Categories = () => {
     } catch (error) {
       window.toast.error(fetchError(error))
     }
+    setLoading(false)
   }
 
-  const findTranslation = (translations, langId) =>
-    translations.find(t => t.language?.id === langId)
+  const findTranslation = (translations, langId) => translations.find(t => t.language?.id === langId)
 
   const handleAdd = () => {
     setErrorMessage('')
@@ -223,7 +224,7 @@ const Categories = () => {
               <CTableHeaderCell>Short Description</CTableHeaderCell>
               <CTableHeaderCell><div className="row-cell-center-50">Active</div></CTableHeaderCell>
               <CTableHeaderCell style={{ width: 60 }}></CTableHeaderCell>
-              <CTableHeaderCell>Actions</CTableHeaderCell>
+              <CTableHeaderCell style={{ width: 1 }}>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
@@ -252,7 +253,7 @@ const Categories = () => {
                     />
                   </CTableDataCell>
                   <CTableDataCell><CompletedChart value={getCompletedValue(item.translations)} /></CTableDataCell>
-                  <CTableDataCell className="text-nowrap" style={{ width: 1 }}>
+                  <CTableDataCell className="text-nowrap">
                     <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)} title="Edit">
                       <CIcon icon={cilPencil} />
                     </CButton>
@@ -266,9 +267,10 @@ const Categories = () => {
                   </CTableDataCell>
                 </CTableRow>
               )
-            })}
+              })}
           </CTableBody>
         </CTable>
+        {!items.length && <EmptyDataRow loading={loading} />}
       </CCardBody>
 
       {/* Modals (simplified) */}
