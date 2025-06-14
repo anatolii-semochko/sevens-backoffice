@@ -68,39 +68,54 @@ const LogoInput = ({
   }
 
   return (
-    <div className="mb-3 logo-input">
-      <CFormLabel>Logo</CFormLabel>
-      <div className="input-group">
-        <CFormInput
-          type="file"
-          accept="image/*"
-          onChange={handleChange}
-          ref={fileInputRef}
-          disabled={!!preview}
-        />
+    <>
+      <div className="mb-3 logo-input">
+        <CFormLabel>Logo</CFormLabel>
+        <div className="input-group">
+          <CFormInput
+            type="file"
+            accept="image/*"
+            onChange={handleChange}
+            ref={fileInputRef}
+            disabled={!!preview}
+          />
+          {preview && (
+            <CButton
+              type="button"
+              color="danger"
+              onClick={handleClear}
+              className="input-group-text"
+            >
+              <CIcon icon={cilX} />
+            </CButton>
+          )}
+        </div>
+        {error && (
+          <CAlert color="danger" className="show mb-0 mt-3">{error}</CAlert>
+        )}
         {preview && (
-          <CButton
-            type="button"
-            color="danger"
-            onClick={handleClear}
-            className="input-group-text"
-          >
-            <CIcon icon={cilX} />
-          </CButton>
+          <div className="mt-3 d-flex justify-content-center">
+            <img
+              src={preview}
+              alt="Logo preview"
+            />
+          </div>
         )}
       </div>
-      {error && (
-        <CAlert color="danger" className="show mb-0 mt-3">{error}</CAlert>
-      )}
-      {preview && (
-        <div className="mt-3 d-flex justify-content-center">
-          <img
-            src={preview}
-            alt="Logo preview"
-          />
-        </div>
-      )}
-    </div>
+      <style>{`
+        .logo-input button {
+          padding: 0.375rem 0.75rem;
+        }
+        .logo-input img {
+          border: 1px solid #ced4da;
+          padding: 8px;
+          max-width: 100%;
+          max-height: 400px;
+          border-radius: 4px;
+          background-color: #f8f9fa;
+        }
+    `}</style>
+    </>
   )
 }
 
