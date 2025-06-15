@@ -147,7 +147,7 @@ const Pages = () => {
   return (
     <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
-        <h4 className="mb-0">Pages</h4>
+        <h4 className="mb-0">Pages and SEO</h4>
         <PaginatorInfo
           currentPage={currentPage}
           totalItems={totalItems}
