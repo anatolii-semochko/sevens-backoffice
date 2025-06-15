@@ -19,13 +19,25 @@ class LogoService
     /**
      * @throws Exception
      */
-    public function saveLogo(string $logoPath, string $id, ?string $currentValue, $blob): ?string
-    {
+    public function saveLogo(
+        string $logoPath,
+        string $id,
+        ?string $currentValue,
+        ?string $blob = null,
+        string $ext = 'webp'
+    ): ?string {
         if ($blob === $currentValue) {
             return $currentValue;
         }
 
-        $ext = 'webp';
+        // Видалення старих файлів
+        if ($currentValue) {
+            foreach (array_keys(self::LOGO_SIZES) as $label) {
+                $fileName = "{$label}-{$currentValue}";
+                $this->fileService->delete($logoPath, $fileName);
+            }
+        }
+        
         try {
             if ($blob) {
                 // Створення унікального імені без розширення
@@ -34,18 +46,11 @@ class LogoService
                 // Збереження файлів різних розмірів
                 foreach (self::LOGO_SIZES as $label => [$maxWidth, $maxHeight]) {
                     $fileName = "{$label}-{$uuid}.{$ext}";
-                    $this->fileService->saveResizedBlobImage(FileService::CATEGORY_LOGO, $fileName, $blob, $maxWidth, $maxHeight);
+                    $this->fileService->saveResizedBlobImage($logoPath, $fileName, $blob, $maxWidth, $maxHeight);
                 }
 
                 return "{$uuid}.{$ext}";
             } else {
-                // Видалення старих файлів
-                if ($currentValue) {
-                    foreach (array_keys(self::LOGO_SIZES) as $label) {
-                        $fileName = "{$label}-{$currentValue}.{$ext}";
-                        $this->fileService->delete(FileService::CATEGORY_LOGO, $fileName);
-                    }
-                }
                 return null;
             }
         } catch (FileException $e) {

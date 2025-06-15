@@ -2,13 +2,18 @@
 
 namespace App\Service\File;
 
+use Exception;
 use Imagick;
+use ImagickException;
 
 class FileService
 {
     public const string FILE_DIR = '/shared/';
     public const string CATEGORY_LOGO = 'images/categories/logo';
 
+    /**
+     * @throws Exception
+     */
     public function saveBlobImage(string $filePath, string $fileName, string $blob): string
     {
         $dir = rtrim(self::FILE_DIR . $filePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
@@ -29,41 +34,51 @@ class FileService
             throw new \RuntimeException('File decoding error base64');
         }
 
-        $image = new Imagick();
-        $image->readImageBlob($binaryData);
-        $image->setImageFormat('webp');
-        $image->setImageCompressionQuality(80);
+        try {
+            $image = new Imagick();
+            $image->readImageBlob($binaryData);
+            $image->setImageFormat('webp');
+            $image->setImageCompressionQuality(80);
 
-        // Якщо $fileName вже містить ".webp", не додавати ще раз
-        $savedFileName = str_ends_with($fileName, '.webp') ? $fileName : $fileName . '.webp';
-        $fullPath = $dir . $savedFileName;
+            // Якщо $fileName вже містить ".webp", не додавати ще раз
+            $savedFileName = str_ends_with($fileName, '.webp') ? $fileName : $fileName . '.webp';
+            $fullPath = $dir . $savedFileName;
 
-        if (!is_writable($dir)) {
-            throw new \RuntimeException("Directory {$dir} is not writable by PHP");
+            if (!is_writable($dir)) {
+                throw new \RuntimeException("Directory {$dir} is not writable by PHP");
+            }
+
+            if (!$image->writeImage($fullPath)) {
+                throw new \RuntimeException("File saving error $fullPath");
+            }
+
+            $image->clear();
+            $image->clear();
+        } catch (ImagickException $e) {
+            throw new Exception($e->getMessage());       
         }
-        
-        if (!$image->writeImage($fullPath)) {
-            throw new \RuntimeException("File saving error $fullPath");
-        }
-
-        $image->clear();
-        $image->destroy();
 
         return $savedFileName;
     }
 
     /**
      * Remove the file with the path
+     * @throws Exception
      */
     public function delete(string $filePath, string $fileName): void
     {
-        $fullPath = rtrim($filePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $fileName;
-
-        if (is_file($fullPath)) {
-            @unlink($fullPath);
+        $fullPathFileName = rtrim(self::FILE_DIR . $filePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $fileName;
+        if (is_file($fullPathFileName)) {
+            @unlink($fullPathFileName);
+        }
+        if (is_file($fullPathFileName)) {
+            throw new Exception("Can't delete file {$fullPathFileName}");
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function saveResizedBlobImage(
         string $filePath,
         string $fileName,
@@ -88,25 +103,29 @@ class FileService
             throw new \RuntimeException('File decoding error base64');
         }
 
-        $image = new Imagick();
-        $image->readImageBlob($binaryData);
-        $image->setImageFormat('webp');
-        $image->setImageCompressionQuality(80);
+        try {
+            $image = new Imagick();
+            $image->readImageBlob($binaryData);
+            $image->setImageFormat('webp');
+            $image->setImageCompressionQuality(80);
 
-        $image->thumbnailImage($maxWidth, $maxHeight, true); // зберігає пропорції
+            $image->thumbnailImage($maxWidth, $maxHeight, true); // зберігає пропорції
 
-        $fullPath = $dir . $fileName;
+            $fullPath = $dir . $fileName;
 
-        if (!is_writable($dir)) {
-            throw new \RuntimeException("Directory {$dir} is not writable by PHP");
+            if (!is_writable($dir)) {
+                throw new \RuntimeException("Directory {$dir} is not writable by PHP");
+            }
+
+            if (!$image->writeImage($fullPath)) {
+                throw new \RuntimeException("File saving error $fullPath");
+            }
+
+            $image->clear();
+            $image->clear();
+        } catch (ImagickException $e) {
+            throw new Exception($e->getMessage());
         }
-
-        if (!$image->writeImage($fullPath)) {
-            throw new \RuntimeException("File saving error $fullPath");
-        }
-
-        $image->clear();
-        $image->destroy();
 
         return $fileName;
     }

@@ -12,7 +12,27 @@ RUN apk add --no-cache libpq-dev bash coreutils git linux-headers \
     && docker-php-ext-install pdo_mysql xdebug \
     && apk del git linux-headers
 
+RUN apk add --no-cache \
+    mariadb-dev \
+    fcgi \
+    imagemagick \
+    imagemagick-dev \
+    libwebp \
+    libwebp-dev \
+    libjpeg \
+    libjpeg-turbo \
+    libjpeg-turbo-dev \
+    jpeg-dev \
+    autoconf \
+    gcc \
+    g++ \
+    make \
+    pkgconfig
+
 RUN mv $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
+
+RUN apk add --no-cache imagemagick imagemagick-dev
+RUN pecl install imagick && docker-php-ext-enable imagick
 
 COPY ./common/php/conf.d /usr/local/etc/php/conf.d
 COPY ./development/php/conf.d /usr/local/etc/php/conf.d

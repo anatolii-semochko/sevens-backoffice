@@ -160,10 +160,18 @@ class CategoryService
         $currentCategory->setOrder($swapOrder);
         $this->em->flush();
     }
-    
-    public function delete(Object $page): void
+
+    /**
+     * @throws Exception
+     */
+    public function delete(Object $category): void
     {
-        $this->em->remove($page);
+        if ($category->getLogo()) {
+            $this->logoService->saveLogo(FileService::CATEGORY_LOGO, $category->getId(), $category->getLogo());
+            $this->em->persist($category);
+            $this->em->flush();
+        }
+        $this->em->remove($category);
         $this->em->flush();
     }
 
