@@ -1,11 +1,11 @@
 import React from 'react'
 
-const Languages  = React.lazy(() => import('./views/content/languages/Languages'));
-const Users  = React.lazy(() => import('./views/content/users/Users'));
-const Pages  = React.lazy(() => import('./views/content/pages/Pages'));
-const PagesContent  = React.lazy(() => import('./views/content/pages/PagesContent'));
-const Categories  = React.lazy(() => import('./views/content/categories/Categories'));
-const Help  = React.lazy(() => import('./views/content/help/Help'));
+const Languages  = React.lazy(() => import('./views/base-elements/Languages'));
+const Users  = React.lazy(() => import('./views/base-elements/Users'));
+const Pages  = React.lazy(() => import('./views/content/Pages'));
+const PagesContent  = React.lazy(() => import('./views/content/PagesContent'));
+const Categories  = React.lazy(() => import('./views/base-elements/Categories'));
+const Help  = React.lazy(() => import('./views/content/Help'));
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 

@@ -10,7 +10,7 @@ import { fetchPages, createPage, patchPage, deletePage, fetchError } from 'src/a
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { CompletedChart } from 'src/components/table/CustomTableElements'
-import { PaginatorInfo, PaginatorControls } from '../../../components/table/Paginator'
+import { PaginatorInfo, PaginatorControls } from 'src/components/table/Paginator'
 
 const Pages = () => {
   const [items, setItems] = useState([])

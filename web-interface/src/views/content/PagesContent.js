@@ -1,17 +1,18 @@
+import React, { useEffect, useState } from 'react'
+import { fetchContent, patchContent, deleteContent, createContent, fetchError } from 'src/api/pages-content'
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
-  CCard, CCardHeader, CCardBody, CFormSelect, CFormTextarea, CAlert
+  CCardBody, CFormSelect, CAlert
 } from '@coreui/react'
 import { cilPen, cilTrash, cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import React, { useEffect, useState } from 'react'
-import { fetchContent, patchContent, deleteContent, createContent, fetchError } from 'src/api/pages-content'
 import { fetchPages } from 'src/api/pages'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { CompletedChart, EmptyDataRow } from 'src/components/table/CustomTableElements'
-import { PaginatorControls, PaginatorInfo } from '../../../components/table/Paginator'
+import { PaginatorControls, PaginatorInfo } from 'src/components/table/Paginator'
+import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
 
 const PagesContent = () => {
   const [items, setItems] = useState([])
@@ -292,7 +293,7 @@ const PagesContent = () => {
                 <option key={page.id} value={page.id}>{page.url}</option>
               ))}
             </CFormSelect>
-            <CFormTextarea
+            <TextEditorMCE
               label={'Translation ' + (editLang?.name || 'No Language')}
               className="mb-3"
               rows={5}
@@ -310,7 +311,7 @@ const PagesContent = () => {
           </CModalFooter>
         </CModal>
       </div>
-      )
-      }
+  )
+}
 
-      export default PagesContent
+export default PagesContent

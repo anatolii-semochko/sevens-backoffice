@@ -28,7 +28,7 @@ import {
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { LanguageSelector } from './AppLanguageSelector'
-import { AppToaster } from '../views/utils/AppToaster'
+import { AppToaster } from 'src/components/utils/AppToaster'
 
 const AppHeader = () => {
   const headerRef = useRef()

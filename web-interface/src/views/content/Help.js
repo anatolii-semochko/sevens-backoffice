@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { fetchHelps, createHelp, putHelp, patchHelp, deleteHelp, swapHelpOrder, fetchError } from 'src/api/help'
 import {
   CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter,
@@ -9,7 +10,7 @@ import { cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { EmptyDataRow, CompletedChart } from 'src/components/table/CustomTableElements'
-import { fetchHelps, createHelp, putHelp, patchHelp, deleteHelp, swapHelpOrder, fetchError } from 'src/api/help'
+import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
 
 const Help = () => {
   const [items, setItems] = useState([])
@@ -323,7 +324,7 @@ const Help = () => {
             value={editing?.contents.find(t => t.language?.id === editLang?.id)?.shortDescription || ''}
             onChange={(e) => handleTextChange('shortDescription', e.target.value)}
           />
-          <CFormTextarea
+          <TextEditorMCE
             rows={5}
             label="Description"
             className="mb-3"

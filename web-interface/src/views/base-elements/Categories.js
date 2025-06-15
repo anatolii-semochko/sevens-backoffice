@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import {
+  fetchCategories, createCategory, putCategory, patchCategory, deleteCategory, swapCategoryOrder, fetchError
+} from 'src/api/categories'
+import {
   CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter,
   CFormInput, CAlert, CCardBody, CFormTextarea
@@ -8,12 +11,10 @@ import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
-import { LogoInput } from 'src/components/image/LogoInput'
+import { LogoInput } from 'src/components/input-fields/LogoInput'
 import { BooleanTrigger } from 'src/components/table/CustomTableElements'
 import { EmptyDataRow, LogoCell, CompletedChart } from 'src/components/table/CustomTableElements'
-import {
-  fetchCategories, createCategory, putCategory, patchCategory, deleteCategory, swapCategoryOrder, fetchError
-} from 'src/api/categories'
+import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
 
 const Categories = () => {
   const logoPath = '/src/assets/images/categories/logo/' // TODO - move to environment constants
@@ -345,10 +346,10 @@ const Categories = () => {
             value={textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.shortDescription || ''}
             onChange={(e) => handleTextChange('shortDescription', e.target.value)}
           />
-          <CFormTextarea
+          <TextEditorMCE
             label="Description"
             className="mb-3"
-            rows={10}
+            rows={5}
             value={textEditingItem?.translations.find(t => t.language?.id === editLang?.id)?.description || ''}
             onChange={(e) => handleTextChange('description', e.target.value)}
           />
