@@ -31,7 +31,7 @@ class HelpService
         $help->setId($data['id'] ?? Uuid::v4());
         $help->setParentId($data['parentId']);
         $help->setName($data['name']);
-        $help->setUrl($data['url']);
+        $help->setUrl($data['url'] ?: null);
         $help->setOrder($data['order']);
 
         $this->em->persist($help);
@@ -45,7 +45,7 @@ class HelpService
     public function put(object $help, array $data): void
     {
         $help->setName($data['name']);
-        $help->setUrl($data['url']);
+        $help->setUrl($data['url'] ?: null);
 
         if (isset($data['contents']) && is_array($data['contents'])) {
             foreach ($data['contents'] as $content) {

@@ -119,10 +119,6 @@ const Help = () => {
       setError('Name is required')
       return
     }
-    if (!editing.url) {
-      setError('URL is required')
-      return
-    }
     try {
       editing.id
         ? await putHelp(editing.id, editing)
