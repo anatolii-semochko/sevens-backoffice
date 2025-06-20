@@ -12,7 +12,7 @@ init: init-ci frontend-ready
 init-ci: docker-down-clear \
 	api-clear frontend-clear \
 	docker-pull docker-build docker-up \
-	api-init frontend-init
+	frontend-init
 
 up: docker-up
 down: docker-down
@@ -49,9 +49,6 @@ docker-ps:
 ##########
 api-clear:
 	docker run --rm -v ${PWD}/${API_PATH}:/app -w /app alpine sh -c 'rm -rf var/cache/* var/log/* var/test/*'
-
-api-init:
-	echo 1
 
 api-permission:
 	docker run --rm -v ${PWD}/${API_PATH}:/app -w /app alpine chmod 777 var/cache var/log var/test
