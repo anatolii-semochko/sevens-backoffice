@@ -95,7 +95,7 @@ volumes:
 
 networks:
   blockchain.dev:
-    name: tokens-backoffice.dev
+    name: sevens-backoffice.dev
   proxy:
     external: true
-    name: tokens-proxy
+    name: sevens-proxy
