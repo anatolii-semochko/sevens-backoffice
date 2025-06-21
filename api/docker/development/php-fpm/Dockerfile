@@ -2,12 +2,34 @@ FROM php:8.4-fpm-alpine
 
 ENV XDEBUG_VERSION 3.4.1
 
-RUN apk add --no-cache libpq-dev fcgi git linux-headers \
-    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+RUN apk add --no-cache \
+    libpq-dev \
+    mariadb-dev \
+    fcgi \
+    git \
+    linux-headers \
+    imagemagick \
+    imagemagick-dev \
+    libwebp \
+    libwebp-dev \
+    libjpeg \
+    libjpeg-turbo \
+    libjpeg-turbo-dev \
+    jpeg-dev \
+    autoconf \
+    gcc \
+    g++ \
+    make \
+    pkgconfig
+
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && git clone --branch $XDEBUG_VERSION --depth 1 https://github.com/xdebug/xdebug.git /usr/src/php/ext/xdebug \
     && docker-php-ext-configure xdebug --enable-xdebug-dev \
-    && docker-php-ext-install pdo_pgsql xdebug \
+    && docker-php-ext-install pdo_pgsql xdebug pdo_mysql \
     && apk del git linux-headers
+
+RUN apk add --no-cache imagemagick imagemagick-dev
+RUN pecl install imagick && docker-php-ext-enable imagick
 
 RUN mv $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
 

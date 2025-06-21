@@ -12,7 +12,7 @@ init: init-ci frontend-ready
 init-ci: docker-down-clear \
 	api-clear frontend-clear \
 	docker-pull docker-build docker-up \
-	api-init frontend-init
+	frontend-init
 
 up: docker-up
 down: docker-down
@@ -50,14 +50,11 @@ docker-ps:
 api-clear:
 	docker run --rm -v ${PWD}/${API_PATH}:/app -w /app alpine sh -c 'rm -rf var/cache/* var/log/* var/test/*'
 
-api-init:
-	echo 1
-
 api-permission:
 	docker run --rm -v ${PWD}/${API_PATH}:/app -w /app alpine chmod 777 var/cache var/log var/test
 
 api-deps-install:
-	docker compose run --rm ${APP_PHP_CLI} composer install
+	docker compose run --rm --user root ${APP_PHP_CLI} composer install
 
 api-deps-update:
 	docker compose run --rm ${APP_PHP_CLI} composer update
@@ -121,7 +118,7 @@ frontend-clear:
 frontend-init: frontend-deps-install
 
 frontend-deps-install:
-	docker compose run --rm ${APP_NODE_CLI} yarn install
+	docker compose run --rm --user root ${APP_NODE_CLI} yarn install
 
 frontend-deps-update:
 	docker compose run --rm ${APP_NODE_CLI} yarn update
@@ -194,7 +191,7 @@ rollback:
 ###
 
 bash:
-	docker compose run --rm ${APP_PHP_CLI} bash
+	docker compose run --rm --user root ${APP_PHP_CLI} bash
 
 node:
 	docker compose run --rm ${APP_NODE_CLI} bash
