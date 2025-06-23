@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { CIcon } from '@coreui/icons-react'
-import { flagSet } from '@coreui/icons'
 import { fetchLanguages } from 'src/api/languages'
 
-const LanguageSelector = ({ size = 'xl', selected, onChange }) => {
+const LanguageSelector = ({ selected, onChange }) => {
   const dispatch = useDispatch()
   const allLanguages = useSelector((state) => state.languages)
   const selectedLanguage = useSelector((state) => state.selectedLanguage)
@@ -45,25 +43,22 @@ const LanguageSelector = ({ size = 'xl', selected, onChange }) => {
   return (
     <div className="d-flex align-items-center gap-3 mx-3">
       {languages.map((lang) => {
-        const iconKey = getIconKey(lang.code)
         const isSelected = currentLang?.code === lang.code
-        const flagIcon = flagSet[iconKey]
-        return flagIcon ? (
-          <CIcon
+        return (
+          <img
             key={lang.id}
-            icon={flagIcon}
-            size={size}
+            src={`/src/assets/images/language-flags/${lang.code}.png`}
             title={lang.name}
-            onClick={() => handleLanguageChange(lang)}
+            alt={lang.name}
             style={{
               cursor: 'pointer',
-              opacity: isSelected ? 1 : 0.5,
+              opacity: isSelected ? 1 : 0.3,
               border: isSelected ? '1px solid #007bff' : 'none',
-              borderRadius: '3px',
+              borderRadius: '2px',
+              height: '15px'
             }}
+            onClick={() => handleLanguageChange(lang)}
           />
-        ) : (
-          <span key={lang.id}>{lang.code}</span>
         )
       })}
     </div>

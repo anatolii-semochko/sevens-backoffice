@@ -76,4 +76,12 @@ const CompletedChart = ({ value }) => {
   )
 }
 
-export { EmptyDataRow, BooleanTrigger, LogoCell, CompletedChart }
+const LanguageFlag = ({language}) => (
+  <img src={`/src/assets/images/language-flags/${language.code}.png`}
+       title={language.name}
+       alt={language.name}
+       style={{ height: '30px', marginTop: '1px' }}
+  />
+)
+
+export { EmptyDataRow, BooleanTrigger, LogoCell, CompletedChart, LanguageFlag }

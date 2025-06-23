@@ -15,8 +15,7 @@ import {
 } from '@coreui/react'
 import { cilCheckCircle, cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import { flagSet } from '@coreui/icons'
-import { BooleanTrigger } from 'src/components/table/CustomTableElements'
+import { BooleanTrigger, LanguageFlag } from 'src/components/table/CustomTableElements'
 
 const Languages = () => {
   const dispatch = useDispatch()
@@ -42,9 +41,7 @@ const Languages = () => {
       const iconKey = `cif${code.charAt(0).toUpperCase()}${code.slice(1)}`
       return {
         ...item,
-        flag: flagSet[iconKey]
-          ? <CIcon icon={flagSet[iconKey]} size="xl" title={item.code} />
-          : item.code,
+        flag: <LanguageFlag language={item} />,
         main: item.main
           ? <CIcon icon={cilCheckCircle} className="text-success" title="Main" />
           : <CIcon
