@@ -195,3 +195,5 @@ bash:
 
 node:
 	docker compose run --rm ${APP_NODE_CLI} bash
+yarn-build:
+	docker compose run ${APP_NODE_CLI} yarn build
