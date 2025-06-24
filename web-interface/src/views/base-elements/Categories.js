@@ -317,7 +317,7 @@ const Categories = () => {
       <CModal visible={textModalVisible} onClose={() => setTextModalVisible(false)} size="lg">
         <CModalHeader closeButton>
           <div className="d-flex justify-content-between align-items-center w-100">
-            <div>Edit Translations ({editLang?.name || 'No Language'})</div>
+            <div>Edit <b>"{textEditingItem?.name}"</b> Translations ({editLang?.name || 'No Language'})</div>
             <LanguageSelector selected={editLang} onChange={setEditLang} />
           </div>
         </CModalHeader>
