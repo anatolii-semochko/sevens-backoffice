@@ -264,14 +264,13 @@ const Help = () => {
       <CModal visible={visible} onClose={() => setVisible(false)}>
         <CModalHeader closeButton>
           {editing?.id ? 'Edit Help' : 'Add Help'}
-          <LanguageSelector selected={editLang} onChange={setEditLang} />
         </CModalHeader>
         <CModalBody>
           <CFormInput
             className="mb-3"
             value={editing?.name || ''}
             onChange={e => setEditing({ ...editing, name: e.target.value })}
-            label="Language Name"
+            label="Name"
           />
           <CFormInput
             className="mb-3"
@@ -291,7 +290,7 @@ const Help = () => {
       <CModal visible={contentModalVisible} onClose={() => setContentModalVisible(false)} size="lg">
         <CModalHeader closeButton>
           <div className="d-flex justify-content-between align-items-center w-100">
-            <div>Edit Content ({editLang?.name || 'No Language'})</div>
+            <div>Edit <b>"{editing?.name}"</b> Content ({editLang?.name || 'No Language'})</div>
             <LanguageSelector selected={editLang} onChange={setEditLang} />
           </div>
         </CModalHeader>
