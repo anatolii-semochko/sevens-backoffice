@@ -42,7 +42,7 @@ const PagesContent = () => {
       setDebouncedTerm(termFilter)
       setDebouncedPageUrl(pageUrlFilter)
       setDebouncedTranslation(translationFilter)
-      setCurrentPage(1) // Скинути на першу сторінку при фільтрації
+      setCurrentPage(1)
     }, 500)
 
     return () => clearTimeout(handler)
@@ -66,6 +66,9 @@ const PagesContent = () => {
       })
       setItems(response.items)
       setTotalItems(response.total)
+      if (!response.items.length) {
+        setCurrentPage(1)
+      }
     } catch (e) {
       window.toast.error(fetchError(e))
     }

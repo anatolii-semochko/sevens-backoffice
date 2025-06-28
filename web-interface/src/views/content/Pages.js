@@ -33,6 +33,9 @@ const Pages = () => {
       const response = await fetchPages({ page: currentPage, limit: pageSize })
       setItems(response.items)
       setTotalItems(response.total)
+      if (!response.items.length) {
+        setCurrentPage(1)
+      }
     } catch (error) {
       window.toast.error(fetchError(error))
     }
