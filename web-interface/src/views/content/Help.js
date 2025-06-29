@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { EmptyDataRow, CompletedChart } from 'src/components/table/CustomTableElements'
 import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
+import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 
 const Help = () => {
   const [items, setItems] = useState([])
@@ -274,12 +275,19 @@ const Help = () => {
             onChange={e => setEditing({ ...editing, name: e.target.value })}
             label="Name"
           />
-          <CFormInput
-            className="mb-3"
-            value={editing?.url || ''}
-            onChange={e => setEditing({ ...editing, url: e.target.value })}
-            label="URL"
-          />
+          {editing?.id ? (
+            <SecureFormInput
+              value={editing?.url || ''}
+              onChange={e => setEditing({ ...editing, url: e.target.value })}
+              label="URL"
+            />
+          ) : (
+            <CFormInput
+              value={editing?.url || ''}
+              onChange={e => setEditing({ ...editing, url: e.target.value })}
+              label="URL"
+            />
+          )}
           {error && <CAlert color="danger" className="show mb-0 mt-3">{error}</CAlert>}
         </CModalBody>
 

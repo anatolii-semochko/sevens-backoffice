@@ -14,6 +14,7 @@ import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { LogoInput } from 'src/components/input-fields/LogoInput'
 import { BooleanTrigger } from 'src/components/table/CustomTableElements'
 import { EmptyDataRow, LogoCell, CompletedChart } from 'src/components/table/CustomTableElements'
+import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
 
 const Categories = () => {
@@ -291,12 +292,21 @@ const Categories = () => {
             value={editingItem?.name || ''}
             onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
           />
-          <CFormInput
-            className="mb-3"
-            label="URL"
-            value={editingItem?.url || ''}
-            onChange={(e) => setEditingItem({ ...editingItem, url: e.target.value })}
-          />
+          {!editingItem?.id && (
+            <CFormInput
+              className="mb-3"
+              label="URL"
+              value={editingItem?.url || ''}
+              onChange={(e) => setEditingItem({ ...editingItem, url: e.target.value })}
+            />
+          )}
+          {(editingItem?.id && editingItem?.parentId) && (
+            <SecureFormInput
+              label="URL"
+              value={editingItem?.url || ''}
+              onChange={(e) => setEditingItem({ ...editingItem, url: e.target.value })}
+            />
+          )}
           <div className="mb-3">
             <LogoInput
               path={logoPath}
