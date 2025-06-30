@@ -18,11 +18,12 @@ class HelpService
 
     public function fetchByFilter(array $criteria): array
     {
-        if (!empty($criteria['parentId'])) {
-            $criteria['parentId'] = $criteria['parentId'] === 'root' ? null : $criteria['parentId'];
+        if (array_key_exists('parentId', $criteria)) {
+            $criteria['parent'] = $criteria['parentId'] === 'root' ? null : $criteria['parentId'];
+            unset($criteria['parentId']);
         }
 
-        return $this->repository->findBy($criteria, ['order' => 'ASC']);
+        return $this->repository->fetchByFilter($criteria);
     }
 
     public function create(array $data): Help
@@ -38,14 +39,21 @@ class HelpService
         $this->em->flush();
 
         $this->indexHelps();
-        
+
         return $help;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function put(object $help, array $data): void
     {
         $help->setName($data['name']);
         $help->setUrl($data['url'] ?: null);
+
+        if ($help->getChildrenData() && !$help->getUrl()) {
+            throw new \Exception('Help must have url if it has children');
+        }
 
         if (isset($data['contents']) && is_array($data['contents'])) {
             foreach ($data['contents'] as $content) {
@@ -98,13 +106,13 @@ class HelpService
 
         $this->indexHelps();
     }
-    
+
     public function delete(Object $help): void
     {
         $this->em->remove($help);
         $this->em->flush();
     }
-    
+
     public function swapHelp(Object $currentHelp, Object $swapHelp): void
     {
         $currentOrder = $currentHelp->getOrder();

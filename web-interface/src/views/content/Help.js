@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { fetchHelps, createHelp, putHelp, patchHelp, deleteHelp, swapHelpOrder, fetchError } from 'src/api/help'
+import { fetchHelps, createHelp, putHelp, deleteHelp, swapHelpOrder, fetchError } from 'src/api/help'
 import {
   CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter,
@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { EmptyDataRow, CompletedChart } from 'src/components/table/CustomTableElements'
 import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
+import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 
 const Help = () => {
   const [items, setItems] = useState([])
@@ -91,7 +92,7 @@ const Help = () => {
       setContentModalVisible(false)
       loadData(currentParent, breadcrumb)
     } catch (error) {
-      loadData(fetchError(error))
+      setError(fetchError(error))
     }
   }
 
@@ -126,7 +127,7 @@ const Help = () => {
       setVisible(false)
       loadData(currentParent, breadcrumb)
     } catch (e) {
-      setError(e.message)
+      setError(fetchError(e))
     }
   }
 
@@ -224,9 +225,11 @@ const Help = () => {
               return (
                 <CTableRow key={item.id}>
                   <CTableDataCell>
-                    <a href="#" onClick={e => { e.preventDefault(); handleNameClick(item) }}>
-                      {item.name}
-                    </a>
+                    {item.url ? (
+                      <a href="#" className="text-link-active" onClick={e => { e.preventDefault(); handleNameClick(item) }}>
+                        {item.name}
+                      </a>
+                    ) : item.name}
                   </CTableDataCell>
                   <CTableDataCell>{item.url}</CTableDataCell>
                   <CTableDataCell>{translation?.title || empty('title')}</CTableDataCell>
@@ -243,8 +246,8 @@ const Help = () => {
                       className="me-2"
                       title="Move Up"
                       size="sm"
-                      disabled={idx <= 0}
-                      color={idx <= 0 ? 'secondary' : 'info'}
+                      disabled={idx <= 0 || !item.url}
+                      color={idx <= 0 || !item.url ? 'secondary' : 'info'}
                       onClick={() => handleOrderUp(idx)}
                     >
                       <CIcon icon={cilArrowTop} />
@@ -272,12 +275,19 @@ const Help = () => {
             onChange={e => setEditing({ ...editing, name: e.target.value })}
             label="Name"
           />
-          <CFormInput
-            className="mb-3"
-            value={editing?.url || ''}
-            onChange={e => setEditing({ ...editing, url: e.target.value })}
-            label="URL"
-          />
+          {editing?.id ? (
+            <SecureFormInput
+              value={editing?.url || ''}
+              onChange={e => setEditing({ ...editing, url: e.target.value })}
+              label="URL"
+            />
+          ) : (
+            <CFormInput
+              value={editing?.url || ''}
+              onChange={e => setEditing({ ...editing, url: e.target.value })}
+              label="URL"
+            />
+          )}
           {error && <CAlert color="danger" className="show mb-0 mt-3">{error}</CAlert>}
         </CModalBody>
 
