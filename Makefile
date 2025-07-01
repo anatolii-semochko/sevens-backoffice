@@ -197,3 +197,6 @@ node:
 	docker compose run --rm ${APP_NODE_CLI} bash
 yarn-build:
 	docker compose run ${APP_NODE_CLI} yarn build
+
+build-permissions:
+	sudo chmod 777 web-interface/package.json web-interface/package-lock.json
