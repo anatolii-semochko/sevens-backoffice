@@ -77,7 +77,7 @@ const CompletedChart = ({ value }) => {
 }
 
 const LanguageFlag = ({language}) => (
-  <img src={`/src/assets/images/language-flags/${language.code}.png`}
+  <img src={`/src/assets/frontend/images/language-flags/${language.code}.png`}
        title={language.name}
        alt={language.name}
        style={{ height: '30px', marginTop: '1px' }}

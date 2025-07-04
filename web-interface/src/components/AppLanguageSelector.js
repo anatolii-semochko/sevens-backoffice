@@ -47,7 +47,7 @@ const LanguageSelector = ({ selected, onChange }) => {
         return (
           <img
             key={lang.id}
-            src={`/src/assets/images/language-flags/${lang.code}.png`}
+            src={`/src/assets/frontend/images/language-flags/${lang.code}.png`}
             title={lang.name}
             alt={lang.name}
             style={{

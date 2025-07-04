@@ -185,7 +185,7 @@ const Help = () => {
   const Breadcrumbs = () => (
     <div className="mb-3 d-flex align-items-center">
       <img
-        src="/src/assets/images/custom/up.png"
+        src="/src/assets/images/up.png"
         onClick={breadcrumb.length ? handleGoUp : undefined}
         className={breadcrumb.length ? 'c_pointer' : ''}
         style={{ opacity: breadcrumb.length ? 1 : 0.4, cursor: breadcrumb.length ? 'pointer' : 'default' }}
