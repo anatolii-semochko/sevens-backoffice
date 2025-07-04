@@ -4,6 +4,7 @@ namespace App\Controller\PagesContent;
 
 use App\Controller\BaseController;
 use App\Repository\Help\HelpRepository;
+use App\Service\PagesContent\HelpGenerateService;
 use App\Service\PagesContent\HelpService;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,10 +15,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class HelpController extends BaseController
 {
     private const array HELP_GROUPS = ['groups' => ['help:read', 'help-content:read', 'language:read']];
-    
+
     public function __construct(
-        private HelpRepository $repository,
-        private HelpService $service,
+        readonly private HelpRepository $repository,
+        readonly private HelpService $service,
+        readonly private HelpGenerateService $helpGenerateService,
     ) {}
 
     #[Route('', name: 'help_fetch', methods: ['GET'])]
@@ -104,5 +106,17 @@ class HelpController extends BaseController
         }
 
         return $this->json(null);
+    }
+
+    #[Route('/generate', name: 'help_generate_files', methods: ['POST'])]
+    public function generate(): JsonResponse
+    {
+        try {
+            $result = $this->helpGenerateService->generate();
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $this->json(['message' => $result]);
     }
 }
