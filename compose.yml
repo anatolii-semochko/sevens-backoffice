@@ -39,6 +39,7 @@ services:
       - ./api:/app
       - ./api/docker/common/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ../sevenstime-storage/images:/app/public/frontend/images
+      - ../sevenstime-storage/files:/app/public/frontend/files
     networks:
       - default
       - blockchain.dev
@@ -60,6 +61,7 @@ services:
     volumes:
       - ./api:/app
       - ../sevenstime-storage/images:/app/public/frontend/images
+      - ../sevenstime-storage/files:/app/public/frontend/files
 
   api-php-cli:
     build:
@@ -73,6 +75,7 @@ services:
     volumes:
       - ./api:/app
       - ../sevenstime-storage/images:/app/public/frontend/images
+      - ../sevenstime-storage/files:/app/public/frontend/files
 
 secrets:
   api_db_password:
