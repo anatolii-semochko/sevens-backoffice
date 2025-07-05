@@ -8,8 +8,8 @@ use ImagickException;
 
 class FileService
 {
-    public const string FILE_DIR = '/shared/';
-    public const string CATEGORY_LOGO = 'images/categories/logo';
+    public const string FILE_DIR = '/app/public/';
+    public const string CATEGORY_LOGO = 'frontend/images/categories-logo';
 
     /**
      * @throws Exception
@@ -55,7 +55,7 @@ class FileService
             $image->clear();
             $image->clear();
         } catch (ImagickException $e) {
-            throw new Exception($e->getMessage());       
+            throw new Exception($e->getMessage());
         }
 
         return $savedFileName;

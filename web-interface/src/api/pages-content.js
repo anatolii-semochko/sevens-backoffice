@@ -22,4 +22,7 @@ export const patchContent = (id, data) => api
 export const deleteContent = (id) => api
   .delete(`${mainUrl}/${id}`)
 
+export const generateContent = () => api
+  .post(`${mainUrl}/generate`, {})
+
 export const fetchError = (error) => fetchErrorMessage(error)

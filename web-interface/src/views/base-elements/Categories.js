@@ -18,7 +18,7 @@ import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
 
 const Categories = () => {
-  const logoPath = '/src/assets/images/categories/logo/' // TODO - move to environment constants
+  const logoPath = '/src/assets/frontend/images/categories-logo/' // TODO - move to environment constants
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
@@ -182,7 +182,7 @@ const Categories = () => {
   const Breadcrumbs = () => (
     <div className="mb-3 d-flex align-items-center">
       <img
-        src="/src/assets/images/custom/up.png"
+        src="/src/assets/images/up.png"
         onClick={breadcrumb.length ? handleGoUp : undefined}
         className={breadcrumb.length ? 'c_pointer' : ''}
         style={{ opacity: breadcrumb.length ? 1 : 0.4, cursor: breadcrumb.length ? 'pointer' : 'default' }}

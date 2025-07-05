@@ -25,4 +25,7 @@ export const deleteHelp = (id) => api
 export const swapHelpOrder = (id, swapId) => api
   .patch(`${mainUrl}/${id}/swap`, {swapId})
 
+export const generateHelp = () => api
+  .post(`${mainUrl}/generate`, {})
+
 export const fetchError = (error) => fetchErrorMessage(error)

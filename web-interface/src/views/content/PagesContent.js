@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { fetchContent, patchContent, deleteContent, createContent, fetchError } from 'src/api/pages-content'
+import {
+  fetchContent, patchContent, deleteContent,
+  createContent, generateContent, fetchError
+} from 'src/api/pages-content'
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
@@ -156,6 +159,15 @@ const PagesContent = () => {
       window.toast.error(fetchError(e))
     }
   }
+
+  const handleGenerate = async () => {
+    try {
+      await generateContent().then((result) => window.toast.success(result.data?.message))
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
+  }
+
   const getCompletedValue = (translationsArray) => {
     if (!languages?.length) return 0
 
@@ -187,9 +199,14 @@ const PagesContent = () => {
         />
         <div className="d-flex gap-2">
           {isFiltered && <CButton color="danger" size="sm" onClick={handleClearFilter}>Clear Filter</CButton>}
-          <CButton color="success" size="sm" onClick={handleCreate}>
-            <CIcon icon={cilPlus} className="me-1 pt-1"/> Add Term
-          </CButton>
+          <div className="d-flex gap-2">
+            <CButton color="success" size="sm" onClick={handleCreate}>
+              <CIcon icon={cilPlus} className="me-1 pt-1"/> Add Term
+            </CButton>
+            <CButton color="warning" size="sm" onClick={handleGenerate}>
+              Generate Term Translation Files
+            </CButton>
+          </div>
         </div>
         </div>
         <CCardBody>

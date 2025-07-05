@@ -10,7 +10,7 @@ use App\Repository\PagesContent\PageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
-class PageContentService
+readonly class PageContentService
 {
     public function __construct(
         private EntityManagerInterface $em,
@@ -21,7 +21,7 @@ class PageContentService
     public function fetchByFilter(array $criteria): array
     {
         $allowedFields = ['term', 'pageUrl', 'translation'];
-        
+
         $page = $criteria['page'] ?? 1;
         $limit = $criteria['limit'] ?? 10;
         $offset = ($page - 1) * $limit;
@@ -124,12 +124,12 @@ class PageContentService
     public function create(array $data): PageContent
     {
         $page = $this->pageRepository->find($data['page']['id'] ?? null);
-       
+
         $pageContent = new PageContent();
         $pageContent->setId($data['id'] ?? Uuid::v4());
         $pageContent->setTerm($data['term']);
         $pageContent->setPage($page);
-        
+
         $this->em->persist($pageContent);
         $this->em->flush();
 
@@ -178,7 +178,7 @@ class PageContentService
 
         $this->em->flush();
     }
-    
+
     public function delete(Object $page): void
     {
         $this->em->remove($page);

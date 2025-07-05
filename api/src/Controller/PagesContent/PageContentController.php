@@ -3,6 +3,7 @@ namespace App\Controller\PagesContent;
 
 use App\Controller\BaseController;
 use App\Repository\PagesContent\PageContentRepository;
+use App\Service\PagesContent\PageContentGenerateService;
 use App\Service\PagesContent\PageContentService;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,8 +21,9 @@ class PageContentController extends BaseController
     ]];
 
     public function __construct(
-        private PageContentRepository $repository,
-        private PageContentService $service,
+        readonly private PageContentRepository $repository,
+        readonly private PageContentService $service,
+        readonly private PageContentGenerateService $pageContentGenerateService,
     ) {}
 
     #[Route('', methods: ['GET'])]
@@ -97,5 +99,17 @@ class PageContentController extends BaseController
         }
 
         return $this->json(null);
+    }
+
+    #[Route('/generate', methods: ['POST'])]
+    public function generate(): Response
+    {
+        try {
+            $result = $this->pageContentGenerateService->generate();
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $this->json(['message' => $result]);
     }
 }
