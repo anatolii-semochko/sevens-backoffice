@@ -55,10 +55,10 @@ const Pages = () => {
     setVisible(true)
   }
 
-  const handleRemove = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this page?')) return
+  const handleRemove = async (page) => {
+    if (!window.confirm(`Are you sure you want to delete page "${page.url}"?`)) return
     try {
-      await deletePage(id)
+      await deletePage(page.id)
       fetchData()
     } catch (error) {
       window.toast.error(fetchError(error))
@@ -195,7 +195,7 @@ const Pages = () => {
                     <CButton size="sm" color="info" className="me-2" onClick={() => handleEditText(item)}>
                       SEO
                     </CButton>
-                    <CButton size="sm" color="danger" onClick={() => handleRemove(item.id)}>
+                    <CButton size="sm" color="danger" onClick={() => handleRemove(item)}>
                       <CIcon icon={cilTrash} />
                     </CButton>
                   </CTableDataCell>

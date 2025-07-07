@@ -109,9 +109,9 @@ const Help = () => {
     })
   }
 
-  const handleRemove = async (id) => {
-    if (!window.confirm('Ви дійсно хочете видалити?')) return
-    await deleteHelp(id)
+  const handleRemove = async (help) => {
+    if (!window.confirm(`Are you sure you want to delete help "${help.name}"?`)) return
+    await deleteHelp(help.id)
     loadData(currentParent, breadcrumb)
   }
 
@@ -265,7 +265,7 @@ const Help = () => {
                     >
                       <CIcon icon={cilArrowTop} />
                     </CButton>
-                    <CButton color="danger" size="sm" onClick={() => handleRemove(item.id)}>
+                    <CButton color="danger" size="sm" onClick={() => handleRemove(item)}>
                       <CIcon icon={cilTrash} />
                     </CButton>
                   </CTableDataCell>
