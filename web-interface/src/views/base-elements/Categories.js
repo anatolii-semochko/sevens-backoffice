@@ -75,10 +75,10 @@ const Categories = () => {
     setVisible(true)
   }
 
-  const handleRemove = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this category?')) return
+  const handleRemove = async (category) => {
+    if (!window.confirm(`Are you sure you want to delete category "${category.name}"?`)) return
     try {
-      await deleteCategory(id)
+      await deleteCategory(category.id)
       fetchData(currentParent, breadcrumb)
     } catch (error) {
       window.toast.error(fetchError(error))
@@ -270,7 +270,7 @@ const Categories = () => {
                     >
                       <CIcon icon={cilArrowTop} />
                     </CButton>
-                    <CButton color="danger" size="sm" onClick={() => handleRemove(item.id)} title="Remove">
+                    <CButton color="danger" size="sm" onClick={() => handleRemove(item)} title="Remove">
                       <CIcon icon={cilTrash} />
                     </CButton>
                   </CTableDataCell>

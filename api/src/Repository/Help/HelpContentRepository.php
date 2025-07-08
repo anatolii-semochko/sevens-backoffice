@@ -6,6 +6,9 @@ use App\Entity\Help\HelpContent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<HelpContent>
+ */
 class HelpContentRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -28,6 +31,4 @@ class HelpContentRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
-    // Додаткові методи запиту за потреби...
 }

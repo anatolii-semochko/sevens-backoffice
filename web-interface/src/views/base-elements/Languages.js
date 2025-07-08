@@ -67,10 +67,10 @@ const Languages = () => {
     setVisible(true)
   }
 
-  const handleRemove = async (id) => {
+  const handleRemove = async (language) => {
     try {
-      if (!window.confirm('Are you sure you want to delete this language?')) return
-      await deleteLanguage(id)
+      if (!window.confirm(`Are you sure you want to delete language "${language.name}"?`)) return
+      await deleteLanguage(language.id)
       fetchData()
     } catch (error) {
       window.toast.error(fetchError(error))
@@ -197,7 +197,7 @@ const Languages = () => {
                   >
                     <CIcon icon={cilArrowTop} />
                   </CButton>
-                  <CButton size="sm" color="danger" onClick={() => handleRemove(item.id)} title="Remove">
+                  <CButton size="sm" color="danger" onClick={() => handleRemove(item)} title="Remove">
                     <CIcon icon={cilTrash} />
                   </CButton>
                 </CTableDataCell>

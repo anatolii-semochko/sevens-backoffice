@@ -150,10 +150,10 @@ const PagesContent = () => {
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this term?')) return
+  const handleDelete = async (term) => {
+    if (!window.confirm(`Are you sure you want to delete term "${term.term}"?`)) return
     try {
-      await deleteContent(id)
+      await deleteContent(term.id)
       fetchData()
     } catch (e) {
       window.toast.error(fetchError(e))
@@ -261,7 +261,7 @@ const PagesContent = () => {
                     <CButton size="sm" color="info" className="me-2" onClick={() => handleEdit(item)}>
                       <CIcon icon={cilPen}/>
                     </CButton>
-                    <CButton size="sm" color="danger" onClick={() => handleDelete(item.id)}>
+                    <CButton size="sm" color="danger" onClick={() => handleDelete(item)}>
                       <CIcon icon={cilTrash}/>
                     </CButton>
                   </CTableDataCell>

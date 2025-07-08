@@ -8,6 +8,7 @@ APP_PHP_CLI=api-php-cli
 APP_NODE_CLI=web-interface-node-cli
 
 init: init-ci frontend-ready
+init-build: init app-build
 
 init-ci: docker-down-clear \
 	api-clear frontend-clear \
@@ -143,6 +144,11 @@ build-api:
 try-build:
 	REGISTRY=localhost IMAGE_TAG=0 make build
 
+app-build:
+	docker compose run --rm --user root ${APP_PHP_CLI} composer install
+	docker compose run ${APP_NODE_CLI} npm install
+	docker compose run ${APP_NODE_CLI} yarn build
+
 push: push-frontend push-api
 
 push-frontend:
@@ -199,4 +205,4 @@ yarn-build:
 	docker compose run ${APP_NODE_CLI} yarn build
 
 build-permissions:
-	sudo chmod 777 web-interface/package.json web-interface/package-lock.json
+	sudo chmod 777 web-interface/package.json web-interface/yarn.lock web-interface/package-lock.json
