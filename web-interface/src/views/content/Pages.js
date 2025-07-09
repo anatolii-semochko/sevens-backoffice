@@ -277,6 +277,9 @@ const Pages = () => {
                   onChange={(e) => handleTextChange('description', e.target.value)}
                   rows={3}
                 />
+                {textEditingItem?.terms && (
+                  <div className="mb-2">Available terms - {textEditingItem?.terms}</div>
+                )}
               </>
             )
           })()}
