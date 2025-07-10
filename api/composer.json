@@ -7,9 +7,11 @@
         "php": ">=8.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-imagick": "*",
         "doctrine/doctrine-bundle": "^2.14",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^2.9",
+        "egulias/email-validator": "^4.0",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
         "symfony/flex": "^2",
@@ -20,8 +22,7 @@
         "symfony/serializer": "7.2.*",
         "symfony/uid": "7.2.*",
         "symfony/validator": "7.2.*",
-        "symfony/yaml": "7.2.*",
-        "ext-imagick": "*"
+        "symfony/yaml": "7.2.*"
     },
     "config": {
         "allow-plugins": {
