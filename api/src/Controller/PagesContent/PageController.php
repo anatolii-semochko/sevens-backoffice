@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class PageController extends BaseController
 {
     private const array PAGE_GROUPS = ['groups' => ['page:read', 'page-seo:read', 'language:read']];
-    
+
     public function __construct(
         private PageRepository $repository,
         private PageService $service,
@@ -29,7 +29,7 @@ class PageController extends BaseController
             $limit = $request->query->getInt('limit', 10);
             $offset = ($page - 1) * $limit;
             $result = [
-                'items' => $this->repository->findBy($criteria, null, $limit, $offset),
+                'items' => $this->repository->findBy($criteria, ['url' => 'ASC'], $limit, $offset),
                 'total' => $this->repository->count($criteria),
             ];
         } catch (\Exception $e) {
