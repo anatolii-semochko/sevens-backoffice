@@ -15,8 +15,8 @@ class UserController extends BaseController
     public const array USER_GROUPS = ['groups' => 'user:read'];
 
     public function __construct(
-        private UserRepository $repository,
-        private UserService $service,
+        private readonly UserRepository $repository,
+        private readonly UserService $service,
     ) {}
 
     #[Route('', name: 'user_fetch', methods: ['GET'])]

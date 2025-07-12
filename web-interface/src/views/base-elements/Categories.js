@@ -18,7 +18,7 @@ import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
 
 const Categories = () => {
-  const logoPath = '/src/assets/frontend/images/categories-logo/' // TODO - move to environment constants
+  const logoPath = useSelector((state) => state.path.categoryLogos)
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)

@@ -16,6 +16,9 @@ readonly class PageContentGenerateService
 
     public function generate(): string
     {
+        // TODO - Implement translations page
+        throw new \Exception('Function is blocked');
+
         $languages = $this->languageRepository->findAll();
         $pageContents = $this->pageContentRepository->findAll();
 

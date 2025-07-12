@@ -4,6 +4,7 @@ import { fetchLanguages } from 'src/api/languages'
 
 const LanguageSelector = ({ selected, onChange }) => {
   const dispatch = useDispatch()
+  const flagsPath = useSelector((state) => state.path.languageFlags)
   const allLanguages = useSelector((state) => state.languages)
   const selectedLanguage = useSelector((state) => state.selectedLanguage)
 
@@ -47,7 +48,7 @@ const LanguageSelector = ({ selected, onChange }) => {
         return (
           <img
             key={lang.id}
-            src={`/src/assets/frontend/images/language-flags/${lang.code}.png`}
+            src={`${flagsPath}/${lang.code}.png`}
             title={lang.name}
             alt={lang.name}
             style={{

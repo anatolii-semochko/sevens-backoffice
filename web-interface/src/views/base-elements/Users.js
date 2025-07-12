@@ -8,11 +8,12 @@ import {
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import React, { useEffect, useState } from 'react'
+import store from 'src/store'
 import { fetchUsers, createUser, patchUser, deleteUser, fetchError } from 'src/api/users'
 import { LogoInput } from 'src/components/input-fields/LogoInput'
 
 const Users = () => {
-  const avatarPath = '/src/assets/frontend/images/avatars/' // TODO - move to environment constants
+  const userAvatars = store.getState().path.userAvatars
   const [items, setItems] = useState([])
   const [visible, setVisible] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
@@ -108,7 +109,7 @@ const Users = () => {
               <CTableRow key={item.id}>
                 <CTableDataCell>
                   {item.avatar ? (
-                    <CAvatar src={avatarPath + 'small-' + item.avatar} status={item.active ? 'success' : 'danger'} />
+                    <CAvatar src={userAvatars + 'small-' + item.avatar} status={item.active ? 'success' : 'danger'} />
                   ) : (
                     <CAvatar status={item.active ? 'success' : 'danger'}>{getInitials(item.fullName)}</CAvatar>
                   )}
@@ -156,7 +157,7 @@ const Users = () => {
             onChange={(e) => setEditingItem({ ...editingItem, email: e.target.value })}
           />
           <LogoInput
-            path={avatarPath}
+            path={userAvatars}
             prefix={'large-'}
             value={editingItem?.avatar || null}
             onChange={(file) => setEditingItem({ ...editingItem, avatar: file })}
