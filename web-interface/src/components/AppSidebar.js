@@ -30,7 +30,7 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarHeader className="border-bottom justify-content-lg-start">
-        <img src="/src/assets/frontend/images/sevens-logo.svg" style={{ height: '32px' }} />
+        <img src="/storage/images/sevens-logo.svg" style={{ height: '32px' }} alt="Sevenstime Logo"/>
         <b className="ps-3" style={{fontSize: '20px'}}>SEVENSTIME</b>
         <CCloseButton
           className="d-lg-none"

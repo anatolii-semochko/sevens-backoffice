@@ -1,8 +1,9 @@
-import { CSpinner } from "@coreui/react"
-import React from "react";
-import { CChartDoughnut } from "@coreui/react-chartjs"
-import CIcon from "@coreui/icons-react";
-import { cilCheckCircle, cilXCircle } from "@coreui/icons";
+import { CSpinner } from '@coreui/react'
+import React from 'react'
+import store from 'src/store'
+import { CChartDoughnut } from '@coreui/react-chartjs'
+import CIcon from '@coreui/icons-react'
+import { cilCheckCircle, cilXCircle } from '@coreui/icons'
 
 const EmptyDataRow = ({
   loading = false,
@@ -77,7 +78,7 @@ const CompletedChart = ({ value }) => {
 }
 
 const LanguageFlag = ({language}) => (
-  <img src={`/src/assets/frontend/images/language-flags/${language.code}.png`}
+  <img src={`${store.getState().path.languageFlags}/${language.code}.png`}
        title={language.name}
        alt={language.name}
        style={{ height: '30px', marginTop: '1px' }}

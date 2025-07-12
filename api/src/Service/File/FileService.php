@@ -9,8 +9,8 @@ use ImagickException;
 class FileService
 {
     public const string FILE_DIR = '/app/public/';
-    public const string CATEGORY_LOGO = 'frontend/images/categories-logo';
-    public const string USER_AVATAR = 'frontend/images/avatars';
+    public const string CATEGORY_LOGO = 'storage/images/category-logos';
+    public const string USER_AVATAR = 'web/images/user-avatars';
 
     /**
      * @throws Exception

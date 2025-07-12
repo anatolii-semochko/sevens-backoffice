@@ -9,7 +9,7 @@ use App\Repository\LanguageRepository;
 readonly class HelpGenerateService
 {
     public function __construct(
-        private string $helpTranslationsFolder,
+        private string $pathHelpTranslations,
         private LanguageRepository $languageRepository,
         private HelpRepository $helpRepository,
         private HelpContentRepository $helpContentRepository,
@@ -42,7 +42,7 @@ readonly class HelpGenerateService
 
     private function saveFile(string $locale, array $data): void
     {
-        $filePath = $this->helpTranslationsFolder . DIRECTORY_SEPARATOR . "help.{$locale}.json";
+        $filePath = $this->pathHelpTranslations . DIRECTORY_SEPARATOR . "help.{$locale}.json";
         if (file_exists($filePath)) {
             unlink($filePath);
         }
