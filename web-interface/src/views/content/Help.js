@@ -189,6 +189,7 @@ const Help = () => {
         onClick={breadcrumb.length ? handleGoUp : undefined}
         className={breadcrumb.length ? 'c_pointer' : ''}
         style={{ opacity: breadcrumb.length ? 1 : 0.4, cursor: breadcrumb.length ? 'pointer' : 'default' }}
+        alt="Up"
       />
       <div className="ms-2" style={{ fontSize: '20px' }}>
         <a className={breadcrumb.length ? 'text-link-active' : 'text-link'} onClick={() => loadData(null, [])}>Root</a>

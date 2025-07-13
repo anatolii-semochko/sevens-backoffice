@@ -23,3 +23,8 @@ export const deleteUser = (id) => api
   .delete(`${mainUrl}/${id}`)
 
 export const fetchError = (error) => fetchErrorMessage(error)
+
+export const fetchCurrentUser = () =>
+  api
+    .get(`${mainUrl}/me`)
+    .then((res) => res.data)

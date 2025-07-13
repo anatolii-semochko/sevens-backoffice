@@ -44,6 +44,10 @@ const BooleanTrigger = ({
   )
 }
 
+const BooleanStatusIcon = ({status, color, title}) => status ?
+  <CIcon icon={cilCheckCircle} className={color ?? 'text-success'} title={title} /> :
+  <CIcon icon={cilXCircle} className={color ?? 'text-danger'} title={title} />
+
 const LogoCell = ({path, value}) => (
   <div className="row-cell-center-50">
     {value
@@ -85,4 +89,4 @@ const LanguageFlag = ({language}) => (
   />
 )
 
-export { EmptyDataRow, BooleanTrigger, LogoCell, CompletedChart, LanguageFlag }
+export { EmptyDataRow, BooleanTrigger, BooleanStatusIcon, LogoCell, CompletedChart, LanguageFlag }

@@ -1,16 +1,18 @@
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
-  CCardBody, CAlert, CAvatar
+  CCardBody, CAlert
 } from '@coreui/react'
 import { cilPencil, cilTrash, cilPlus } from '@coreui/icons'
+import { TfiReload } from 'react-icons/tfi'
 import CIcon from '@coreui/icons-react'
 import React, { useEffect, useState } from 'react'
 import store from 'src/store'
 import { fetchUsers, createUser, patchUser, deleteUser, fetchError } from 'src/api/users'
+import { UserAvatar } from 'src/components/table/UserAvatar'
 import { LogoInput } from 'src/components/input-fields/LogoInput'
 import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
-import { BooleanTrigger } from 'src/components/table/CustomTableElements'
+import { BooleanTrigger, BooleanStatusIcon } from 'src/components/table/CustomTableElements'
 import { dateTime } from 'src/components/utils/DateTime'
 
 const Users = () => {
@@ -29,9 +31,7 @@ const Users = () => {
     }
   }
 
-  useEffect(() => {
-    fetchData()
-  }, [])
+  useEffect(() => fetchData(), [])
 
   const handleEdit = (item) => {
     setErrorMessage('')
@@ -69,19 +69,18 @@ const Users = () => {
     }
   }
 
-  const getInitials = (fullName) => fullName
-      .split(' ')
-      .filter(fullName => fullName.length > 0)
-      .map(fullName => fullName[0].toUpperCase())
-      .join('');
-
   return (
     <div className="card p-4 pb-0 mb-4">
       <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
         <h4 className="mb-0">Users</h4>
-        <CButton color="success" size="sm" onClick={handleAdd}>
-          <CIcon icon={cilPlus} className="me-1 pt-1" /> Add User
-        </CButton>
+        <div className="d-flex gap-2">
+          <CButton size="sm" title="Reload" onClick={() => fetchData()}>
+            <TfiReload />
+          </CButton>
+          <CButton color="success" size="sm" onClick={handleAdd}>
+            <CIcon icon={cilPlus} className="me-1 pt-1" /> Add User
+          </CButton>
+        </div>
       </div>
       <CCardBody>
         <CTable className="no-border-last" hover responsive>
@@ -89,24 +88,21 @@ const Users = () => {
             <CTableRow>
               <CTableHeaderCell><div className="row-cell-center-50">Avatar</div></CTableHeaderCell>
               <CTableHeaderCell>Full Name</CTableHeaderCell>
+              <CTableHeaderCell>Role</CTableHeaderCell>
               <CTableHeaderCell>Email</CTableHeaderCell>
               <CTableHeaderCell>Created</CTableHeaderCell>
               <CTableHeaderCell>Last Active</CTableHeaderCell>
               <CTableHeaderCell><div className="row-cell-center-50">Active</div></CTableHeaderCell>
+              <CTableHeaderCell><div className="row-cell-center-50">Authorized</div></CTableHeaderCell>
               <CTableHeaderCell style={{ width: 1 }}>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
             {items.map((item) => (
               <CTableRow key={item.id}>
-                <CTableDataCell>
-                  {item.avatar ? (
-                    <CAvatar src={userAvatars + 'small-' + item.avatar} status={item.active ? 'success' : 'danger'} />
-                  ) : (
-                    <CAvatar status={item.active ? 'success' : 'danger'}>{getInitials(item.fullName)}</CAvatar>
-                  )}
-                </CTableDataCell>
+                <CTableDataCell><UserAvatar user={item} showStatus={true} /></CTableDataCell>
                 <CTableDataCell>{item.fullName}</CTableDataCell>
+                <CTableDataCell>Admin</CTableDataCell>
                 <CTableDataCell>{item.email}</CTableDataCell>
                 <CTableDataCell>{dateTime(item.createdAt)}</CTableDataCell>
                 <CTableDataCell>{dateTime(item.lastActivityAt)}</CTableDataCell>
@@ -118,6 +114,13 @@ const Users = () => {
                       await patchUser(i.id, { active: i.active ? 0 : 1 })
                       fetchData()
                     }}
+                  />
+                </CTableDataCell>
+                <CTableDataCell>
+                  <BooleanStatusIcon
+                    status={item.authorized}
+                    color={'text-warning'}
+                    title={item.authorized ? 'Authorized' : 'Not Authorized'}
                   />
                 </CTableDataCell>
                 <CTableDataCell className="text-nowrap">

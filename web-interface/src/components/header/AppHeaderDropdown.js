@@ -1,25 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import {
-  CAvatar,
-  CDropdown,
-  CDropdownDivider,
-  CDropdownHeader,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle,
-} from '@coreui/react'
-import {
-  cilLockLocked,
-  cilUser,
-} from '@coreui/icons'
+import { useSelector } from 'react-redux'
+import { logout as apiLogout } from 'src/api/auth'
+import { CDropdown, CDropdownDivider, CDropdownHeader, CDropdownItem, CDropdownMenu, CDropdownToggle } from '@coreui/react'
+import { cilLockLocked, cilUser } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
+import { UserAvatar } from 'src/components/table/UserAvatar'
 import ProfileModal from 'src/views/UserAccount/ProfileModal'
 
 const AppHeaderDropdown = () => {
-
-
   const [profileVisible, setProfileVisible] = useState(false)
-  const [user, setUser] = useState({ email: 'test@example.com', avatar: '' }) // або отримати з API/store
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
     const openModal = () => setProfileVisible(true)
@@ -33,18 +23,23 @@ const AppHeaderDropdown = () => {
     setProfileVisible(false)
   }
 
-
-  const logout = () => console.log('logout')
+  const logout = async () => {
+    await apiLogout()
+    window.location.replace('/login')
+  }
 
   return (
     <>
       <CDropdown variant="nav-item">
         <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
-          <CAvatar src="" size="md" />
+          {user && <UserAvatar user={user} size={'md'} />}
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
           <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Account</CDropdownHeader>
-          <CDropdownItem className="cursor-pointer" onClick={() => window.dispatchEvent(new Event('openProfile'))}>
+          <CDropdownItem
+            className="cursor-pointer"
+            onClick={() => window.dispatchEvent(new Event('openProfile'))}
+          >
             <CIcon icon={cilUser} className="me-2" />
             Profile
           </CDropdownItem>
