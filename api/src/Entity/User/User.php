@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
+use DateTimeImmutable;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'admin_users')]
@@ -23,8 +24,8 @@ class User
     #[Groups(['user:read'])]
     private string $email;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $password;
+    #[ORM\Column(type: 'string', length: 64)]
+    private string $passwordHash;
 
     #[ORM\Column(type: 'string', length: 64)]
     #[Groups(['user:read'])]
@@ -42,9 +43,18 @@ class User
     #[Groups(['user:read'])]
     private array $roles = [];
 
+    #[ORM\Column(type: 'datetime_immutable')]
+    #[Groups(['user:read'])]
+    private DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Groups(['user:read'])]
+    private ?DateTimeImmutable $lastActivityAt = null;
+
     public function __construct()
     {
         $this->id = Uuid::v4()->toRfc4122();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getId(): string
@@ -67,14 +77,14 @@ class User
         $this->email = $email;
     }
 
-    public function getPassword(): string
+    public function getPasswordHash(): string
     {
-        return $this->password;
+        return $this->passwordHash;
     }
 
-    public function setPassword(string $password): void
+    public function setPasswordHash(string $passwordHash): void
     {
-        $this->password = $password;
+        $this->passwordHash = $passwordHash;
     }
 
     public function getFullName(): string
@@ -115,5 +125,25 @@ class User
     public function setRoles(array $roles): void
     {
         $this->roles = $roles;
+    }
+
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getLastActivityAt(): ?DateTimeImmutable
+    {
+        return $this->lastActivityAt;
+    }
+
+    public function setLastActivityAt(?DateTimeImmutable $lastActivityAt): void
+    {
+        $this->lastActivityAt = $lastActivityAt;
     }
 }

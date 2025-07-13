@@ -3,14 +3,15 @@ import {
   CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
   CCardBody, CAlert, CAvatar
 } from '@coreui/react'
-import {
-  cilXCircle, cilCheckCircle, cilPencil, cilTrash, cilPlus
-} from '@coreui/icons'
+import { cilPencil, cilTrash, cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import React, { useEffect, useState } from 'react'
 import store from 'src/store'
 import { fetchUsers, createUser, patchUser, deleteUser, fetchError } from 'src/api/users'
 import { LogoInput } from 'src/components/input-fields/LogoInput'
+import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
+import { BooleanTrigger } from 'src/components/table/CustomTableElements'
+import { dateTime } from 'src/components/utils/DateTime'
 
 const Users = () => {
   const userAvatars = store.getState().path.userAvatars
@@ -19,7 +20,7 @@ const Users = () => {
   const [editingItem, setEditingItem] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
 
-  const fetchAndSetUsers = async () => {
+  const fetchData = async () => {
     try {
       const data = await fetchUsers()
       setItems(data)
@@ -29,7 +30,7 @@ const Users = () => {
   }
 
   useEffect(() => {
-    fetchAndSetUsers()
+    fetchData()
   }, [])
 
   const handleEdit = (item) => {
@@ -42,7 +43,7 @@ const Users = () => {
     if (!window.confirm(`Are you sure you want to delete "${item.fullName}"?`)) return
     try {
       await deleteUser(item.id)
-      fetchAndSetUsers()
+      fetchData()
     } catch (error) {
       window.toast.error(fetchError(error))
     }
@@ -50,7 +51,7 @@ const Users = () => {
 
   const handleAdd = () => {
     setErrorMessage('')
-    setEditingItem({ id: null, fullName: '', email: '', avatar: null, active: true })
+    setEditingItem({ id: null, fullName: '', email: '', avatar: null, active: false, createdAt: '',  lastActivityAt: ''})
     setVisible(true)
   }
 
@@ -62,20 +63,9 @@ const Users = () => {
         await createUser(editingItem)
       }
       setVisible(false)
-      fetchAndSetUsers()
+      fetchData()
     } catch (error) {
       setErrorMessage(fetchError(error))
-    }
-  }
-
-  const toggleActive = async (item) => {
-    try {
-      await patchUser(item.id, {
-        active: item.active ? 0 : 1,
-      })
-      fetchAndSetUsers()
-    } catch (error) {
-      window.toast.error(fetchError(error))
     }
   }
 
@@ -100,6 +90,8 @@ const Users = () => {
               <CTableHeaderCell><div className="row-cell-center-50">Avatar</div></CTableHeaderCell>
               <CTableHeaderCell>Full Name</CTableHeaderCell>
               <CTableHeaderCell>Email</CTableHeaderCell>
+              <CTableHeaderCell>Created</CTableHeaderCell>
+              <CTableHeaderCell>Last Active</CTableHeaderCell>
               <CTableHeaderCell><div className="row-cell-center-50">Active</div></CTableHeaderCell>
               <CTableHeaderCell style={{ width: 1 }}>Actions</CTableHeaderCell>
             </CTableRow>
@@ -116,13 +108,16 @@ const Users = () => {
                 </CTableDataCell>
                 <CTableDataCell>{item.fullName}</CTableDataCell>
                 <CTableDataCell>{item.email}</CTableDataCell>
+                <CTableDataCell>{dateTime(item.createdAt)}</CTableDataCell>
+                <CTableDataCell>{dateTime(item.lastActivityAt)}</CTableDataCell>
                 <CTableDataCell>
-                  <CIcon
-                    icon={item.active ? cilCheckCircle : cilXCircle}
-                    className={item.active ? 'text-success' : 'text-danger'}
-                    style={{ cursor: 'pointer' }}
-                    title="Toggle active"
-                    onClick={() => toggleActive(item)}
+                  <BooleanTrigger
+                    item={item}
+                    isActive={(i) => i.active}
+                    onToggle={async (i) => {
+                      await patchUser(i.id, { active: i.active ? 0 : 1 })
+                      fetchData()
+                    }}
                   />
                 </CTableDataCell>
                 <CTableDataCell className="text-nowrap">
@@ -155,6 +150,13 @@ const Users = () => {
             label="Email"
             value={editingItem?.email || ''}
             onChange={(e) => setEditingItem({ ...editingItem, email: e.target.value })}
+          />
+          <SecureFormInput
+            label="Password"
+            type="password"
+            secured={editingItem?.id}
+            value={editingItem?.password || ''}
+            onChange={(e) => setEditingItem({ ...editingItem, password: e.target.value })}
           />
           <LogoInput
             path={userAvatars}
