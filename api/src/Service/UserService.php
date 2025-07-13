@@ -6,6 +6,7 @@ use App\Entity\User\User;
 use App\Service\File\FileService;
 use App\Service\File\LogoService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -25,10 +26,11 @@ readonly class UserService
     {
         $user = new User();
         $user->setId($data['id'] ?? Uuid::v4()->toRfc4122());
+        $user->setActive(false);
         $this->checkEmail($data['email']);
         $user->setEmail(trim($data['email']));
-        $user->setPassword($data['password'] ?? ''); // TODO - REMOVE and CHANGE to HASH !!!
         $user->setFullName(trim($data['fullName']) ?? '');
+        $user->setPasswordHash($this->getPasswordHash($data['password']));
         $user->setRoles($data['roles'] ?? []);
 
         $this->em->persist($user);
@@ -40,7 +42,7 @@ readonly class UserService
                     FileService::USER_AVATAR,
                     $user->getId(),
                     $user->getAvatar(),
-                    $data['avatar']
+                    $data['avatar'],
                 )
             );
             $this->em->persist($user);
@@ -53,14 +55,14 @@ readonly class UserService
     /**
      * @throws \Exception
      */
-    public function save(object $user, array $data): void
+    public function save(User $user, array $data): void
     {
         if (isset($data['email'])) {
             $this->checkEmail($data['email']);
             $user->setEmail($data['email']);
         }
-        if (isset($data['password'])) {
-            $user->setPassword($data['password']);
+        if (isset($data['password']) && $data['password']) {
+            $user->setPasswordHash($this->getPasswordHash($data['password']));
         }
         if (isset($data['fullName'])) {
             $user->setFullName($data['fullName']);
@@ -74,7 +76,7 @@ readonly class UserService
                     FileService::USER_AVATAR,
                     $user->getId(),
                     $user->getAvatar(),
-                    $data['avatar']
+                    $data['avatar'],
                 )
             );
         }
@@ -83,23 +85,27 @@ readonly class UserService
     }
 
     /**
-     * @param object $user
-     * @param array $data
-     * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function patch(object $user, array $data): void
+    public function patch(User $user, array $data): void
     {
         foreach ($data as $key => $value) {
+            if (in_array($key, ['id', 'roles', 'createdAt', 'lastActivityAt'])) {
+                continue;
+            }
             if ($key === 'avatar') {
                 $user->setAvatar(
                     $this->logoService->saveLogo(
                         FileService::USER_AVATAR,
                         $user->getId(),
                         $user->getAvatar(),
-                        $value
+                        $value,
                     )
                 );
+                continue;
+            }
+            if ($key === 'password') {
+                $user->setPasswordHash($this->getPasswordHash($value));
                 continue;
             }
             if ($key === 'email') {
@@ -114,13 +120,16 @@ readonly class UserService
         $this->em->flush();
     }
 
-    public function delete(object $user): void
+    /**
+     * @throws Exception
+     */
+    public function delete(User $user): void
     {
         if ($user->getAvatar()) {
             $this->logoService->saveLogo(
                 FileService::USER_AVATAR,
                 $user->getId(),
-                $user->getAvatar()
+                $user->getAvatar(),
             );
         }
         $this->em->remove($user);
@@ -128,7 +137,7 @@ readonly class UserService
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function checkEmail(?string $email): void
     {
@@ -140,8 +149,13 @@ readonly class UserService
         ]);
         if (count($violations) > 0) {
             foreach ($violations as $violation) {
-                throw new \Exception("Email: {$violation->getMessage()}");
+                throw new Exception("Email: {$violation->getMessage()}");
             }
         }
+    }
+
+    public function getPasswordHash(string $password): string
+    {
+        return password_hash($password, PASSWORD_DEFAULT);
     }
 }

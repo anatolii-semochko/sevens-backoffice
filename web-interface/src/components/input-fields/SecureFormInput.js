@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { CFormLabel, CFormInput, CInputGroup, CButton } from '@coreui/react'
 import { FaLock, FaUnlock } from 'react-icons/fa'
 
-const SecureFormInput = ({ label, value, onChange, type = 'text', ...props }) => {
+const SecureFormInput = ({ label, value, onChange, type = 'text', secured = true, ...props }) => {
   const [editable, setEditable] = useState(false)
 
   return (
@@ -12,19 +12,21 @@ const SecureFormInput = ({ label, value, onChange, type = 'text', ...props }) =>
         <CFormInput
           type={type}
           value={value}
-          disabled={!editable}
+          disabled={!editable && secured}
           onChange={onChange}
           {...props}
         />
-        <CButton
-          type="button"
-          color={editable ? 'danger' : 'success'}
-          variant="outline"
-          onClick={() => setEditable(!editable)}
-          title="Unlock for editing"
-        >
-          {editable ? <FaUnlock /> : <FaLock />}
-        </CButton>
+        {secured &&
+          <CButton
+            type="button"
+            color={editable ? 'danger' : 'success'}
+            variant="outline"
+            onClick={() => setEditable(!editable)}
+            title="Unlock for editing"
+          >
+            {editable ? <FaUnlock /> : <FaLock />}
+          </CButton>
+        }
       </CInputGroup>
     </div>
   )
