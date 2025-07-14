@@ -15,6 +15,7 @@ class UserAuthorizationListener implements EventSubscriberInterface
     public function __construct(
         private TokenStorageInterface $tokenStorage,
         private EntityManagerInterface $em,
+        private int $invalidationSeconds,
     ) {
     }
 
@@ -43,7 +44,7 @@ class UserAuthorizationListener implements EventSubscriberInterface
         if ($user instanceof User) {
             $now = new DateTimeImmutable();
             $last = $user->getLastActivityAt();
-            if ($last && $last->getTimestamp() < $now->modify('-1 hour')->getTimestamp()) {
+            if ($last && $last->getTimestamp() < $now->modify('-' . $this->invalidationSeconds . ' seconds')->getTimestamp()) {
                 $user->setAuthorized(false);
             }
 
