@@ -6,6 +6,13 @@ const initialState = {
     languageFlags: '/storage/images/language-flags/',
     categoryLogos: '/storage/images/category-logos/',
   },
+  user: {
+    id: null,
+    roles: [],
+    fullName: null,
+    email: null,
+    avatar: null,
+  },
   sidebarShow: true,
   theme: 'light',
   languages: [],

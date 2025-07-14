@@ -1,7 +1,16 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
+import store from '../store'
+import { fetchCurrentUser } from '../api/users'
 
 const DefaultLayout = () => {
+  useEffect(() => {
+    if (!store.getState().user.id) {
+      fetchCurrentUser()
+        .then((user) => store.dispatch({ type: 'set', user }))
+        .catch(() => {})
+    }
+  }, [])
   return (
     <div>
       <AppSidebar />
