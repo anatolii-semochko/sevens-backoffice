@@ -13,6 +13,7 @@ const initialState = {
     email: null,
     avatar: null,
   },
+  userRoles: {},
   sidebarShow: true,
   theme: 'light',
   languages: [],

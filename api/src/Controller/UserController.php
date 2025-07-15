@@ -48,6 +48,12 @@ class UserController extends BaseController
         return $this->json($user, context: self::USER_GROUPS);
     }
 
+    #[Route('/roles-list', name: 'user_roles_list', methods: ['GET'])]
+    public function roles(): JsonResponse
+    {
+        return $this->json(User::ROLES, context: self::USER_GROUPS);
+    }
+
     #[Route('/{id}', name: 'user_get', methods: ['GET'])]
     public function get(string $id): JsonResponse
     {

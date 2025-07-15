@@ -12,6 +12,7 @@ use DateTimeImmutable;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'admin_users')]
+#[ORM\UniqueConstraint(name: 'uniq_admin_user_email', columns: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -57,50 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?DateTimeImmutable $lastActivityAt = null;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(['user:read'])]
     private bool $authorized = true;
-
-    public function __construct()
-    {
-        $this->id = Uuid::v4()->toRfc4122();
-        $this->createdAt = new DateTimeImmutable();
-    }
-
-    public function getUserIdentifier(): string { return $this->email; }
-    public function getPassword(): string { return $this->passwordHash; }
-    public function eraseCredentials(): void {}
-
-    public function getId(): string { return $this->id; }
-    public function setId(string $id): void { $this->id = $id; }
-
-    public function getUserName(): string { return $this->userName; }
-    public function setUserName(string $userName): void { $this->userName = $userName; }
-
-    public function getEmail(): string { return $this->email; }
-    public function setEmail(string $email): void { $this->email = $email; }
-
-    public function getPasswordHash(): string { return $this->passwordHash; }
-    public function setPasswordHash(string $passwordHash): void { $this->passwordHash = $passwordHash; }
-
-    public function getFullName(): string { return $this->fullName; }
-    public function setFullName(string $fullName): void { $this->fullName = $fullName; }
-
-    public function isActive(): bool { return $this->active; }
-    public function setActive(bool $active): void { $this->active = $active; }
-
-    public function getAvatar(): ?string { return $this->avatar; }
-    public function setAvatar(?string $avatar): void { $this->avatar = $avatar; }
-
-    public function getCreatedAt(): DateTimeImmutable { return $this->createdAt; }
-    public function setCreatedAt(DateTimeImmutable $createdAt): void { $this->createdAt = $createdAt; }
-
-    public function getLastActivityAt(): ?DateTimeImmutable { return $this->lastActivityAt; }
-    public function setLastActivityAt(?DateTimeImmutable $lastActivityAt): void {
-        $this->lastActivityAt = $lastActivityAt;
-    }
-
-    public function isAuthorized(): bool { return $this->authorized; }
-    public function setAuthorized(bool $authorized): void { $this->authorized = $authorized; }
 
     public const array ROLES = [
         'ROLE_SUPER_ADMIN' => 'Super Admin',
@@ -111,17 +69,136 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'ROLE_MANAGER' => 'Manager',
         'ROLE_CUSTOMER_SUPPORT' => 'Customer Support',
     ];
+
+    public function __construct()
+    {
+        $this->id = Uuid::v4()->toRfc4122();
+        $this->createdAt = new DateTimeImmutable();
+    }
+
+    public function getId(): string {
+        return $this->id;
+    }
+
+    public function setId(string $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function setUserName(string $userName): void
+    {
+        $this->userName = $userName;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function getPasswordHash(): string
+    {
+        return $this->passwordHash;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->getPasswordHash();
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // No temporary sensitive data stored
+    }
+
+    public function setPasswordHash(string $passwordHash): void
+    {
+        $this->passwordHash = $passwordHash;
+    }
+
+    public function getFullName(): string
+    {
+        return $this->fullName;
+    }
+
+    public function setFullName(string $fullName): void
+    {
+        $this->fullName = $fullName;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): void
+    {
+        $this->active = $active;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): void
+    {
+        $this->avatar = $avatar;
+    }
+
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getLastActivityAt(): ?DateTimeImmutable
+    {
+        return $this->lastActivityAt;
+    }
+
+    public function setLastActivityAt(?DateTimeImmutable $lastActivityAt): void
+    {
+        $this->lastActivityAt = $lastActivityAt;
+    }
+
+    public function isAuthorized(): bool
+    {
+        return $this->authorized;
+    }
+
+    public function setAuthorized(bool $authorized): void
+    {
+        $this->authorized = $authorized;
+    }
+
     public function getRoles(): array { return $this->roles; }
     public function setRoles(array $roles): void { $this->roles = $roles; }
-    public function getRolesList(): array
-    {
-        return self::ROLES;
-    }
+    #[Groups(['user:read'])]
     public function isSuperAdmin(): bool { return in_array('ROLE_SUPER_ADMIN', $this->roles); }
+    #[Groups(['user:read'])]
     public function isAdmin(): bool { return in_array('ROLE_ADMIN', $this->roles); }
+    #[Groups(['user:read'])]
     public function isUser(): bool { return in_array('ROLE_USER', $this->roles); }
+    #[Groups(['user:read'])]
     public function isModerator(): bool { return in_array('ROLE_MODERATOR', $this->roles); }
+    #[Groups(['user:read'])]
     public function isEditor(): bool { return in_array('ROLE_EDITOR', $this->roles); }
+    #[Groups(['user:read'])]
     public function isManager(): bool { return in_array('ROLE_MANAGER', $this->roles); }
+    #[Groups(['user:read'])]
     public function isCustomerSupport(): bool { return in_array('ROLE_CUSTOMER_SUPPORT', $this->roles); }
 }

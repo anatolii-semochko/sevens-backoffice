@@ -29,7 +29,8 @@ readonly class UserService
         $user->setActive(false);
         $this->checkEmail($data['email']);
         $user->setEmail(trim($data['email']));
-        $user->setFullName(trim($data['fullName']) ?? '');
+        $user->setUserName(trim($data['userName']) ?? throw new Exception('User name is missing'));
+        $user->setFullName(trim($data['fullName']) ?? throw new Exception('Full name is missing'));
         $user->setPasswordHash($this->getPasswordHash($data['password']));
         $user->setRoles($data['roles'] ?? []);
 
@@ -64,8 +65,15 @@ readonly class UserService
         if (isset($data['password']) && $data['password']) {
             $user->setPasswordHash($this->getPasswordHash($data['password']));
         }
+        if (isset($data['userName'])) {
+            $user->setUserName($data['userName']);
+        } else {
+            throw new Exception('User name is missing');
+        }
         if (isset($data['fullName'])) {
             $user->setFullName($data['fullName']);
+        } else {
+            throw new Exception('Full name is missing');
         }
         if (isset($data['roles'])) {
             $user->setRoles($data['roles']);
