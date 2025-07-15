@@ -1,19 +1,30 @@
-import {
-  CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
-  CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
-  CCardBody, CAlert
-} from '@coreui/react'
-import { cilPencil, cilTrash, cilPlus } from '@coreui/icons'
-import { TfiReload } from 'react-icons/tfi'
-import CIcon from '@coreui/icons-react'
 import React, { useEffect, useState } from 'react'
 import store from 'src/store'
-import { fetchUsers, createUser, patchUser, deleteUser, fetchRolesList, fetchError } from 'src/api/users'
+import { fetchUsers, createUser, updateUser, patchUser, deleteUser, fetchError } from 'src/api/users'
+import {
+  CTable,
+  CTableBody,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableDataCell,
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
+  CFormInput,
+  CCardBody,
+  CAlert,
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPencil, cilTrash, cilPlus } from '@coreui/icons'
+import { TfiReload } from 'react-icons/tfi'
 import { UserAvatar } from 'src/components/table/UserAvatar'
 import { LogoInput } from 'src/components/input-fields/LogoInput'
 import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 import { BooleanTrigger, BooleanStatusIcon } from 'src/components/table/CustomTableElements'
-import { dateTime } from 'src/components/utils/DateTime'
+import { dateTime, timeAgo, isRecent } from 'src/components/utils/DateTime'
 
 const Users = () => {
   const userAvatars = store.getState().path.userAvatars
@@ -31,7 +42,9 @@ const Users = () => {
     }
   }
 
-  useEffect(() => fetchData(), [])
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   const handleEdit = (item) => {
     setErrorMessage('')
@@ -53,21 +66,28 @@ const Users = () => {
     setErrorMessage('')
     setEditingItem({
       id: null,
-      userName: '',
+      password: null,
+      confirmPassword: null,
+      loginName: '',
       fullName: '',
       email: '',
       avatar: null,
       active: false,
       createdAt: '',
       lastActivityAt: '',
+      roles: [],
     })
     setVisible(true)
   }
 
   const handleSave = async () => {
+    setErrorMessage(null)
     try {
+      if (editingItem.password && editingItem.password !== editingItem.confirmPassword) {
+        return setErrorMessage('Incorrect password')
+      }
       if (editingItem.id) {
-        await patchUser(editingItem.id, editingItem)
+        await updateUser(editingItem.id, editingItem)
       } else {
         await createUser(editingItem)
       }
@@ -76,6 +96,12 @@ const Users = () => {
     } catch (error) {
       setErrorMessage(fetchError(error))
     }
+  }
+
+  const rolesString = (roles) => {
+    if (!roles?.length) return ''
+    const map = store.getState().userRoles
+    return roles.map((r) => map[r] || r).join(', ')
   }
 
   return (
@@ -96,25 +122,33 @@ const Users = () => {
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell><div className="row-cell-center-50">Avatar</div></CTableHeaderCell>
+              <CTableHeaderCell>User Name</CTableHeaderCell>
               <CTableHeaderCell>Full Name</CTableHeaderCell>
               <CTableHeaderCell>Role</CTableHeaderCell>
               <CTableHeaderCell>Email</CTableHeaderCell>
               <CTableHeaderCell>Created</CTableHeaderCell>
-              <CTableHeaderCell>Last Active</CTableHeaderCell>
-              <CTableHeaderCell><div className="row-cell-center-50">Active</div></CTableHeaderCell>
-              <CTableHeaderCell><div className="row-cell-center-50">Authorized</div></CTableHeaderCell>
+              <CTableHeaderCell>Last Activity</CTableHeaderCell>
+              <CTableHeaderCell>
+                <div className="row-cell-center-50">Active</div>
+              </CTableHeaderCell>
+              <CTableHeaderCell>
+                <div className="row-cell-center-50">Authorized</div>
+              </CTableHeaderCell>
               <CTableHeaderCell style={{ width: 1 }}>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
             {items.map((item) => (
               <CTableRow key={item.id}>
-                <CTableDataCell><UserAvatar user={item} showStatus={true} /></CTableDataCell>
+                <CTableDataCell>
+                  <UserAvatar user={item} showStatus={true} />
+                </CTableDataCell>
+                <CTableDataCell>{item.loginName}</CTableDataCell>
                 <CTableDataCell>{item.fullName}</CTableDataCell>
-                <CTableDataCell>Admin</CTableDataCell>
+                <CTableDataCell>{rolesString(item.roles)}</CTableDataCell>
                 <CTableDataCell>{item.email}</CTableDataCell>
                 <CTableDataCell>{dateTime(item.createdAt)}</CTableDataCell>
-                <CTableDataCell>{dateTime(item.lastActivityAt)}</CTableDataCell>
+                <CTableDataCell>{item.lastActivity ?? timeAgo(item.lastActivityAt)}</CTableDataCell>
                 <CTableDataCell>
                   <BooleanTrigger
                     item={item}
@@ -128,15 +162,32 @@ const Users = () => {
                 <CTableDataCell>
                   <BooleanStatusIcon
                     status={item.authorized}
-                    color={'text-warning'}
+                    color={
+                      item.authorized
+                        ? isRecent(item.lastActivityAt)
+                          ? 'text-success'
+                          : 'text-warning'
+                        : 'text-danger'
+                    }
                     title={item.authorized ? 'Authorized' : 'Not Authorized'}
                   />
                 </CTableDataCell>
                 <CTableDataCell className="text-nowrap">
-                  <CButton size="sm" color="warning" className="me-2" onClick={() => handleEdit(item)} title="Edit">
+                  <CButton
+                    size="sm"
+                    color="warning"
+                    className="me-2"
+                    onClick={() => handleEdit(item)}
+                    title="Edit"
+                  >
                     <CIcon icon={cilPencil} />
                   </CButton>
-                  <CButton size="sm" color="danger" onClick={() => handleRemove(item)} title="Remove">
+                  <CButton
+                    size="sm"
+                    color="danger"
+                    onClick={() => handleRemove(item)}
+                    title="Remove"
+                  >
                     <CIcon icon={cilTrash} />
                   </CButton>
                 </CTableDataCell>
@@ -147,40 +198,51 @@ const Users = () => {
       </CCardBody>
 
       <CModal visible={visible} onClose={() => setVisible(false)}>
-        <CModalHeader closeButton>
-          {editingItem?.id ? 'Edit User' : 'Add User'}
-        </CModalHeader>
+        <CModalHeader closeButton>{editingItem?.id ? 'Edit User' : 'Add User'}</CModalHeader>
         <CModalBody>
-          <CFormInput
-            className="mb-3"
+          <SecureFormInput
             label="User Name"
-            value={editingItem?.userName || ''}
-            onChange={(e) => setEditingItem({...editingItem, userName: e.target.value})}
+            secured={editingItem?.id}
+            value={editingItem?.loginName || ''}
+            onChange={(e) => setEditingItem({ ...editingItem, loginName: e.target.value })}
           />
           <CFormInput
             className="mb-3"
             label="Full Name"
             value={editingItem?.fullName || ''}
-            onChange={(e) => setEditingItem({...editingItem, fullName: e.target.value})}
+            onChange={(e) => setEditingItem({ ...editingItem, fullName: e.target.value })}
           />
           <CFormInput
             className="mb-3"
             label="Email"
             value={editingItem?.email || ''}
-            onChange={(e) => setEditingItem({...editingItem, email: e.target.value})}
+            onChange={(e) => setEditingItem({ ...editingItem, email: e.target.value })}
           />
-          <SecureFormInput
+          <CFormInput
+            className="mb-3"
             label="Password"
             type="password"
+            placeholder="Set password"
             secured={editingItem?.id}
             value={editingItem?.password || ''}
-            onChange={(e) => setEditingItem({...editingItem, password: e.target.value})}
+            onChange={(e) => setEditingItem({ ...editingItem, password: e.target.value })}
           />
+          {editingItem?.password &&
+            <CFormInput
+              className="mb-3"
+              label="Confirm Password"
+              type="password"
+              placeholder="Confirm password"
+              secured={editingItem?.id}
+              value={editingItem?.confirmPassword || ''}
+              onChange={(e) => setEditingItem({ ...editingItem, confirmPassword: e.target.value })}
+            />
+          }
           <LogoInput
             path={userAvatars}
             prefix={'large-'}
             value={editingItem?.avatar || null}
-            onChange={(file) => setEditingItem({...editingItem, avatar: file})}
+            onChange={(file) => setEditingItem({ ...editingItem, avatar: file })}
           />
           <div className="mb-3">
             <label className="form-label">Roles</label>
@@ -192,6 +254,20 @@ const Users = () => {
                   id={`role-${role}`}
                   name="roles"
                   value={role}
+                  checked={editingItem?.roles?.includes(role)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setEditingItem({
+                        ...editingItem,
+                        roles: [...(editingItem?.roles || []), role],
+                      })
+                    } else {
+                      setEditingItem({
+                        ...editingItem,
+                        roles: editingItem.roles.filter((r) => r !== role),
+                      })
+                    }
+                  }}
                 />
                 <label className="form-check-label ms-2" htmlFor={`role-${role}`}>
                   {title}
@@ -200,12 +276,18 @@ const Users = () => {
             ))}
           </div>
           {errorMessage && (
-            <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>
+            <CAlert color="danger" className="show mb-0 mt-3">
+              {errorMessage}
+            </CAlert>
           )}
         </CModalBody>
         <CModalFooter>
-          <CButton color="secondary" onClick={() => setVisible(false)}>Cancel</CButton>
-          <CButton color="primary" onClick={handleSave}>Save</CButton>
+          <CButton color="secondary" onClick={() => setVisible(false)}>
+            Cancel
+          </CButton>
+          <CButton color="primary" onClick={handleSave}>
+            Save
+          </CButton>
         </CModalFooter>
       </CModal>
     </div>

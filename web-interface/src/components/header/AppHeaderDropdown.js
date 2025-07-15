@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { logout as apiLogout } from 'src/api/auth'
-import { CDropdown, CDropdownDivider, CDropdownHeader, CDropdownItem, CDropdownMenu, CDropdownToggle } from '@coreui/react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
+import { patchUser, fetchCurrentUser, fetchError } from 'src/api/users'
+import {
+  CDropdown,
+  CDropdownDivider,
+  CDropdownHeader,
+  CDropdownItem,
+  CDropdownMenu,
+  CDropdownToggle,
+} from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { UserAvatar } from 'src/components/table/UserAvatar'
 import ProfileModal from 'src/views/UserAccount/ProfileModal'
+import { cilLockLocked, cilUser } from '@coreui/icons'
+import { UserAvatar } from 'src/components/table/UserAvatar'
 
 const AppHeaderDropdown = () => {
   const [profileVisible, setProfileVisible] = useState(false)
   const user = useSelector((state) => state.user)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const openModal = () => setProfileVisible(true)
@@ -17,10 +26,18 @@ const AppHeaderDropdown = () => {
     return () => window.removeEventListener('openProfile', openModal)
   }, [])
 
-  const handleSaveProfile = (formData) => {
-    console.log('Saving profile:', formData)
-    // API call here
-    setProfileVisible(false)
+  const handleSaveProfile = async (formData) => {
+    try {
+      await patchUser(user.id, formData)
+      const updated = await fetchCurrentUser()
+      dispatch({ type: 'set', user: updated })
+      setProfileVisible(false)
+      if (formData.password) {
+        await logout()
+      }
+    } catch (error) {
+      window.toast.error(fetchError(error))
+    }
   }
 
   const logout = async () => {

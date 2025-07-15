@@ -4,13 +4,12 @@ namespace App\Controller;
 
 use App\Entity\User\User;
 use App\Repository\UserRepository;
-use App\Service\UserService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\User\AuthService;
+use App\Service\User\UserService;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
 #[Route('/users')]
 class UserController extends BaseController
@@ -18,8 +17,7 @@ class UserController extends BaseController
     public const array USER_GROUPS = ['groups' => 'user:read'];
 
     public function __construct(
-        private readonly EntityManagerInterface $em, //////////////////// TODO - MOVE TO SERVICE !!!!!!!!!!!!!!!!!!!!!!!!!
-        private readonly JWTTokenManagerInterface $jwtManager,
+        private readonly AuthService $authService,
         private readonly UserService $service,
         private readonly UserRepository $repository,
     ) {}
@@ -117,23 +115,15 @@ class UserController extends BaseController
     #[Route('/login', name: 'user_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
-        $data = $this->getData($request);
-        $email = $data['email'] ?? null;
-        $password = $data['password'] ?? null;
-        if (!$email || !$password) {
-            throw new BadRequestException('Email and password required');
+        try {
+            $data = $this->getData($request);
+            $token = $this->authService->login(
+                $data['login'] ?? $data['email'] ?? null,
+                $data['password'] ?? null,
+            );
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
-
-        $user = $this->repository->findOneBy(['email' => $email]);
-        if (!$user || !password_verify($password, $user->getPasswordHash())) {
-            throw new BadRequestException('Invalid credentials');
-        }
-
-        $user->setAuthorized(true);
-        $user->setLastActivityAt(new \DateTimeImmutable());
-        $this->em->flush();
-
-        $token = $this->jwtManager->create($user);
 
         return $this->json(['token' => $token]);
     }
@@ -141,10 +131,10 @@ class UserController extends BaseController
     #[Route('/logout', name: 'user_logout', methods: ['POST'])]
     public function logout(): JsonResponse
     {
-        $user = $this->getUser();
-        if ($user instanceof \App\Entity\User\User) {
-            $user->setAuthorized(false);
-            $this->em->flush();
+        try {
+            $this->authService->logout($this->getUser());
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
 
         return $this->json(null);

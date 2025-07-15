@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -7,9 +6,8 @@
 /public/bundles/
 /var/
 /vendor/
-###< symfony/framework-bundle ###
 /.idea
 ###> lexik/jwt-authentication-bundle ###
 # Ignore JWT keys in production, but keep in repository for dev
-#/config/jwt/*.pem
+# /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###

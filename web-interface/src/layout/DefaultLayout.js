@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
 import store from '../store'
 import { fetchCurrentUser, fetchRolesList } from '../api/users'
+import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
 
 const DefaultLayout = () => {
   useEffect(() => {

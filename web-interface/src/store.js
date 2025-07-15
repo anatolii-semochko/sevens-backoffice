@@ -8,10 +8,11 @@ const initialState = {
   },
   user: {
     id: null,
-    roles: [],
+    loginName: '',
     fullName: null,
     email: null,
     avatar: null,
+    roles: [],
   },
   userRoles: {},
   sidebarShow: true,
