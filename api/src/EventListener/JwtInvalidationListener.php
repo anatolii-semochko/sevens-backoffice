@@ -9,7 +9,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use DateTimeImmutable;
 
-class JwtInvalidationListener implements EventSubscriberInterface
+readonly class JwtInvalidationListener implements EventSubscriberInterface
 {
     public function __construct(
         private UserRepository $userRepository,
@@ -38,7 +38,8 @@ class JwtInvalidationListener implements EventSubscriberInterface
 
         $now = new DateTimeImmutable();
         $lastActivity = $user->getLastActivityAt();
-        if ($lastActivity && $lastActivity->getTimestamp() < $now->modify('-' . $this->invalidationSeconds . ' seconds')->getTimestamp()) {
+        $invalidationTime = $now->modify('-' . $this->invalidationSeconds . ' seconds')->getTimestamp();
+        if ($lastActivity && $lastActivity->getTimestamp() < $invalidationTime) {
             $user->setAuthorized(false);
         }
 

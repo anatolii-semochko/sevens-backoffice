@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Doctrine\ORM\EntityManagerInterface;
 use DateTimeImmutable;
 
-class UserAuthorizationListener implements EventSubscriberInterface
+readonly class UserAuthorizationListener implements EventSubscriberInterface
 {
     public function __construct(
         private TokenStorageInterface $tokenStorage,
@@ -44,7 +44,8 @@ class UserAuthorizationListener implements EventSubscriberInterface
         if ($user instanceof User) {
             $now = new DateTimeImmutable();
             $last = $user->getLastActivityAt();
-            if ($last && $last->getTimestamp() < $now->modify('-' . $this->invalidationSeconds . ' seconds')->getTimestamp()) {
+            $invalidationTime = $now->modify('-' . $this->invalidationSeconds . ' seconds')->getTimestamp();
+            if ($last && $last->getTimestamp() < $invalidationTime) {
                 $user->setAuthorized(false);
             }
 

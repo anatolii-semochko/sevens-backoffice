@@ -85,7 +85,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->id = $id;
     }
 
-    public function setUserName(string $userName): void
+    #[Groups(['user:read'])]
+    public function getLoginName(): string
+    {
+        return $this->userName;
+    }
+    public function setLoginName(string $userName): void
     {
         $this->userName = $userName;
     }
@@ -175,6 +180,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->lastActivityAt = $lastActivityAt;
     }
 
+    #[Groups(['user:read'])]
+    public function getLastActivity(): string
+    {
+        if (!$this->lastActivityAt) {
+            return '';
+        }
+
+        $now = new \DateTimeImmutable();
+        $seconds = $now->getTimestamp() - $this->lastActivityAt->getTimestamp();
+
+        if ($seconds < 60) {
+            return '0 minutes';
+        }
+
+        if ($seconds < 3600) {
+            $minutes = (int) floor($seconds / 60);
+            return $minutes . ' minute' . ($minutes > 1 ? 's' : '');
+        }
+
+        if ($seconds < 86400) {
+            $hours = (int) floor($seconds / 3600);
+            return $hours . ' hour' . ($hours > 1 ? 's' : '');
+        }
+
+        if ($seconds < 2592000) { // ~30 days
+            $days = (int) floor($seconds / 86400);
+            return $days . ' day' . ($days > 1 ? 's' : '');
+        }
+
+        $months = (int) floor($seconds / 2592000);
+        return $months . ' month' . ($months > 1 ? 's' : '');
+    }
+
+    #[Groups(['user:read'])]
     public function isAuthorized(): bool
     {
         return $this->authorized;
@@ -188,17 +227,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array { return $this->roles; }
     public function setRoles(array $roles): void { $this->roles = $roles; }
     #[Groups(['user:read'])]
-    public function isSuperAdmin(): bool { return in_array('ROLE_SUPER_ADMIN', $this->roles); }
+    public function isSuperAdmin(): bool {
+        return in_array('ROLE_SUPER_ADMIN', $this->roles);
+    }
     #[Groups(['user:read'])]
-    public function isAdmin(): bool { return in_array('ROLE_ADMIN', $this->roles); }
+    public function isAdmin(): bool {
+        return in_array('ROLE_ADMIN', $this->roles);
+    }
     #[Groups(['user:read'])]
-    public function isUser(): bool { return in_array('ROLE_USER', $this->roles); }
+    public function isUser(): bool {
+        return in_array('ROLE_USER', $this->roles);
+    }
     #[Groups(['user:read'])]
-    public function isModerator(): bool { return in_array('ROLE_MODERATOR', $this->roles); }
+    public function isModerator(): bool {
+        return in_array('ROLE_MODERATOR', $this->roles);
+    }
     #[Groups(['user:read'])]
-    public function isEditor(): bool { return in_array('ROLE_EDITOR', $this->roles); }
+    public function isEditor(): bool {
+        return in_array('ROLE_EDITOR', $this->roles);
+    }
     #[Groups(['user:read'])]
-    public function isManager(): bool { return in_array('ROLE_MANAGER', $this->roles); }
+    public function isManager(): bool {
+        return in_array('ROLE_MANAGER', $this->roles);
+    }
     #[Groups(['user:read'])]
-    public function isCustomerSupport(): bool { return in_array('ROLE_CUSTOMER_SUPPORT', $this->roles); }
+    public function isCustomerSupport(): bool {
+        return in_array('ROLE_CUSTOMER_SUPPORT', $this->roles);
+    }
 }

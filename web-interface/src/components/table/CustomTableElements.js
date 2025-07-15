@@ -1,8 +1,8 @@
-import { CSpinner } from '@coreui/react'
 import React from 'react'
 import store from 'src/store'
-import { CChartDoughnut } from '@coreui/react-chartjs'
 import CIcon from '@coreui/icons-react'
+import { CSpinner } from '@coreui/react'
+import { CChartDoughnut } from '@coreui/react-chartjs'
 import { cilCheckCircle, cilXCircle } from '@coreui/icons'
 
 const EmptyDataRow = ({
@@ -44,9 +44,14 @@ const BooleanTrigger = ({
   )
 }
 
-const BooleanStatusIcon = ({status, color, title}) => status ?
-  <CIcon icon={cilCheckCircle} className={color ?? 'text-success'} title={title} /> :
-  <CIcon icon={cilXCircle} className={color ?? 'text-danger'} title={title} />
+const BooleanStatusIcon = ({status, color, title}) => (
+    <div className="row-cell-center-50 pt-2">
+      {status ?
+        <CIcon icon={cilCheckCircle} className={color ?? 'text-success'} title={title} /> :
+        <CIcon icon={cilXCircle} className={color ?? 'text-danger'} title={title} />
+      }
+    </div>
+)
 
 const LogoCell = ({path, value}) => (
   <div className="row-cell-center-50">
