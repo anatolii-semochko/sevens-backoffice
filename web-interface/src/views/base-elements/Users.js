@@ -8,7 +8,7 @@ import { TfiReload } from 'react-icons/tfi'
 import CIcon from '@coreui/icons-react'
 import React, { useEffect, useState } from 'react'
 import store from 'src/store'
-import { fetchUsers, createUser, patchUser, deleteUser, fetchError } from 'src/api/users'
+import { fetchUsers, createUser, patchUser, deleteUser, fetchRolesList, fetchError } from 'src/api/users'
 import { UserAvatar } from 'src/components/table/UserAvatar'
 import { LogoInput } from 'src/components/input-fields/LogoInput'
 import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
@@ -51,7 +51,16 @@ const Users = () => {
 
   const handleAdd = () => {
     setErrorMessage('')
-    setEditingItem({ id: null, fullName: '', email: '', avatar: null, active: false, createdAt: '',  lastActivityAt: ''})
+    setEditingItem({
+      id: null,
+      userName: '',
+      fullName: '',
+      email: '',
+      avatar: null,
+      active: false,
+      createdAt: '',
+      lastActivityAt: '',
+    })
     setVisible(true)
   }
 
@@ -144,29 +153,52 @@ const Users = () => {
         <CModalBody>
           <CFormInput
             className="mb-3"
+            label="User Name"
+            value={editingItem?.userName || ''}
+            onChange={(e) => setEditingItem({...editingItem, userName: e.target.value})}
+          />
+          <CFormInput
+            className="mb-3"
             label="Full Name"
             value={editingItem?.fullName || ''}
-            onChange={(e) => setEditingItem({ ...editingItem, fullName: e.target.value })}
+            onChange={(e) => setEditingItem({...editingItem, fullName: e.target.value})}
           />
           <CFormInput
             className="mb-3"
             label="Email"
             value={editingItem?.email || ''}
-            onChange={(e) => setEditingItem({ ...editingItem, email: e.target.value })}
+            onChange={(e) => setEditingItem({...editingItem, email: e.target.value})}
           />
           <SecureFormInput
             label="Password"
             type="password"
             secured={editingItem?.id}
             value={editingItem?.password || ''}
-            onChange={(e) => setEditingItem({ ...editingItem, password: e.target.value })}
+            onChange={(e) => setEditingItem({...editingItem, password: e.target.value})}
           />
           <LogoInput
             path={userAvatars}
             prefix={'large-'}
             value={editingItem?.avatar || null}
-            onChange={(file) => setEditingItem({ ...editingItem, avatar: file })}
+            onChange={(file) => setEditingItem({...editingItem, avatar: file})}
           />
+          <div className="mb-3">
+            <label className="form-label">Roles</label>
+            {Object.entries(store.getState().userRoles).map(([role, title]) => (
+              <div className="form-check" key={role}>
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`role-${role}`}
+                  name="roles"
+                  value={role}
+                />
+                <label className="form-check-label ms-2" htmlFor={`role-${role}`}>
+                  {title}
+                </label>
+              </div>
+            ))}
+          </div>
           {errorMessage && (
             <CAlert color="danger" className="show mb-0 mt-3">{errorMessage}</CAlert>
           )}

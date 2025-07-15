@@ -22,9 +22,12 @@ export const patchUser = (id, data) => api
 export const deleteUser = (id) => api
   .delete(`${mainUrl}/${id}`)
 
-export const fetchError = (error) => fetchErrorMessage(error)
+export const fetchCurrentUser = () => api
+  .get(`${mainUrl}/me`)
+  .then((res) => res.data)
 
-export const fetchCurrentUser = () =>
-  api
-    .get(`${mainUrl}/me`)
-    .then((res) => res.data)
+export const fetchRolesList = () => api
+  .get(`${mainUrl}/roles-list`)
+  .then((res) => res.data)
+
+export const fetchError = (error) => fetchErrorMessage(error)

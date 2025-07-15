@@ -25,7 +25,7 @@ const UserAvatar = ({
         status={status}
       />
     ) : (
-      <CAvatar size={size} title={user.fullName} status={status} >
+      <CAvatar size={size} title={user.fullName} status={status} style={{border: '1px solid grey'}}>
         {getInitials(user.fullName)}
       </CAvatar>
     )
