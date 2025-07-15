@@ -12,7 +12,6 @@ use DateTimeImmutable;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'admin_users')]
-#[ORM\UniqueConstraint(name: 'uniq_admin_user_email', columns: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
