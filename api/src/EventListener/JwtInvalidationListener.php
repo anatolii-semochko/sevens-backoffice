@@ -14,6 +14,7 @@ class JwtInvalidationListener implements EventSubscriberInterface
     public function __construct(
         private UserRepository $userRepository,
         private EntityManagerInterface $em,
+        private int $invalidationSeconds,
     ) {
     }
 
@@ -37,8 +38,7 @@ class JwtInvalidationListener implements EventSubscriberInterface
 
         $now = new DateTimeImmutable();
         $lastActivity = $user->getLastActivityAt();
-        $invalidationSeconds = (int) ($_ENV['USER_TIME_INVALIDATION'] ?? 3600);
-        if ($lastActivity && $lastActivity->getTimestamp() < $now->modify('-' . $invalidationSeconds . ' seconds')->getTimestamp()) {
+        if ($lastActivity && $lastActivity->getTimestamp() < $now->modify('-' . $this->invalidationSeconds . ' seconds')->getTimestamp()) {
             $user->setAuthorized(false);
         }
 
