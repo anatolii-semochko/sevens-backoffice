@@ -16,6 +16,7 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 import { UserAvatar } from 'src/components/table/UserAvatar'
 
 const AppHeaderDropdown = () => {
+  const userAvatars = useSelector((state) => state.path.userAvatars)
   const [profileVisible, setProfileVisible] = useState(false)
   const user = useSelector((state) => state.user)
   const dispatch = useDispatch()
@@ -52,9 +53,10 @@ const AppHeaderDropdown = () => {
           {user && <UserAvatar user={user} size={'md'} />}
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
-          <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Account</CDropdownHeader>
+          <CDropdownHeader className="bg-body-secondary fw-semibold">Account</CDropdownHeader>
+          {user.avatar && <img src={userAvatars + 'large-' + user.avatar} alt={user.fullName} style={{width: '158px'}}/>}
           <CDropdownItem
-            className="cursor-pointer"
+            className="mt-2 cursor-pointer"
             onClick={() => window.dispatchEvent(new Event('openProfile'))}
           >
             <CIcon icon={cilUser} className="me-2" />
