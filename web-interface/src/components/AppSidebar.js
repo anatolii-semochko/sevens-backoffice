@@ -1,18 +1,9 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-
-import {
-  CCloseButton,
-  CSidebar,
-  CSidebarFooter,
-  CSidebarHeader,
-  CSidebarToggler,
-} from '@coreui/react'
-
-import { AppSidebarNav } from './AppSidebarNav'
-
-// sidebar nav config
 import navigation from '../_nav'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppSidebarNav } from './AppSidebarNav'
+import { SiteLogo } from 'src/components/header/SiteLogo'
+import { CCloseButton, CSidebar, CSidebarFooter, CSidebarHeader, CSidebarToggler } from '@coreui/react'
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
@@ -30,8 +21,7 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarHeader className="border-bottom justify-content-lg-start">
-        <img src="/storage/images/sevens-logo.svg" style={{ height: '32px' }} alt="Sevenstime Logo"/>
-        <b className="ps-3" style={{fontSize: '20px'}}>SEVENSTIME</b>
+        <SiteLogo />
         <CCloseButton
           className="d-lg-none"
           dark

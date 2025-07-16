@@ -7,9 +7,10 @@ use App\Entity\Help\HelpContent;
 use App\Entity\Language;
 use App\Repository\Help\HelpRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Uid\Uuid;
 
-class HelpService
+readonly class HelpService
 {
     public function __construct(
         private EntityManagerInterface $em,
@@ -44,9 +45,9 @@ class HelpService
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function put(object $help, array $data): void
+    public function put(Help $help, array $data): void
     {
         $help->setName($data['name']);
         $help->setUrl($data['url'] ?: null);
@@ -63,10 +64,9 @@ class HelpService
 
                 $language = $this->em->getRepository(Language::class)->find($content['language']['id']);
                 if (!$language) {
-                    continue; // unknown language
+                    continue;
                 }
 
-                // Check if this $help already has seo for this language
                 $existingContent = null;
                 foreach ($help->getContents() as $existing) {
                     if ($existing->getLanguage()?->getId() === $language->getId()) {
@@ -75,7 +75,6 @@ class HelpService
                     }
                 }
 
-                // If SEO exists, update it, otherwise create new
                 if (!$existingContent) {
                     $existingContent = new HelpContent();
                     $existingContent->setHelp($help);
@@ -107,13 +106,13 @@ class HelpService
         $this->indexHelps();
     }
 
-    public function delete(Object $help): void
+    public function delete(Help $help): void
     {
         $this->em->remove($help);
         $this->em->flush();
     }
 
-    public function swapHelp(Object $currentHelp, Object $swapHelp): void
+    public function swapHelp(Help $currentHelp, Help $swapHelp): void
     {
         $currentOrder = $currentHelp->getOrder();
         $swapOrder = $swapHelp->getOrder();
@@ -127,7 +126,6 @@ class HelpService
 
     public function indexHelps(): int
     {
-        // 1. Завантаження всіх Help-розділів
         $qb = $this->em->createQueryBuilder()
             ->select('h')
             ->from(Help::class, 'h');
@@ -135,13 +133,11 @@ class HelpService
         /** @var Help[] $allHelps */
         $allHelps = $qb->getQuery()->getResult();
 
-        // 2. Побудова дерева
         $helps = [];
         foreach ($allHelps as $help) {
             $helps[$help->getId()] = $help;
         }
 
-        // 3. Обнулення індексованих полів
         foreach ($helps as $help) {
             $help->setChildrenData(null);
             $help->setChildrenInside(null);
@@ -149,7 +145,6 @@ class HelpService
             $help->setParents(null);
         }
 
-        // 4. Індексація
         foreach ($helps as $help) {
             $id = $help->getId();
             $parentId = $help->getParentId();
@@ -158,7 +153,6 @@ class HelpService
             $path = [];
             $currentParentId = $parentId;
 
-            // Побудова ланцюжка батьків
             while ($currentParentId && isset($helps[$currentParentId])) {
                 $parent = $helps[$currentParentId];
                 $parents[] = $currentParentId;
@@ -170,12 +164,10 @@ class HelpService
                 $currentParentId = $parent->getParentId();
             }
 
-            // Запис батьків
             $help->setParents($parents ? implode(',', array_reverse($parents)) : null);
             $help->setPath($path ? json_encode(array_reverse($path), JSON_UNESCAPED_UNICODE) : null);
             $help->setLevel(count($parents) + 1);
 
-            // Заповнення childrenData
             foreach ($helps as $child) {
                 if ($child->getParentId() === $id) {
                     $currentChildren = array_filter(explode(',', $help->getChildrenData() ?? ''));
@@ -184,7 +176,6 @@ class HelpService
                 }
             }
 
-            // Заповнення childrenInside (усі нащадки)
             $ancestorId = $help->getParentId();
             while ($ancestorId && isset($helps[$ancestorId])) {
                 $ancestor = $helps[$ancestorId];
@@ -195,7 +186,6 @@ class HelpService
             }
         }
 
-        // 5. Збереження
         foreach ($helps as $help) {
             $this->em->persist($help);
         }

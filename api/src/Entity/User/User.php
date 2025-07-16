@@ -59,16 +59,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private bool $authorized = true;
 
-    public const array ROLES = [
-        'ROLE_SUPER_ADMIN' => 'Super Admin',
-        'ROLE_ADMIN' => 'Admin',
-        'ROLE_USER' => 'User',
-        'ROLE_MODERATOR' => 'Moderator',
-        'ROLE_EDITOR' => 'Editor',
-        'ROLE_MANAGER' => 'Manager',
-        'ROLE_CUSTOMER_SUPPORT' => 'Customer Support',
-    ];
-
     public function __construct()
     {
         $this->id = Uuid::v4()->toRfc4122();
@@ -159,6 +149,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->avatar = $avatar;
     }
 
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
+
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
+    }
+
     public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
@@ -221,36 +221,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAuthorized(bool $authorized): void
     {
         $this->authorized = $authorized;
-    }
-
-    public function getRoles(): array { return $this->roles; }
-    public function setRoles(array $roles): void { $this->roles = $roles; }
-    #[Groups(['user:read'])]
-    public function isSuperAdmin(): bool {
-        return in_array('ROLE_SUPER_ADMIN', $this->roles);
-    }
-    #[Groups(['user:read'])]
-    public function isAdmin(): bool {
-        return in_array('ROLE_ADMIN', $this->roles);
-    }
-    #[Groups(['user:read'])]
-    public function isUser(): bool {
-        return in_array('ROLE_USER', $this->roles);
-    }
-    #[Groups(['user:read'])]
-    public function isModerator(): bool {
-        return in_array('ROLE_MODERATOR', $this->roles);
-    }
-    #[Groups(['user:read'])]
-    public function isEditor(): bool {
-        return in_array('ROLE_EDITOR', $this->roles);
-    }
-    #[Groups(['user:read'])]
-    public function isManager(): bool {
-        return in_array('ROLE_MANAGER', $this->roles);
-    }
-    #[Groups(['user:read'])]
-    public function isCustomerSupport(): bool {
-        return in_array('ROLE_CUSTOMER_SUPPORT', $this->roles);
     }
 }

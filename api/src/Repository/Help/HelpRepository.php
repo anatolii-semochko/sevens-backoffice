@@ -7,6 +7,9 @@ use App\Exception\NotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Help>
+ */
 class HelpRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -39,7 +42,7 @@ class HelpRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function get(string $id): Object
+    public function get(string $id): Help
     {
         $help = $this->find($id);
         if (!$help->getId()) {

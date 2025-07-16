@@ -1,13 +1,28 @@
 import React from 'react'
+import { roles } from 'src/components/utils/Permissions'
+import { CBadge, CNavLink, CSidebarNav } from '@coreui/react'
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
-
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
 
-import { CBadge, CNavLink, CSidebarNav } from '@coreui/react'
+const filterNavigation = (items, roles) => {
+  return items.reduce((acc, item) => {
+    if (!roles.editor && ['Languages', 'Categories', 'Content', 'Pages Content'].includes(item.name)) {
+      return acc
+    }
+    if (item.items) {
+      const filtered = filterNavigation(item.items, roles)
+      if (filtered.length) acc.push({ ...item, items: filtered })
+    } else {
+      acc.push(item)
+    }
+    return acc
+  }, [])
+}
 
 export const AppSidebarNav = ({ items }) => {
+  const accessedItems = filterNavigation(items, roles())
   const navLink = (name, icon, badge, indent = false) => {
     return (
       <>
@@ -62,8 +77,9 @@ export const AppSidebarNav = ({ items }) => {
 
   return (
     <CSidebarNav as={SimpleBar}>
-      {items &&
-        items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
+      {accessedItems && accessedItems.map((item, index) =>
+        item.items ? navGroup(item, index) : navItem(item, index),
+      )}
     </CSidebarNav>
   )
 }

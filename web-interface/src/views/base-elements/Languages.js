@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { roles, AccessDeniedBlock } from 'src/components/utils/Permissions'
 import {
   fetchLanguages,
   createLanguage,
@@ -18,6 +19,9 @@ import CIcon from '@coreui/icons-react'
 import { BooleanTrigger, LanguageFlag } from 'src/components/table/CustomTableElements'
 
 const Languages = () => {
+  if (!roles().editor) {
+    return <AccessDeniedBlock />
+  }
   const dispatch = useDispatch()
   const [rawItems, setRawItems] = useState([])
   const [items, setItems] = useState([])

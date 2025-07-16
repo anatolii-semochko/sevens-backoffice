@@ -26,7 +26,7 @@ import {
 } from '@coreui/icons'
 
 import { AppBreadcrumb } from './index'
-import { AppHeaderDropdown } from './header/index'
+import AppHeaderDropdown from './header/AppHeaderDropdown'
 import { LanguageSelector } from './AppLanguageSelector'
 import { AppToaster } from 'src/components/utils/AppToaster'
 

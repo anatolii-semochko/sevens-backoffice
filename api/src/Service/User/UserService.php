@@ -28,7 +28,6 @@ readonly class UserService
         $user = new User();
         $user->setId($data['id'] ?? Uuid::v4()->toRfc4122());
         $this->fillUser($user, $data);
-        $user->setAuthorized(false);
 
         $this->em->persist($user);
         $this->em->flush();
@@ -74,6 +73,9 @@ readonly class UserService
                 $user->$setter($value);
             }
         }
+        if (!$user->isActive()) {
+            $user->setAuthorized(false);
+        }
 
         $this->em->persist($user);
         $this->em->flush();
@@ -113,6 +115,9 @@ readonly class UserService
         $user->setActive($data['active'] ?? false);
         $this->setAvatar($user, $data);
         $user->setRoles($data['roles'] ?? []);
+        if (!$user->isActive()) {
+            $user->setAuthorized(false);
+        }
 
         if (!empty($data['password'])) {
             $this->validate->checkPassword($data['password']);

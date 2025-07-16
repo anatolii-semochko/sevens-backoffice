@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/pages')]
 class PageController extends BaseController
@@ -16,8 +17,8 @@ class PageController extends BaseController
     private const array PAGE_GROUPS = ['groups' => ['page:read', 'page-seo:read', 'language:read']];
 
     public function __construct(
-        private PageRepository $repository,
-        private PageService $service,
+        private readonly PageRepository $repository,
+        private readonly PageService $service,
     ) {}
 
     #[Route('', name: 'pages_fetch', methods: ['GET'])]
@@ -52,6 +53,7 @@ class PageController extends BaseController
     }
 
     #[Route('', name: 'pages_post', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function post(Request $request): JsonResponse
     {
         try {
@@ -64,6 +66,7 @@ class PageController extends BaseController
     }
 
     #[Route('/{id}', name: 'pages_put', methods: ['PUT'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function put(string $id, Request $request): JsonResponse
     {
         try {
@@ -76,6 +79,7 @@ class PageController extends BaseController
     }
 
     #[Route('/{id}', name: 'pages_patch', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function patch(string $id, Request $request): JsonResponse
     {
         try {
@@ -88,6 +92,7 @@ class PageController extends BaseController
     }
 
     #[Route('/{id}', name: 'pages_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(string $id): JsonResponse
     {
         try {

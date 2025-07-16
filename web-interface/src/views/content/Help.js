@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { roles, AccessDeniedBlock } from 'src/components/utils/Permissions'
 import { fetchHelps, createHelp, putHelp, deleteHelp, swapHelpOrder, generateHelp , fetchError } from 'src/api/help'
 import {
   CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableDataCell,
@@ -7,13 +9,15 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
-import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { EmptyDataRow, CompletedChart } from 'src/components/table/CustomTableElements'
 import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
 import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 
 const Help = () => {
+  if (!roles().editor) {
+    return <AccessDeniedBlock />
+  }
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
   const [currentParent, setCurrentParent] = useState(null)
@@ -39,8 +43,8 @@ const Help = () => {
       setItems(data)
       setCurrentParent(parentId)
       setBreadcrumb(path)
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      window.toast.error(fetchError(error))
     }
     setLoading(false)
   }

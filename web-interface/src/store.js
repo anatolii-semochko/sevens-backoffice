@@ -3,6 +3,7 @@ import { legacy_createStore as createStore } from 'redux'
 const initialState = {
   path: { // TODO - move to environment constants
     userAvatars: '/images/user-avatars/',
+    storageImages: '/storage/images/',
     languageFlags: '/storage/images/language-flags/',
     categoryLogos: '/storage/images/category-logos/',
   },

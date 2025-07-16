@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/users')]
 class UserController extends BaseController
@@ -65,6 +66,7 @@ class UserController extends BaseController
     }
 
     #[Route('', name: 'user_post', methods: ['POST'])]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     public function post(Request $request): JsonResponse
     {
         try {
@@ -77,6 +79,7 @@ class UserController extends BaseController
     }
 
     #[Route('/{id}', name: 'user_put', methods: ['PUT'])]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     public function put(string $id, Request $request): JsonResponse
     {
         try {
@@ -89,6 +92,7 @@ class UserController extends BaseController
     }
 
     #[Route('/{id}', name: 'user_patch', methods: ['PATCH'])]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     public function patch(string $id, Request $request): JsonResponse
     {
         try {
@@ -101,6 +105,7 @@ class UserController extends BaseController
     }
 
     #[Route('/{id}', name: 'user_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     public function delete(string $id): JsonResponse
     {
         try {

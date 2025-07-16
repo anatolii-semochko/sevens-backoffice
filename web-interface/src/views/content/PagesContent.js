@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { roles, AccessDeniedBlock } from 'src/components/utils/Permissions'
+import { fetchPages } from 'src/api/pages'
 import {
   fetchContent, patchContent, deleteContent,
   createContent, generateContent, fetchError
@@ -10,14 +13,15 @@ import {
 } from '@coreui/react'
 import { cilPen, cilTrash, cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import { fetchPages } from 'src/api/pages'
-import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { CompletedChart, EmptyDataRow } from 'src/components/table/CustomTableElements'
 import { PaginatorControls, PaginatorInfo } from 'src/components/table/Paginator'
 import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
 
 const PagesContent = () => {
+  if (!roles().editor) {
+    return <AccessDeniedBlock />
+  }
   const [items, setItems] = useState([])
   const [pages, setPages] = useState([])
   const [loading, setLoading] = useState(false)

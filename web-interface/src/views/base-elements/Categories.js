@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { roles, AccessDeniedBlock } from 'src/components/utils/Permissions'
 import {
   fetchCategories, createCategory, putCategory, patchCategory, deleteCategory, swapCategoryOrder, fetchError
 } from 'src/api/categories'
 import {
-  CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableDataCell,
-  CButton, CModal, CModalHeader, CModalBody, CModalFooter,
-  CFormInput, CAlert, CCardBody, CFormTextarea
+  CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell,
+  CTableDataCell, CModal, CModalHeader, CModalBody,
+  CModalFooter, CFormInput, CAlert, CCardBody, CButton,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilPlus, cilArrowTop } from '@coreui/icons'
-import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { LogoInput } from 'src/components/input-fields/LogoInput'
 import { BooleanTrigger } from 'src/components/table/CustomTableElements'
@@ -18,6 +19,9 @@ import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 import { TextEditorMCE } from 'src/components/input-fields/TextEditorMCE'
 
 const Categories = () => {
+  if (!roles().editor) {
+    return <AccessDeniedBlock />
+  }
   const logoPath = useSelector((state) => state.path.categoryLogos)
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
