@@ -14,6 +14,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/pages-content')]
 class PageContentController extends BaseController
 {
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    // TODO - This functionality has to be adapted to Symfony translations or removed //
+    ////////////////////////////////////////////////////////////////////////////////////
+
     public const array CONTENT_GROUPS = ['groups' => [
         'page:read',
         'page-content:read',
