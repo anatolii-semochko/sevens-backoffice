@@ -1,9 +1,7 @@
 import React, { Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { CContainer, CSpinner } from '@coreui/react'
-import Page404 from '../views/pages/page404/Page404'
-
-// routes config
+import Page404 from '../views/pages/Page404'
 import routes from '../routes'
 
 const AppContent = () => {
