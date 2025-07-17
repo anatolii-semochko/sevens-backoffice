@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User\User;
+use App\Entity\User\UserConstants;
 use App\Repository\UserRepository;
 use App\Service\User\AuthService;
 use App\Service\User\UserService;
@@ -47,10 +48,25 @@ class UserController extends BaseController
         return $this->json($user, context: self::USER_GROUPS);
     }
 
+    #[Route('/user-profile', name: 'user_profile_patch', methods: ['PATCH'])]
+    public function myProfile(Request $request): JsonResponse
+    {
+        try {
+            $this->service->saveMyProfile(
+                $this->getUser()->getId(),
+                $this->getData($request),
+            );
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $this->json(null);
+    }
+
     #[Route('/roles-list', name: 'user_roles_list', methods: ['GET'])]
     public function roles(): JsonResponse
     {
-        return $this->json(User::ROLES, context: self::USER_GROUPS);
+        return $this->json(UserConstants::ROLES, context: self::USER_GROUPS);
     }
 
     #[Route('/{id}', name: 'user_get', methods: ['GET'])]

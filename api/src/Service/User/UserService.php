@@ -3,6 +3,7 @@
 namespace App\Service\User;
 
 use App\Entity\User\User;
+use App\Repository\UserRepository;
 use App\Service\File\FileService;
 use App\Service\File\LogoService;
 use App\Utils\Validate;
@@ -14,6 +15,7 @@ readonly class UserService
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private UserRepository $userRepository,
         private LogoService $logoService,
         private Validate $validate,
     ) {}
@@ -51,7 +53,7 @@ readonly class UserService
     public function patch(User $user, array $data): void
     {
         foreach ($data as $key => $value) {
-            if (in_array($key, ['id', 'roles', 'createdAt', 'lastActivityAt'])) {
+            if (in_array($key, ['id', 'roles', 'createdAt', 'lastActivity', 'lastActivityAt'])) {
                 continue;
             }
             if ($key === 'avatar') {
@@ -79,6 +81,20 @@ readonly class UserService
 
         $this->em->persist($user);
         $this->em->flush();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function saveMyProfile(string $userId, array $data): void
+    {
+        $user = $this->userRepository->get($userId);
+        $this->patch($user, [
+            'loginName' => $data['loginName'],
+            'email' => $data['email'],
+            'avatar' => $data['avatar'],
+            'password' => $data['password'],
+        ]);
     }
 
     /**
