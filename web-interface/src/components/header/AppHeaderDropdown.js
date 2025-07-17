@@ -32,6 +32,9 @@ const AppHeaderDropdown = () => {
       await updateUserProfile(formData)
       const updated = await fetchCurrentUser()
       dispatch({ type: 'set', user: updated })
+      if (document.activeElement) {
+        document.activeElement.blur()
+      }
       setProfileVisible(false)
       if (formData.password) {
         await logout()
@@ -44,6 +47,13 @@ const AppHeaderDropdown = () => {
   const logout = async () => {
     await apiLogout()
     window.location.replace('/login')
+  }
+
+  const handleCloseProfile = () => {
+    if (document.activeElement) {
+      document.activeElement.blur()
+    }
+    setProfileVisible(false)
   }
 
   return (
@@ -71,7 +81,7 @@ const AppHeaderDropdown = () => {
       </CDropdown>
       <ProfileModal
         visible={profileVisible}
-        onClose={() => setProfileVisible(false)}
+        onClose={handleCloseProfile}
         user={user}
         onSave={handleSaveProfile}
       />
