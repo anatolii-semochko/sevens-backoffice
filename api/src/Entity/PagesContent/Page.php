@@ -29,19 +29,40 @@ class Page
     #[Groups(['page:read'])]
     private string $terms;
 
+    private Collection $contents;
+
     public function __construct()
     {
         $this->id = Uuid::v4()->toRfc4122();
         $this->seo = new ArrayCollection();
     }
 
-    public function getId(): ?string { return $this->id; }
-    public function setId(string $id): void { $this->id = $id; }
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
 
-    public function getUrl(): string { return $this->url; }
+    public function setId(string $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
     public function setUrl(string $url): void { $this->url = trim($url); }
 
-    public function getSeo(): Collection { return $this->seo; }
+    public function getSeo(): Collection
+    {
+        return $this->seo;
+    }
+
+    public function setTerms(array $terms): void
+    {
+        $this->terms = implode(',', $terms);
+    }
 
     public function getTerms(): string {
         $terms = [];
@@ -69,7 +90,10 @@ class Page
         return $this;
     }
 
-    public function getContents(): Collection { return $this->contents; }
+    public function getContents(): Collection
+    {
+        return $this->contents;
+    }
 
     public function addContent(PageContent $content): self
     {

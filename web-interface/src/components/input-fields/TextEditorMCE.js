@@ -28,7 +28,6 @@ const TextEditorMCE = ({
 
   useEffect(() => {
     setContent(value)
-    setIsPlainText(!containsHTML(value))
   }, [value])
 
   const handleEditorChange = (newContent, editor) => {

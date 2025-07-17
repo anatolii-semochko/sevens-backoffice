@@ -16,6 +16,9 @@ export const createUser = (data) => api
 export const updateUser = (id, data) => api
   .put(`${mainUrl}/${id}`, data)
 
+export const updateUserProfile = (data) => api
+  .patch(`${mainUrl}/user-profile`, data)
+
 export const patchUser = (id, data) => api
   .patch(`${mainUrl}/${id}`, data)
 

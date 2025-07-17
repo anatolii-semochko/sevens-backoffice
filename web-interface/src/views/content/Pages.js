@@ -1,18 +1,22 @@
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { roles, AccessDeniedBlock } from 'src/components/utils/Permissions'
+import { fetchPages, createPage, patchPage, deletePage, fetchError } from 'src/api/pages'
 import {
   CTable, CTableBody, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell,
-  CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput, CFormLabel,
+  CButton, CModal, CModalHeader, CModalBody, CModalFooter, CFormInput,
   CCardBody, CFormTextarea, CAlert,
 } from '@coreui/react'
 import { cilPencil, cilTrash, cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import React, { useEffect, useState } from 'react'
-import { fetchPages, createPage, patchPage, deletePage, fetchError } from 'src/api/pages'
-import { useSelector } from 'react-redux'
 import { LanguageSelector } from 'src/components/AppLanguageSelector'
 import { CompletedChart } from 'src/components/table/CustomTableElements'
 import { PaginatorInfo, PaginatorControls } from 'src/components/table/Paginator'
 
 const Pages = () => {
+  if (!roles().editor) {
+    return <AccessDeniedBlock />
+  }
   const [items, setItems] = useState([])
   const [visible, setVisible] = useState(false)
   const [editingItem, setEditingItem] = useState(null)

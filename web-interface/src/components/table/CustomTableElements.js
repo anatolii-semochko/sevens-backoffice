@@ -20,10 +20,12 @@ const BooleanTrigger = ({
   onToggle,
   className = '',
   title = 'Toggle status',
+  disabled = false,
 }) => {
   const active = typeof isActive === 'function' ? isActive(item) : Boolean(isActive)
 
   const handleClick = async () => {
+    if (disabled) return
     try {
       await onToggle(item)
     } catch (error) {
@@ -38,7 +40,7 @@ const BooleanTrigger = ({
         className={active ? 'text-success' : 'text-danger'}
         title={title}
         onClick={handleClick}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.65 : 1 }}
       />
     </div>
   )

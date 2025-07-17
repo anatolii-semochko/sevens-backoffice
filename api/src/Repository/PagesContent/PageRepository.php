@@ -9,6 +9,9 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
+/**
+ * @extends ServiceEntityRepository<Page>
+ */
 class PageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,7 +19,7 @@ class PageRepository extends ServiceEntityRepository
         parent::__construct($registry, Page::class);
     }
 
-    public function get(string $id): Object
+    public function get(string $id): Page
     {
         $page = $this->find($id);
         if (!$page->getId()) {
@@ -25,7 +28,7 @@ class PageRepository extends ServiceEntityRepository
 
         return $page;
     }
-    
+
     public function findOneByTerm(string $term): ?Page
     {
         try {
@@ -33,7 +36,7 @@ class PageRepository extends ServiceEntityRepository
                 ->where('p.term = :term')
                 ->setParameter('term', $term)
                 ->getQuery()
-                ->getOneOrNullResult();   
+                ->getOneOrNullResult();
         } catch (NonUniqueResultException $e) {
             throw new UnprocessableEntityHttpException($e->getMessage());
         }

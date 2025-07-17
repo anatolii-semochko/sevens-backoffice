@@ -8,15 +8,16 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/languages')]
 class LanguageController extends BaseController
 {
     public const array LANGUAGE_GROUPS = ['groups' => 'language:read'];
-    
+
     public function __construct(
-        private LanguageRepository $repository,
-        private LanguageService $service,
+        private readonly LanguageRepository $repository,
+        private readonly LanguageService $service,
     ) {}
 
     #[Route('', name: 'language_fetch', methods: ['GET'])]
@@ -40,11 +41,12 @@ class LanguageController extends BaseController
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
-        
+
         return $this->json($language, context: self::LANGUAGE_GROUPS);
     }
 
     #[Route('', name: 'language_post', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function post(Request $request): JsonResponse
     {
         try {
@@ -52,14 +54,15 @@ class LanguageController extends BaseController
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
-        
+
         return $this->json(null);
     }
 
     #[Route('/{id}', name: 'language_put', methods: ['PUT'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function put(Request $request, string $id): JsonResponse
     {
-        try { 
+        try {
             $this->service->save($this->repository->get($id), $this->getData($request));
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
@@ -69,6 +72,7 @@ class LanguageController extends BaseController
     }
 
     #[Route('/{id}', name: 'language_patch', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function patch(string $id, Request $request): JsonResponse
     {
         try {
@@ -81,6 +85,7 @@ class LanguageController extends BaseController
     }
 
     #[Route('/{id}', name: 'language_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(string $id): JsonResponse
     {
         try {
@@ -93,6 +98,7 @@ class LanguageController extends BaseController
     }
 
     #[Route('/{id}/swap', name: 'language_order_swap', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function swapOrder(string $id, Request $request): JsonResponse
     {
         try {

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User\User;
+use App\Entity\User\UserConstants;
 use App\Repository\UserRepository;
 use App\Service\User\AuthService;
 use App\Service\User\UserService;
@@ -10,6 +11,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/users')]
 class UserController extends BaseController
@@ -46,10 +48,25 @@ class UserController extends BaseController
         return $this->json($user, context: self::USER_GROUPS);
     }
 
+    #[Route('/user-profile', name: 'user_profile_patch', methods: ['PATCH'])]
+    public function myProfile(Request $request): JsonResponse
+    {
+        try {
+            $this->service->saveMyProfile(
+                $this->getUser()->getId(),
+                $this->getData($request),
+            );
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $this->json(null);
+    }
+
     #[Route('/roles-list', name: 'user_roles_list', methods: ['GET'])]
     public function roles(): JsonResponse
     {
-        return $this->json(User::ROLES, context: self::USER_GROUPS);
+        return $this->json(UserConstants::ROLES, context: self::USER_GROUPS);
     }
 
     #[Route('/{id}', name: 'user_get', methods: ['GET'])]
@@ -65,6 +82,7 @@ class UserController extends BaseController
     }
 
     #[Route('', name: 'user_post', methods: ['POST'])]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     public function post(Request $request): JsonResponse
     {
         try {
@@ -77,6 +95,7 @@ class UserController extends BaseController
     }
 
     #[Route('/{id}', name: 'user_put', methods: ['PUT'])]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     public function put(string $id, Request $request): JsonResponse
     {
         try {
@@ -89,6 +108,7 @@ class UserController extends BaseController
     }
 
     #[Route('/{id}', name: 'user_patch', methods: ['PATCH'])]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     public function patch(string $id, Request $request): JsonResponse
     {
         try {
@@ -101,6 +121,7 @@ class UserController extends BaseController
     }
 
     #[Route('/{id}', name: 'user_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     public function delete(string $id): JsonResponse
     {
         try {

@@ -2,7 +2,6 @@ import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {
   cilSpeedometer,
-  cilStar,
   cilUser,
   cilFlagAlt,
   cilLibrary,
@@ -54,11 +53,11 @@ const _nav = [
         name: 'Pages and SEO',
         to: '/content/pages',
       },
-      {
-        component: CNavItem,
-        name: 'Terms and Translations',
-        to: '/content/pages-content',
-      },
+      // { // TODO - This page has to be adapted to Symfony translations or removed
+      //   component: CNavItem,
+      //   name: 'Terms and Translations',
+      //   to: '/content/pages-content',
+      // },
       {
         component: CNavItem,
         name: 'Help Section',
@@ -66,37 +65,6 @@ const _nav = [
       },
     ],
   },
-  // {
-  //   component: CNavTitle,
-  //   name: 'Extras',
-  // },
-  // {
-  //   component: CNavGroup,
-  //   name: 'Pages',
-  //   icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
-  //   items: [
-  //     {
-  //       component: CNavItem,
-  //       name: 'Login',
-  //       to: '/login',
-  //     },
-  //     {
-  //       component: CNavItem,
-  //       name: 'Register',
-  //       to: '/register',
-  //     },
-  //     {
-  //       component: CNavItem,
-  //       name: 'Error 404',
-  //       to: '/404',
-  //     },
-  //     {
-  //       component: CNavItem,
-  //       name: 'Error 500',
-  //       to: '/500',
-  //     },
-  //   ],
-  // },
 ]
 
 export default _nav

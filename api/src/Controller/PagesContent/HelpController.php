@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/help')]
 class HelpController extends BaseController
@@ -47,6 +48,7 @@ class HelpController extends BaseController
     }
 
     #[Route('', name: 'help_post', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function post(Request $request): JsonResponse
     {
         try {
@@ -59,6 +61,7 @@ class HelpController extends BaseController
     }
 
     #[Route('/{id}', name: 'help_put', methods: ['PUT'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function put(string $id, Request $request): JsonResponse
     {
         try {
@@ -70,19 +73,8 @@ class HelpController extends BaseController
         return $this->json(null);
     }
 
-    #[Route('/{id}', name: 'help_patch', methods: ['PATCH'])]
-    public function patch(string $id, Request $request): JsonResponse
-    {
-        try {
-            $this->service->patch($this->repository->get($id), $this->getData($request));
-        } catch (\Exception $e) {
-            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        return $this->json(null);
-    }
-
     #[Route('/{id}', name: 'help_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(string $id): JsonResponse
     {
         try {
@@ -95,6 +87,7 @@ class HelpController extends BaseController
     }
 
     #[Route('/{id}/swap', name: 'help_order_swap', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function swapHelp(string $id, Request $request): JsonResponse
     {
         try {
@@ -109,6 +102,7 @@ class HelpController extends BaseController
     }
 
     #[Route('/generate', name: 'help_generate_files', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function generate(): JsonResponse
     {
         try {

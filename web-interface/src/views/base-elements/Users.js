@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import store from 'src/store'
+import { roles } from 'src/components/utils/Permissions'
 import { fetchUsers, createUser, updateUser, patchUser, deleteUser, fetchError } from 'src/api/users'
 import {
   CTable,
@@ -27,6 +28,7 @@ import { BooleanTrigger, BooleanStatusIcon } from 'src/components/table/CustomTa
 import { dateTime, timeAgo, isRecent } from 'src/components/utils/DateTime'
 
 const Users = () => {
+  const isSuperAdmin = roles().superAdmin
   const userAvatars = store.getState().path.userAvatars
   const [items, setItems] = useState([])
   const [visible, setVisible] = useState(false)
@@ -112,9 +114,11 @@ const Users = () => {
           <CButton size="sm" title="Reload" onClick={() => fetchData()}>
             <TfiReload />
           </CButton>
-          <CButton color="success" size="sm" onClick={handleAdd}>
-            <CIcon icon={cilPlus} className="me-1 pt-1" /> Add User
-          </CButton>
+          {isSuperAdmin &&
+            <CButton color="success" size="sm" onClick={handleAdd} disabled={!isSuperAdmin}>
+              <CIcon icon={cilPlus} className="me-1 pt-1" /> Add User
+            </CButton>
+          }
         </div>
       </div>
       <CCardBody>
@@ -134,7 +138,7 @@ const Users = () => {
               <CTableHeaderCell>
                 <div className="row-cell-center-50">Authorized</div>
               </CTableHeaderCell>
-              <CTableHeaderCell style={{ width: 1 }}>Actions</CTableHeaderCell>
+              {isSuperAdmin && <CTableHeaderCell style={{ width: 1 }}>Actions</CTableHeaderCell>}
             </CTableRow>
           </CTableHead>
           <CTableBody>
@@ -148,12 +152,16 @@ const Users = () => {
                 <CTableDataCell>{rolesString(item.roles)}</CTableDataCell>
                 <CTableDataCell>{item.email}</CTableDataCell>
                 <CTableDataCell>{dateTime(item.createdAt)}</CTableDataCell>
-                <CTableDataCell>{item.lastActivity ?? timeAgo(item.lastActivityAt)}</CTableDataCell>
+                <CTableDataCell title={dateTime(item.lastActivityAt)}>
+                  {timeAgo(item.lastActivityAt)}
+                </CTableDataCell>
                 <CTableDataCell>
                   <BooleanTrigger
                     item={item}
                     isActive={(i) => i.active}
+                    disabled={!isSuperAdmin}
                     onToggle={async (i) => {
+                      if (!isSuperAdmin) return
                       await patchUser(i.id, { active: i.active ? 0 : 1 })
                       fetchData()
                     }}
@@ -172,25 +180,27 @@ const Users = () => {
                     title={item.authorized ? 'Authorized' : 'Not Authorized'}
                   />
                 </CTableDataCell>
-                <CTableDataCell className="text-nowrap">
-                  <CButton
-                    size="sm"
-                    color="warning"
-                    className="me-2"
-                    onClick={() => handleEdit(item)}
-                    title="Edit"
-                  >
-                    <CIcon icon={cilPencil} />
-                  </CButton>
-                  <CButton
-                    size="sm"
-                    color="danger"
-                    onClick={() => handleRemove(item)}
-                    title="Remove"
-                  >
-                    <CIcon icon={cilTrash} />
-                  </CButton>
-                </CTableDataCell>
+                {isSuperAdmin &&
+                  <CTableDataCell className="text-nowrap">
+                    <CButton
+                      size="sm"
+                      color="warning"
+                      className="me-2"
+                      onClick={() => handleEdit(item)}
+                      title="Edit"
+                    >
+                      <CIcon icon={cilPencil} />
+                    </CButton>
+                    <CButton
+                      size="sm"
+                      color="danger"
+                      onClick={() => handleRemove(item)}
+                      title="Remove"
+                    >
+                      <CIcon icon={cilTrash} />
+                    </CButton>
+                  </CTableDataCell>
+                }
               </CTableRow>
             ))}
           </CTableBody>

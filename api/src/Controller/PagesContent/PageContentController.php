@@ -9,10 +9,16 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/pages-content')]
 class PageContentController extends BaseController
 {
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    // TODO - This functionality has to be adapted to Symfony translations or removed //
+    ////////////////////////////////////////////////////////////////////////////////////
+
     public const array CONTENT_GROUPS = ['groups' => [
         'page:read',
         'page-content:read',
@@ -51,6 +57,7 @@ class PageContentController extends BaseController
     }
 
     #[Route('', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function post(Request $request): Response
     {
         try {
@@ -65,6 +72,7 @@ class PageContentController extends BaseController
     }
 
     #[Route('/{id}', methods: ['PUT'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function put(string $id, Request $request): Response
     {
         try {
@@ -77,6 +85,7 @@ class PageContentController extends BaseController
     }
 
     #[Route('/{id}', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function patch(string $id, Request $request): Response
     {
         try {
@@ -90,6 +99,7 @@ class PageContentController extends BaseController
     }
 
     #[Route('/{id}', methods: ['DELETE'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(string $id): Response
     {
         try {
@@ -102,6 +112,7 @@ class PageContentController extends BaseController
     }
 
     #[Route('/generate', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function generate(): Response
     {
         try {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout as apiLogout } from 'src/api/auth'
-import { patchUser, fetchCurrentUser, fetchError } from 'src/api/users'
+import { fetchCurrentUser, updateUserProfile, fetchError } from 'src/api/users'
 import {
   CDropdown,
   CDropdownDivider,
@@ -29,7 +29,7 @@ const AppHeaderDropdown = () => {
 
   const handleSaveProfile = async (formData) => {
     try {
-      await patchUser(user.id, formData)
+      await updateUserProfile(formData)
       const updated = await fetchCurrentUser()
       dispatch({ type: 'set', user: updated })
       setProfileVisible(false)

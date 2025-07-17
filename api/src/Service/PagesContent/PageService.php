@@ -19,14 +19,15 @@ class PageService
         $page = new Page();
         $page->setId($data['id'] ?? Uuid::v4());
         $page->setUrl($data['url']);
+        $page->setTerms([]);
 
         $this->em->persist($page);
         $this->em->flush();
-        
+
         return $page;
     }
 
-    public function patch(object $page, array $data): void
+    public function patch(Page $page, array $data): void
     {
         if (isset($data['url'])) {
             $page->setUrl($data['url']);
@@ -40,10 +41,9 @@ class PageService
 
                 $language = $this->em->getRepository(Language::class)->find($seoData['language']['id']);
                 if (!$language) {
-                    continue; // unknown language
+                    continue;
                 }
 
-                // Check if this Page already has seo for this language
                 $existingSeo = null;
                 foreach ($page->getSeo() as $existing) {
                     if ($existing->getLanguage()?->getId() === $language->getId()) {
@@ -52,7 +52,6 @@ class PageService
                     }
                 }
 
-                // If SEO exists, update it, otherwise create new
                 if (!$existingSeo) {
                     $existingSeo = new PageSeo();
                     $existingSeo->setPage($page);
@@ -78,7 +77,7 @@ class PageService
 
         $this->em->flush();
     }
-    
+
     public function delete(Object $page): void
     {
         $this->em->remove($page);
