@@ -1,13 +1,14 @@
 import React, { Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { CContainer, CSpinner } from '@coreui/react'
+import Page404 from '../views/pages/page404/Page404'
 
 // routes config
 import routes from '../routes'
 
 const AppContent = () => {
   return (
-    <div className="px-4">
+    <CContainer className="px-4" fluid>
       <Suspense fallback={<CSpinner color="primary" />}>
         <Routes>
           {routes.map((route, idx) => {
@@ -24,9 +25,10 @@ const AppContent = () => {
             )
           })}
           <Route path="/" element={<Navigate to="dashboard" replace />} />
+          <Route path="*" element={<Page404 />} />
         </Routes>
       </Suspense>
-    </div>
+    </CContainer>
   )
 }
 
