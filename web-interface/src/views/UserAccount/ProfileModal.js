@@ -38,9 +38,15 @@ const ProfileModal = ({ visible, onClose, user, onSave }) => {
       <CModalHeader closeButton>Profile</CModalHeader>
       <CModalBody>
         <SecureFormInput
-          label="User Name"
+          label="Login"
           value={form.loginName}
           onChange={(e) => setForm({ ...form, loginName: e.target.value })}
+        />
+        <CFormInput
+          label="Email"
+          className="mb-3"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
         />
         <CFormInput
           type="password"
@@ -60,12 +66,6 @@ const ProfileModal = ({ visible, onClose, user, onSave }) => {
             onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
           />
         }
-        <CFormInput
-          label="Email"
-          className="mb-3"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
         <LogoInput
           path={userAvatars}
           prefix={'large-'}

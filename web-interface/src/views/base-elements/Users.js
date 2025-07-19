@@ -126,10 +126,10 @@ const Users = () => {
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell><div className="row-cell-center-50">Avatar</div></CTableHeaderCell>
-              <CTableHeaderCell>User Name</CTableHeaderCell>
-              <CTableHeaderCell>Full Name</CTableHeaderCell>
-              <CTableHeaderCell>Role</CTableHeaderCell>
+              <CTableHeaderCell>Name</CTableHeaderCell>
+              <CTableHeaderCell>Login</CTableHeaderCell>
               <CTableHeaderCell>Email</CTableHeaderCell>
+              <CTableHeaderCell>Role</CTableHeaderCell>
               <CTableHeaderCell>Created</CTableHeaderCell>
               <CTableHeaderCell>Last Activity</CTableHeaderCell>
               <CTableHeaderCell>
@@ -147,10 +147,10 @@ const Users = () => {
                 <CTableDataCell>
                   <UserAvatar user={item} showStatus={true} />
                 </CTableDataCell>
-                <CTableDataCell>{item.loginName}</CTableDataCell>
                 <CTableDataCell>{item.fullName}</CTableDataCell>
-                <CTableDataCell>{rolesString(item.roles)}</CTableDataCell>
+                <CTableDataCell>{item.loginName}</CTableDataCell>
                 <CTableDataCell>{item.email}</CTableDataCell>
+                <CTableDataCell>{rolesString(item.roles)}</CTableDataCell>
                 <CTableDataCell>{dateTime(item.createdAt)}</CTableDataCell>
                 <CTableDataCell title={dateTime(item.lastActivityAt)}>
                   {timeAgo(item.lastActivityAt)}
@@ -211,16 +211,16 @@ const Users = () => {
         <CModalHeader closeButton>{editingItem?.id ? 'Edit User' : 'Add User'}</CModalHeader>
         <CModalBody>
           <SecureFormInput
-            label="User Name"
-            secured={editingItem?.id}
-            value={editingItem?.loginName || ''}
-            onChange={(e) => setEditingItem({ ...editingItem, loginName: e.target.value })}
+            label="Name"
+            value={editingItem?.fullName || ''}
+            onChange={(e) => setEditingItem({ ...editingItem, fullName: e.target.value })}
           />
           <CFormInput
             className="mb-3"
-            label="Full Name"
-            value={editingItem?.fullName || ''}
-            onChange={(e) => setEditingItem({ ...editingItem, fullName: e.target.value })}
+            label="Login"
+            secured={editingItem?.id}
+            value={editingItem?.loginName || ''}
+            onChange={(e) => setEditingItem({ ...editingItem, loginName: e.target.value })}
           />
           <CFormInput
             className="mb-3"
