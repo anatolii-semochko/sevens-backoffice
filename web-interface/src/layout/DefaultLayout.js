@@ -16,14 +16,15 @@ const DefaultLayout = () => {
   }, [])
   return (
     <div>
-      <AppSidebar />
+      <AppSidebar/>
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader />
+        <AppHeader/>
         <div className="body flex-grow-1">
-          <AppContent />
+          <AppContent/>
         </div>
-        <AppFooter />
+        <AppFooter/>
       </div>
+      <div id="wallet-panel" className="right-slide-panel"></div>
     </div>
   )
 }
