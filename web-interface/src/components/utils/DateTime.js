@@ -6,6 +6,16 @@ const dateTime = (dateTime) => {
   return `${yyyy}-${mm}-${dd}`
 }
 
+export const formatedDateTime = (dateString) => {
+  return new Date(dateString).toLocaleString('uk-UA', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 const timeAgo = (dateTime) => {
   if (!dateTime) return ''
   const seconds = Math.floor((Date.now() - new Date(dateTime).getTime()) / 1000)

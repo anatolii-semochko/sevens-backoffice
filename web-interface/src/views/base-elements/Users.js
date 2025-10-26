@@ -38,7 +38,7 @@ const Users = () => {
   const fetchData = async () => {
     try {
       const data = await fetchUsers()
-      setItems(data)
+      setItems(Array.isArray(data) ? data : [])
     } catch (error) {
       window.toast.error(fetchError(error))
     }
@@ -142,7 +142,7 @@ const Users = () => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {items.map((item) => (
+            {Array.isArray(items) && items.map((item) => (
               <CTableRow key={item.id}>
                 <CTableDataCell>
                   <UserAvatar user={item} showStatus={true} />

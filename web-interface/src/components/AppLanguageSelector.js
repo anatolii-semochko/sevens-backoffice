@@ -10,7 +10,7 @@ const LanguageSelector = ({ selected, onChange }) => {
 
   // 🔁 Load languages if not loaded
   useEffect(() => {
-    if (!allLanguages || allLanguages.length === 0) {
+    if (!Array.isArray(allLanguages) || allLanguages.length === 0) {
       fetchLanguages().then((langs) => {
         dispatch({ type: 'set', languages: langs })
       })
@@ -19,7 +19,7 @@ const LanguageSelector = ({ selected, onChange }) => {
 
   // ✅ Only active languages
   const languages = useMemo(
-    () => allLanguages.filter((lang) => lang.active),
+    () => (Array.isArray(allLanguages) ? allLanguages.filter((lang) => lang.active) : []),
     [allLanguages]
   )
 

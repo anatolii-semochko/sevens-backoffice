@@ -6,6 +6,7 @@ const Pages  = React.lazy(() => import('./views/content/Pages'));
 const PagesContent  = React.lazy(() => import('./views/content/PagesContent'));
 const Categories  = React.lazy(() => import('./views/base-elements/Categories'));
 const Help  = React.lazy(() => import('./views/content/Help'));
+const TariffsManagement = React.lazy(() => import('./views/tariffs-management/./TariffsManagement'));
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 
@@ -19,6 +20,7 @@ const routes = [
   { path: '/content/pages-content', name: 'Pages', element: PagesContent },
   { path: '/categories', name: 'Pages', element: Categories },
   { path: '/content/help', name: 'Help', element: Help },
+  { path: '/tariffs-management', name: 'Tariffs Management', element: TariffsManagement },
 ]
 
 export default routes

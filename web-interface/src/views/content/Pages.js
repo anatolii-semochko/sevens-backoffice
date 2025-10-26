@@ -14,9 +14,6 @@ import { CompletedChart } from 'src/components/table/CustomTableElements'
 import { PaginatorInfo, PaginatorControls } from 'src/components/table/Paginator'
 
 const Pages = () => {
-  if (!roles().editor) {
-    return <AccessDeniedBlock />
-  }
   const [items, setItems] = useState([])
   const [visible, setVisible] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
@@ -31,6 +28,10 @@ const Pages = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [totalItems, setTotalItems] = useState(0)
+
+  if (!roles().editor) {
+    return <AccessDeniedBlock />
+  }
 
   const fetchData = async () => {
     try {
