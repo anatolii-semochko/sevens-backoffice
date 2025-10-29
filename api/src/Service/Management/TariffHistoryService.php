@@ -114,7 +114,7 @@ readonly class TariffHistoryService
      */
     public function getCurrentTariffs(): array
     {
-        return $this->nodeApi->getTariffs()['data'];
+        return $this->nodeApi->getTariffs();
     }
 
     /**
@@ -135,7 +135,7 @@ readonly class TariffHistoryService
             $setSale,
             $buy,
             $burn
-        )['data'];
+        );
 
         return [
             'transactionId' => $this->walletService->saveTransaction($transactionData['transaction']),
@@ -157,18 +157,16 @@ readonly class TariffHistoryService
         string $txSignature
     ): void {
         $this->walletService->matchTransactionSignature($transactionId, $txSignature);
-        $result = $this->nodeApi->sendSignedTransaction($txSignature);
+        $this->nodeApi->sendSignedTransaction($txSignature);
 
-        if ($result['success'] === true) {
-            $tariffHistory = new TariffHistory();
-            $tariffHistory->setAdminUser($adminUser);
-            $tariffHistory->setTargetWallet($targetWallet);
-            $tariffHistory->setMint($mint);
-            $tariffHistory->setSetSale($setSale);
-            $tariffHistory->setBuy($buy);
-            $tariffHistory->setBurn($burn);
-            $this->em->persist($tariffHistory);
-            $this->em->flush();
-        }
+        $tariffHistory = new TariffHistory();
+        $tariffHistory->setAdminUser($adminUser);
+        $tariffHistory->setTargetWallet($targetWallet);
+        $tariffHistory->setMint($mint);
+        $tariffHistory->setSetSale($setSale);
+        $tariffHistory->setBuy($buy);
+        $tariffHistory->setBurn($burn);
+        $this->em->persist($tariffHistory);
+        $this->em->flush();
     }
 }

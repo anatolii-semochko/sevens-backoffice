@@ -10,7 +10,7 @@ readonly class NodeServerApiClient extends NodeServerApi
      */
     public function getTariffs(): array
     {
-        return $this->get('/tariffs', null);
+        return $this->get('/manage/tariffs', null);
     }
 
     /**
@@ -24,7 +24,7 @@ readonly class NodeServerApiClient extends NodeServerApi
         int $buy,
         int $burn
     ): array {
-        return $this->get('/tariffs/get-transaction', [
+        return $this->get('/manage/tariffs/transaction', [
             'authorityPublicKey' => $authorityPublicKey,
             'targetWallet' => $targetWallet,
             'mint' => $mint,
@@ -47,9 +47,9 @@ readonly class NodeServerApiClient extends NodeServerApi
     /**
      * @throws NodeServerApiException
      */
-    public function matchTransactionAndSignature(string $transaction, string $txSignature): array
+    public function matchTransactionAndSignature(string $transaction, string $txSignature): void
     {
-        return $this->post('/transaction/match', [
+        $this->post('/transaction/match', [
             'transaction' => $transaction,
             'txSignature' => $txSignature,
         ]);
