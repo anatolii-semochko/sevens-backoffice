@@ -217,7 +217,7 @@ const Categories = () => {
       </div>
       <CCardBody>
         <Breadcrumbs />
-        <CTable className="no-border-last" hover responsive>
+        <CTable className="align-middle no-border-last" hover responsive>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell><div className="row-cell-center-50">Logo</div></CTableHeaderCell>

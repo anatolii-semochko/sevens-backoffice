@@ -3,6 +3,7 @@
 namespace App\Repository\Wallet;
 
 use App\Entity\Wallet\WalletTransaction;
+use App\Exception\NotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,14 +17,11 @@ class WalletTransactionRepository extends ServiceEntityRepository
         parent::__construct($registry, WalletTransaction::class);
     }
 
-    /**
-     * @throws \Exception
-     */
     public function get(string $id): WalletTransaction
     {
         $transaction = $this->find($id);
         if (!$transaction) {
-            throw new \Exception('Transaction not found');
+            throw new NotFoundException('Transaction not found');
         }
 
         return $transaction;

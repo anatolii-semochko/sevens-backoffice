@@ -226,7 +226,7 @@ const Help = () => {
       </div>
       <CCardBody>
         <Breadcrumbs />
-        <CTable className="no-border-last" hover responsive>
+        <CTable className="align-middle no-border-last" hover responsive>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell>Name</CTableHeaderCell>

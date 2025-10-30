@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Wallet\WalletTransaction;
+use App\Entity\Wallet\WalletTransactionTypeEnum;
 use App\Repository\Wallet\WalletTransactionRepository;
 use App\Service\NodeServer\NodeServerApiClient;
 use App\Service\NodeServer\NodeServerApiException;
@@ -19,6 +20,7 @@ readonly class WalletService
     public function saveTransaction(string $transaction): string
     {
         $walletTransaction = new WalletTransaction();
+        $walletTransaction->setType(WalletTransactionTypeEnum::BACKOFFICE);
         $walletTransaction->setTransaction($transaction);
         $this->em->persist($walletTransaction);
         $this->em->flush();

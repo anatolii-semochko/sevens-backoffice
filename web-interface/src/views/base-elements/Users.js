@@ -122,7 +122,7 @@ const Users = () => {
         </div>
       </div>
       <CCardBody>
-        <CTable className="no-border-last" hover responsive>
+        <CTable className="align-middle no-border-last" hover responsive>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell><div className="row-cell-center-50">Avatar</div></CTableHeaderCell>

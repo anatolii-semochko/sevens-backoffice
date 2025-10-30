@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Repository\Management\TariffHistoryRepository;
+use App\Exception\NotFoundException;
+use App\Repository\TokenManage\ManageTariffHistoryRepository;
 use App\Service\Management\TariffHistoryService;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -24,7 +26,7 @@ class TariffHistoryController extends BaseController
     ];
 
     public function __construct(
-        private readonly TariffHistoryRepository $repository,
+        private readonly ManageTariffHistoryRepository $repository,
         private readonly TariffHistoryService $service,
     ) {}
 
@@ -58,7 +60,7 @@ class TariffHistoryController extends BaseController
             $tariffHistory = $this->repository->find($id);
 
             if (!$tariffHistory) {
-                throw new \Exception('Management history not found', 404);
+                throw new NotFoundException('Token manage history record not found', Response::HTTP_NOT_FOUND);
             }
 
             return $this->json($tariffHistory, context: self::TARIFF_HISTORY_GROUPS);

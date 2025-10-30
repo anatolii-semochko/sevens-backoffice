@@ -44,7 +44,7 @@ export const TariffHistoryTable = ({items, totalItems, currentPage, setCurrentPa
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell scope="col">Date</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Admin User</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Operator</CTableHeaderCell>
               <CTableHeaderCell scope="col">Buy (%)</CTableHeaderCell>
               <CTableHeaderCell scope="col">Mint Fee</CTableHeaderCell>
               <CTableHeaderCell scope="col">Set Buy</CTableHeaderCell>
@@ -60,7 +60,7 @@ export const TariffHistoryTable = ({items, totalItems, currentPage, setCurrentPa
                   <UserAvatar user={item.adminUser} showStatus={true} />
                   <span className="ms-3">{item.adminUser?.fullName}</span>
                 </CTableDataCell>
-                <CTableDataCell>{item.buy}%</CTableDataCell>
+                <CTableDataCell className={'text-primary'}>{item.buy}%</CTableDataCell>
                 <CTableDataCell><FormattedSevens lamports={item.mint} /></CTableDataCell>
                 <CTableDataCell><FormattedSevens lamports={item.setSale} /></CTableDataCell>
                 <CTableDataCell><FormattedSevens lamports={item.burn} /></CTableDataCell>

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service\Management;
 
-use App\Entity\Tariff\TariffHistory;
-use App\Repository\Management\TariffHistoryRepository;
+use App\Entity\TokenManage\ManageTariffHistory;
+use App\Repository\TokenManage\ManageTariffHistoryRepository;
 use App\Service\NodeServer;
 use App\Service\NodeServer\NodeServerApiClient;
 use App\Service\WalletService;
@@ -17,10 +17,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 readonly class TariffHistoryService
 {
     public function __construct(
-        private TariffHistoryRepository $repository,
-        private NodeServerApiClient $nodeApi,
-        private EntityManagerInterface $em,
-        private WalletService $walletService,
+        private ManageTariffHistoryRepository $repository,
+        private NodeServerApiClient           $nodeApi,
+        private EntityManagerInterface        $em,
+        private WalletService                 $walletService,
     ) {}
 
     /**
@@ -159,7 +159,7 @@ readonly class TariffHistoryService
         $this->walletService->matchTransactionSignature($transactionId, $txSignature);
         $this->nodeApi->sendSignedTransaction($txSignature);
 
-        $tariffHistory = new TariffHistory();
+        $tariffHistory = new ManageTariffHistory();
         $tariffHistory->setAdminUser($adminUser);
         $tariffHistory->setTargetWallet($targetWallet);
         $tariffHistory->setMint($mint);

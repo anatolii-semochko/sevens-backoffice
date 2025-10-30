@@ -7,6 +7,7 @@ import {
   cilLibrary,
   cilFork,
   cilDollar,
+  cilSwapHorizontal,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -48,6 +49,12 @@ const _nav = [
     name: 'Tariffs Management',
     to: '/tariffs-management',
     icon: <CIcon icon={cilDollar} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Token Transactions',
+    to: '/token-transactions',
+    icon: <CIcon icon={cilSwapHorizontal} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,

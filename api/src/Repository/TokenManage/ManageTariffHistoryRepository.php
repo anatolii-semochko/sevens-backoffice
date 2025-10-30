@@ -2,29 +2,29 @@
 
 declare(strict_types=1);
 
-namespace App\Repository\Management;
+namespace App\Repository\TokenManage;
 
-use App\Entity\Tariff\TariffHistory;
+use App\Entity\TokenManage\ManageTariffHistory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @extends ServiceEntityRepository<TariffHistory>
+ * @extends ServiceEntityRepository<ManageTariffHistory>
  */
-class TariffHistoryRepository extends ServiceEntityRepository
+class ManageTariffHistoryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, TariffHistory::class);
+        parent::__construct($registry, ManageTariffHistory::class);
     }
 
-    public function create(): TariffHistory
+    public function create(): ManageTariffHistory
     {
-        return new TariffHistory();
+        return new ManageTariffHistory();
     }
 
-    public function save(TariffHistory $tariffHistory): void
+    public function save(ManageTariffHistory $tariffHistory): void
     {
         $this->getEntityManager()->persist($tariffHistory);
         $this->getEntityManager()->flush();
@@ -58,7 +58,7 @@ class TariffHistoryRepository extends ServiceEntityRepository
      * Get latest tariff entry
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLatest(): ?TariffHistory
+    public function getLatest(): ?ManageTariffHistory
     {
         return $this->createQueryBuilder('th')
             ->orderBy('th.createdAt', 'DESC')
@@ -77,7 +77,7 @@ class TariffHistoryRepository extends ServiceEntityRepository
         int $setSale,
         int $buy,
         int $burn
-    ): TariffHistory {
+    ): ManageTariffHistory {
         $tariffHistory = $this->create();
         $tariffHistory->setAdminUser($adminUser);
         $tariffHistory->setTargetWallet($targetWallet);
