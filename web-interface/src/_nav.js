@@ -20,6 +20,22 @@ const _nav = [
   },
   {
     component: CNavTitle,
+    name: 'Tokens management',
+  },
+  {
+    component: CNavItem,
+    name: 'Tariffs',
+    to: '/tariffs-management',
+    icon: <CIcon icon={cilDollar} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Token Transactions',
+    to: '/token-transactions',
+    icon: <CIcon icon={cilSwapHorizontal} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
     name: 'Base elements',
   },
   {
@@ -39,22 +55,6 @@ const _nav = [
     name: 'Categories',
     to: '/categories',
     icon: <CIcon icon={cilFork} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavTitle,
-    name: 'Blockchain',
-  },
-  {
-    component: CNavItem,
-    name: 'Tariffs Management',
-    to: '/tariffs-management',
-    icon: <CIcon icon={cilDollar} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Token Transactions',
-    to: '/token-transactions',
-    icon: <CIcon icon={cilSwapHorizontal} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,

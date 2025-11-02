@@ -52,20 +52,20 @@ const TariffsManagement = () => {
 
   return (
     <>
-      <CCard>
-        <CCardHeader>
-          <div className="d-flex justify-content-between align-items-center">
-            <h4 className="mb-0">Sevens Token Management</h4>
-            <CButton color="primary" onClick={() => setShowEditModal(true)}>
+      <div className="card p-4 pb-0 mb-4">
+        <div className="d-flex justify-content-between align-items-center mt-2 mx-4">
+          <h4 className="mb-0">Tariffs Management</h4>
+          <div className="d-flex gap-2 align-items-center">
+            <CButton color="success" size={'sm'} onClick={() => setShowEditModal(true)}>
               Set Tariffs
             </CButton>
           </div>
-        </CCardHeader>
+        </div>
         <CCardBody>
         <CurrentTariffs currentTariffs={currentTariffs} />
         <TariffHistoryTable {...{items, totalItems, currentPage, setCurrentPage, setItemsFilter, loading}} />
         </CCardBody>
-      </CCard>
+      </div>
 
       <EditTariffModal
         visible={showEditModal}

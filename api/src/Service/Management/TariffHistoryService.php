@@ -112,14 +112,6 @@ readonly class TariffHistoryService
     /**
      * @throws NodeServer\NodeServerApiException
      */
-    public function getCurrentTariffs(): array
-    {
-        return $this->nodeApi->getTariffs();
-    }
-
-    /**
-     * @throws NodeServer\NodeServerApiException
-     */
     public function getTransaction(
         string $authorityPublicKey,
         string $targetWallet,

@@ -39,13 +39,8 @@ const TokenTransactions = () => {
   }
 
   useEffect(() => {
-    fetchData()
+    fetchData().catch()
   }, [currentPage, pageSize])
-
-  const formatNumber = (value) => {
-    if (!value && value !== 0) return '0.000000000'
-    return parseFloat(value).toFixed(9)
-  }
 
   return (
     <div className="card p-4 pb-0 mb-4">
@@ -78,56 +73,7 @@ const TokenTransactions = () => {
         ) : !items.length ? (
           <EmptyDataRow text="No transactions found" />
         ) : (
-          <CTable className="no-border-last" striped hover responsive align={'middle'}>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell scope="col">Date</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Type</CTableHeaderCell>
-                <CTableHeaderCell scope="col">User</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Email</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Token</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Target Wallet</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Income</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Balance</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {items.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell>{formatedDateTime(item.createdAt)}</CTableDataCell>
-                  <CTableDataCell>
-                    <span className="text-primary fw-bold">{item.type}</span>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    {item.user ? (
-                      <span>{item.user?.firstName} {item.user?.lastName}</span>
-                    ) : (
-                      <span className="text-muted">-</span>
-                    )}
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    {item.user ? (
-                      <span>{item.user?.email}</span>
-                    ) : (
-                      <span className="text-muted">-</span>
-                    )}
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    {item.token ? (
-                      <small className="font-monospace text-break">{item.token}</small>
-                    ) : (
-                      <span className="text-muted">-</span>
-                    )}
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <small className="font-monospace text-break">{item.targetWallet}</small>
-                  </CTableDataCell>
-                  <CTableDataCell>{formatNumber(item.income)}</CTableDataCell>
-                  <CTableDataCell>{formatNumber(item.targetWalletBalance)}</CTableDataCell>
-                </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
+          <TransactionTable items={items} />
         )}
         {!loading && items.length > 0 && (
           <div className="d-flex justify-content-center mt-3">
@@ -141,6 +87,78 @@ const TokenTransactions = () => {
         )}
       </CCardBody>
     </div>
+  )
+}
+
+const TransactionTable = ({items}) => {
+  const types = {
+    'token-mint': 'Mint',
+    'token-sale': 'Sale',
+    'token-buy': 'Buy',
+    'token-burn': 'Burn',
+  }
+
+
+
+  // TODO - Create utils formatter !!!
+  const formatNumber = (value) => {
+    if (!value && value !== 0) return '0.000000000'
+    return parseFloat(value).toFixed(9)
+  }
+
+
+
+  return (
+    <CTable className="no-border-last" striped hover responsive align={'middle'}>
+      <CTableHead>
+        <CTableRow>
+          <CTableHeaderCell>Date</CTableHeaderCell>
+          <CTableHeaderCell>Type</CTableHeaderCell>
+          <CTableHeaderCell>User</CTableHeaderCell>
+          <CTableHeaderCell>Email</CTableHeaderCell>
+          <CTableHeaderCell>Token</CTableHeaderCell>
+          <CTableHeaderCell>Target Wallet</CTableHeaderCell>
+          <CTableHeaderCell>Income</CTableHeaderCell>
+          <CTableHeaderCell>Balance</CTableHeaderCell>
+        </CTableRow>
+      </CTableHead>
+      <CTableBody>
+        {items.map((item, index) => (
+          <CTableRow key={index}>
+            <CTableDataCell>{formatedDateTime(item.createdAt)}</CTableDataCell>
+            <CTableDataCell>
+              <span className="text-primary">{types[item.type]}</span>
+            </CTableDataCell>
+            <CTableDataCell>
+              {item.user ? (
+                <span>{item.user?.firstName} {item.user?.lastName}</span>
+              ) : (
+                <span className="text-muted">-</span>
+              )}
+            </CTableDataCell>
+            <CTableDataCell>
+              {item.user ? (
+                <span>{item.user?.email}</span>
+              ) : (
+                <span className="text-muted">-</span>
+              )}
+            </CTableDataCell>
+            <CTableDataCell>
+              {item.token ? (
+                <small className="font-monospace text-break">{item.token}</small>
+              ) : (
+                <span className="text-muted">-</span>
+              )}
+            </CTableDataCell>
+            <CTableDataCell>
+              <small className="font-monospace text-break">{item.targetWallet}</small>
+            </CTableDataCell>
+            <CTableDataCell>{formatNumber(item.income)}</CTableDataCell>
+            <CTableDataCell>{formatNumber(item.targetWalletBalance)}</CTableDataCell>
+          </CTableRow>
+        ))}
+      </CTableBody>
+    </CTable>
   )
 }
 

@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Exception\NotFoundException;
 use App\Repository\TokenManage\ManageTariffHistoryRepository;
 use App\Service\Management\TariffHistoryService;
+use App\Service\NodeServer\NodeServerApiClient;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,6 +29,7 @@ class TariffHistoryController extends BaseController
     public function __construct(
         private readonly ManageTariffHistoryRepository $repository,
         private readonly TariffHistoryService $service,
+        private readonly NodeServerApiClient $nodeApi,
     ) {}
 
     #[Route('', name: 'tariff_history_fetch', methods: ['GET'])]
@@ -47,7 +49,7 @@ class TariffHistoryController extends BaseController
     public function getCurrent(): JsonResponse
     {
         try {
-            return $this->json($this->service->getCurrentTariffs());
+            return $this->json($this->nodeApi->getTariffs());
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }
