@@ -23,7 +23,7 @@ readonly class NodeServerApiClient extends NodeServerApi
         int $setSale,
         int $buy,
         int $burn
-    ): array {
+    ): string {
         return $this->get('/manage/tariffs/transaction', [
             'authorityPublicKey' => $authorityPublicKey,
             'targetWallet' => $targetWallet,

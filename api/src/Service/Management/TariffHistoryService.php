@@ -128,7 +128,7 @@ readonly class TariffHistoryService
         int $buy,
         int $burn
     ): array {
-        $transactionData = $this->nodeApi->getTariffTransaction(
+        $transaction = $this->nodeApi->getTariffTransaction(
             $authorityPublicKey,
             $targetWallet,
             $mint,
@@ -138,8 +138,8 @@ readonly class TariffHistoryService
         );
 
         return [
-            'transactionId' => $this->walletService->saveTransaction($transactionData['transaction']),
-            'transaction' => $transactionData['transaction'],
+            'transactionId' => $this->walletService->saveTransaction($transaction),
+            'transaction' => $transaction,
         ];
     }
 
