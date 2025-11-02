@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { Transaction } from '@solana/web3.js'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { deserializeTransaction, serializeTransaction } from '@js/components/utils/Blockchain'
 import { fetchError, getTariffTransaction, postTariffTransaction } from '@js/api/tariff-history'
 import { CButton, CCol, CFormInput, CFormLabel, CModal, CModalBody, CModalHeader, CRow, CModalTitle } from '@coreui/react'
 import { WalletForm, WalletWrapper } from '@js/components/input-fields/WalletForm'
 import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
-import { formattedSevensToUsd } from '@js/components/utils/Currency'
+import { formattedSevensToUsd, getFloat } from '@js/components/utils/Currency'
 
 const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
   const wallet = useWallet()
@@ -30,22 +31,22 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
       throw new Error('Invalid target wallet address')
     }
 
-    const mint = parseInt(formData.mint)
-    const setSale = parseInt(formData.setSale)
-    const buy = parseInt(formData.buy)
-    const burn = parseInt(formData.burn)
+    const mint = getFloat(formData.mint)
+    const setSale = getFloat(formData.setSale)
+    const buy = getFloat(formData.buy)
+    const burn = getFloat(formData.burn)
 
-    if (mint <= 0) {
-      throw new Error('Mint fee must be a valid number')
+    if (isNaN(mint) || mint < 0) {
+      throw new Error('Mint fee must be a valid number (0 or greater)')
     }
-    if (setSale <= 0) {
-      throw new Error('Set Sale fee must be a valid number')
+    if (isNaN(setSale) || setSale < 0) {
+      throw new Error('Set Sale fee must be a valid number (0 or greater)')
     }
-    if (buy < 0 || buy >= 100) {
+    if (isNaN(buy) || buy < 0 || buy >= 100) {
       throw new Error('Sale fee must be between 0 and 99')
     }
-    if (burn <= 0) {
-      throw new Error('Burn fee must be a valid number')
+    if (isNaN(burn) || burn < 0) {
+      throw new Error('Burn fee must be a valid number (0 or greater)')
     }
 
     return { mint, setSale, buy, burn }
@@ -65,7 +66,6 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
 
       const { mint, setSale, buy, burn } = validateForm()
 
-      // Step 1: Get transaction from PHP API
       const transactionData = await getTariffTransaction({
         authorityPublicKey: wallet.publicKey.toString(),
         targetWallet: formData.targetWallet,
@@ -75,14 +75,12 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
         burn,
       })
 
-      // Step 2: Sign transaction with wallet
       setWaitingSignature(true)
       const txSignature = await wallet.signTransaction(
-        Transaction.from(Buffer.from(transactionData.transaction, 'base64'))
+        Transaction.from(deserializeTransaction(transactionData.transaction))
       )
       setWaitingSignature(false)
 
-      // Step 3: Send signed transaction to PHP API
       setSubmitting(true)
       await postTariffTransaction({
         targetWallet: formData.targetWallet,
@@ -91,10 +89,7 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
         buy,
         burn,
         transactionId: transactionData.transactionId,
-        txSignature: txSignature.serialize({
-          requireAllSignatures: false,
-          verifySignatures: false,
-        }).toString('base64'),
+        txSignature: serializeTransaction(txSignature),
       })
 
       window.toast.success('Tariffs updated successfully')
@@ -109,22 +104,13 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
     }
   }
 
-  const handleSevensChange = (field, sevensValue) => {
-    const lamports = sevensValue ? Math.round(parseFloat(sevensValue) * LAMPORTS_PER_SOL) : ''
-    handleChange(field, lamports)
-  }
-
-  const getLamportsFromSevens = (lamports) => {
-    return lamports ? (parseInt(lamports) / LAMPORTS_PER_SOL).toString() : ''
-  }
-
   return (
     <form onSubmit={handleSubmit}>
 
       {/* Sale Fee (%) */}
       <CRow className="mb-3 align-items-center">
         <CCol md={2}>
-          <CFormLabel className="mb-0">Sale Fee (%)</CFormLabel>
+          <CFormLabel className="mb-0">Sale Fee</CFormLabel>
         </CCol>
         <CCol md={3}>
           <CFormInput
@@ -134,7 +120,6 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
             placeholder="0"
             min="0"
             max="99"
-            required
           />
         </CCol>
         <CCol md={7}>
@@ -145,24 +130,19 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
       {/* Mint Fee */}
       <CRow className="mb-3 align-items-center">
         <CCol md={2}>
-          <CFormLabel className="mb-0">Mint Fee</CFormLabel>
+          <CFormLabel className="mb-0">Mint Fee:</CFormLabel>
         </CCol>
         <CCol md={3}>
           <CFormInput
             type="number"
             step="0.000000001"
-            value={getLamportsFromSevens(formData.mint)}
-            onChange={(e) => handleSevensChange('mint', e.target.value)}
+            value={formData.mint}
+            onChange={(e) => handleChange('mint', e.target.value)}
             placeholder="0"
             min="0"
           />
         </CCol>
-        <CCol md={4}>
-          <small className="text-muted">
-            {formData.mint ? `${parseInt(formData.mint).toLocaleString()} lamports` : '0 lamports'}
-          </small>
-        </CCol>
-        <CCol md={3}>
+        <CCol md={7}>
           <span className="text-dark-red">
             {formData.mint ? `${formattedSevensToUsd(formData.mint)} USD` : '0.00 USD'}
           </span>
@@ -172,24 +152,19 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
       {/* Set Sale Fee */}
       <CRow className="mb-3 align-items-center">
         <CCol md={2}>
-          <CFormLabel className="mb-0">Set Sale Fee</CFormLabel>
+          <CFormLabel className="mb-0">Set Sale Fee:</CFormLabel>
         </CCol>
         <CCol md={3}>
           <CFormInput
             type="number"
             step="0.000000001"
-            value={getLamportsFromSevens(formData.setSale)}
-            onChange={(e) => handleSevensChange('setSale', e.target.value)}
+            value={formData.setSale}
+            onChange={(e) => handleChange('setSale', e.target.value)}
             placeholder="0"
             min="0"
           />
         </CCol>
-        <CCol md={4}>
-          <small className="text-muted">
-            {formData.setSale ? `${parseInt(formData.setSale).toLocaleString()} lamports` : '0 lamports'}
-          </small>
-        </CCol>
-        <CCol md={3}>
+        <CCol md={7}>
           <span className="text-dark-red">
             {formData.setSale ? `${formattedSevensToUsd(formData.setSale)} USD` : '0.00 USD'}
           </span>
@@ -199,24 +174,19 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
       {/* Burn Fee */}
       <CRow className="mb-3 align-items-center">
         <CCol md={2}>
-          <CFormLabel className="mb-0">Burn Fee</CFormLabel>
+          <CFormLabel className="mb-0">Burn Fee:</CFormLabel>
         </CCol>
         <CCol md={3}>
           <CFormInput
             type="number"
             step="0.000000001"
-            value={getLamportsFromSevens(formData.burn)}
-            onChange={(e) => handleSevensChange('burn', e.target.value)}
+            value={formData.burn}
+            onChange={(e) => handleChange('burn', e.target.value)}
             placeholder="0"
             min="0"
           />
         </CCol>
-        <CCol md={4}>
-          <small className="text-muted">
-            {formData.burn ? `${parseInt(formData.burn).toLocaleString()} lamports` : '0 lamports'}
-          </small>
-        </CCol>
-        <CCol md={3}>
+        <CCol md={7}>
           <span className="text-dark-red">
             {formData.burn ? `${formattedSevensToUsd(formData.burn)} USD` : '0.00 USD'}
           </span>

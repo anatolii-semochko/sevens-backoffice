@@ -61,9 +61,9 @@ export const TariffHistoryTable = ({items, totalItems, currentPage, setCurrentPa
                   <span className="ms-3">{item.adminUser?.fullName}</span>
                 </CTableDataCell>
                 <CTableDataCell className={'text-primary'}>{item.buy}%</CTableDataCell>
-                <CTableDataCell><FormattedSevens lamports={item.mint} /></CTableDataCell>
-                <CTableDataCell><FormattedSevens lamports={item.setSale} /></CTableDataCell>
-                <CTableDataCell><FormattedSevens lamports={item.burn} /></CTableDataCell>
+                <CTableDataCell><FormattedSevens sevens={item.mint} /></CTableDataCell>
+                <CTableDataCell><FormattedSevens sevens={item.setSale} /></CTableDataCell>
+                <CTableDataCell><FormattedSevens sevens={item.burn} /></CTableDataCell>
                 <CTableDataCell>
                   <small className="font-monospace text-break">{item.targetWallet}</small>
                 </CTableDataCell>

@@ -1,32 +1,26 @@
 import store from '@js/store'
-import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 
-export const formattedSevens = (lamports) => {
-  if (!lamports) return '0'
-  const sevens = parseInt(lamports) / LAMPORTS_PER_SOL
-  return parseFloat(sevens.toFixed(9)).toString()
+export const getFloat = (value) => value === '' || value === null || value === undefined ? 0 : parseFloat(value)
+
+export const formattedSevens = (sevens) => {
+  if (!sevens || sevens === 0) return '0'
+  return parseFloat(parseFloat(sevens).toFixed(9)).toString()
 }
 
-export const formattedSevensToUsd = (lamports) => {
-  if (!lamports) return '0.00'
-  const sevens = parseInt(lamports) / LAMPORTS_PER_SOL
+export const formattedSevensToUsd = (sevens) => {
+  if (!sevens || sevens === 0) return '0.00'
   const usdRate = store.getState().sevensUsdRate || 1
-  return (sevens / usdRate).toFixed(2)
+  return (parseFloat(sevens) / usdRate).toFixed(2)
 }
 
-export const FormattedSevens = ({lamports, showLamports, showUsd}) => {
-  const TextLamports = () => showLamports && (
-    <span className="text-muted fw-normal"> ({lamports || 0} lamports)</span>
-  )
-
+export const FormattedSevens = ({sevens, showUsd}) => {
   const TextUsd = () => showUsd && (
-    <span className="text-dark-red"> - {formattedSevensToUsd(lamports)} USD</span>
+    <span className="text-dark-red"> - {formattedSevensToUsd(sevens)} USD</span>
   )
 
   return (
     <span className="text-primary">
-      {formattedSevens(lamports)} <span className="fst-italic">$SEV</span>
-      <TextLamports/>
+      {formattedSevens(sevens)} <span className="fst-italic">$SEV</span>
       <TextUsd />
     </span>
   )

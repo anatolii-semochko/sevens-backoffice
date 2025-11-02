@@ -90,17 +90,17 @@ export const CurrentTariffs = ({currentTariffs}) => currentTariffs && (
 
           <div>Mint token fee:</div>
           <div className="ms-3">
-            <FormattedSevens lamports={currentTariffs.mint} showLamports={true} showUsd={true} />
+            <FormattedSevens sevens={currentTariffs.mint} showUsd={true} />
           </div>
 
           <div>Set token for sale operation fee:</div>
           <div className="ms-3">
-            <FormattedSevens lamports={currentTariffs.setSale} showLamports={true} showUsd={true} />
+            <FormattedSevens sevens={currentTariffs.setSale} showUsd={true} />
           </div>
 
           <div>Burn token operation fee:</div>
           <div className="ms-3">
-            <FormattedSevens lamports={currentTariffs.burn} showLamports={true} showUsd={true} />
+            <FormattedSevens sevens={currentTariffs.burn} showUsd={true} />
           </div>
 
           <div>Target wallet for fees income:</div>

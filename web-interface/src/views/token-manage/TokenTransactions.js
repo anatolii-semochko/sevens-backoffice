@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { fetchTokenTransactions, fetchError } from 'src/api/tokenManageApi'
 import { formatedDateTime } from 'src/components/utils/DateTime'
 import {
   CTable,
@@ -13,10 +14,7 @@ import {
 import { TfiReload } from 'react-icons/tfi'
 import { EmptyDataRow } from 'src/components/table/CustomTableElements'
 import { PaginatorControls, PaginatorInfo } from 'src/components/table/Paginator'
-import { UserAvatar } from 'src/components/table/UserAvatar'
-import { fetchTokenTransactions, fetchError } from 'src/api/tokenManageApi'
-import {FormattedSevens} from "@js/components/utils/Currency";
-import {LAMPORTS_PER_SOL} from "@solana/web3.js";
+import { FormattedSevens } from '@js/components/utils/Currency'
 
 const TokenTransactions = () => {
   const [items, setItems] = useState([])
@@ -56,7 +54,7 @@ const TokenTransactions = () => {
         <div className="d-flex gap-2 align-items-center">
           <div className="me-3 fw-bold">
             <strong className="me-2">Total Income:</strong>
-            <FormattedSevens lamports={incomeSum * LAMPORTS_PER_SOL} showUsd={true} />
+            <FormattedSevens sevens={incomeSum} showUsd={true} />
           </div>
           <CButton size="sm" className={'btn-warning btn-sm px-4'} title="Reload" onClick={() => fetchData()}>
             <TfiReload />
