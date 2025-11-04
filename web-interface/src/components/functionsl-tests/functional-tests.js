@@ -58,6 +58,9 @@ export const testTokenManagePda = async () => {
   if (!tariffs.authority) {
     throw new Error('Authority is not set')
   }
+  if (tariffs.paused) {
+    throw new Error('Token operations are blocked !!!')
+  }
 }
 
 export const testGetMintTransaction = async () => {

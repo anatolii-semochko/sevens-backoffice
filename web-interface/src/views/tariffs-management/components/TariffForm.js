@@ -1,24 +1,27 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { Transaction } from '@solana/web3.js'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { formattedSevensToUsd, getFloat } from '@js/components/utils/Currency'
 import { deserializeTransaction, serializeTransaction } from '@js/components/utils/Blockchain'
 import { fetchError, getTariffTransaction, postTariffTransaction } from '@js/api/tariff-history'
-import { CButton, CCol, CFormInput, CFormLabel, CModal, CModalBody, CModalHeader, CRow, CModalTitle } from '@coreui/react'
 import { WalletForm, WalletWrapper } from '@js/components/input-fields/WalletForm'
 import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
-import { formattedSevensToUsd, getFloat } from '@js/components/utils/Currency'
+import { ErrorMessageBlock } from '@js/components/utils/Messages'
+import { CButton, CCol, CFormInput, CFormLabel, CFormSwitch, CModal, CModalBody, CModalHeader, CRow, CModalTitle } from '@coreui/react'
 
-const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
+const EditTariffForm = ({ onSuccess, onClose, initialData, setPaused }) => {
   const wallet = useWallet()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [waitingSignature, setWaitingSignature] = useState(false)
   const [formData, setFormData] = useState({
+    authority:  initialData?.authority || '',
     targetWallet: initialData?.targetWallet || '',
     mint: initialData?.mint || '',
     setSale: initialData?.setSale || '',
     buy: initialData?.buy || '',
     burn: initialData?.burn || '',
+    paused: initialData?.paused || false,
   })
 
   const handleChange = (field, value) => {
@@ -73,6 +76,7 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
         setSale,
         buy,
         burn,
+        paused: formData.paused,
       })
 
       setWaitingSignature(true)
@@ -88,6 +92,7 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
         setSale,
         buy,
         burn,
+        paused: formData.paused,
         transactionId: transactionData.transactionId,
         txSignature: serializeTransaction(txSignature),
       })
@@ -96,13 +101,14 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
       onSuccess()
       onClose()
     } catch (err) {
-      console.error('Failed to update tariffs:', err)
       setError({ message: fetchError(err) })
     } finally {
       setSubmitting(false)
       setWaitingSignature(false)
     }
   }
+
+  useEffect(() => {setError(null)}, [wallet.publicKey?.toString()])
 
   return (
     <form onSubmit={handleSubmit}>
@@ -194,7 +200,7 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
       </CRow>
 
       {/* Target Wallet */}
-      <CRow className="mb-3 align-items-center">
+      <CRow className="mb-1 align-items-center">
         <CCol md={2}>
           <CFormLabel className="mb-3">Target Wallet</CFormLabel>
         </CCol>
@@ -209,13 +215,39 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
         </CCol>
       </CRow>
 
+      {/* Paused Switch */}
+      <CRow className="mb-3 align-items-center">
+        <CCol md={3}>
+          <CFormLabel className="mb-0">Operations Status</CFormLabel>
+        </CCol>
+        <CCol md={9}>
+          <CFormSwitch
+            id="pausedSwitch"
+            label={!formData.paused ? 'Active' : 'Paused (Emergency Stop Active)'}
+            checked={!formData.paused}
+            onChange={(e) => {
+              handleChange('paused', !e.target.checked)
+              setPaused(!e.target.checked)
+            }}
+          />
+        </CCol>
+      </CRow>
+
+      {formData.paused && (
+        <h4 className="text-center text-danger mb-4">All token operations (mint, buy, sell, burn) are blocked</h4>
+      )}
+
       <div className="mb-3">
         <WalletForm
           operation="tariffsChange"
-          error={error}
           waitingSignature={waitingSignature}
+          expectedPublicKey={formData.authority}
         />
       </div>
+
+      {error && (
+        <ErrorMessageBlock message={error} />
+      )}
 
       <div className="d-grid gap-2">
         <CButton type="submit" color="primary" disabled={submitting}>
@@ -227,14 +259,17 @@ const EditTariffForm = ({ onSuccess, onClose, initialData }) => {
 }
 
 export const EditTariffModal = ({ visible, onClose, onSuccess, initialData }) => {
+  const [paused, setPaused] = useState(initialData?.paused)
+  useEffect(() => {setPaused(initialData?.paused)}, [initialData])
+
   return (
     <CModal visible={visible} onClose={onClose} size="lg">
       <CModalHeader>
         <CModalTitle>Edit Tariffs</CModalTitle>
       </CModalHeader>
-      <CModalBody>
+      <CModalBody className={paused ? 'bg-danger-subtle' : ''}>
         <WalletWrapper>
-          <EditTariffForm onSuccess={onSuccess} onClose={onClose} initialData={initialData} />
+          <EditTariffForm onSuccess={onSuccess} onClose={onClose} initialData={initialData} setPaused={setPaused} />
         </WalletWrapper>
       </CModalBody>
     </CModal>

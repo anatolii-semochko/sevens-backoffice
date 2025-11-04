@@ -76,13 +76,14 @@ class TariffHistoryController extends BaseController
     {
         try {
             $payload = $request->getPayload();
-            $transaction = $this->service->getTransaction(
+            $transaction = $this->service->getTariffsTransaction(
                 $payload->get('authorityPublicKey'),
                 $payload->get('targetWallet'),
                 (int) $payload->get('mint'),
                 (int) $payload->get('setSale'),
                 (int) $payload->get('buy'),
                 (int) $payload->get('burn'),
+                (bool) $payload->get('paused'),
             );
 
             return $this->json($transaction);
@@ -103,6 +104,7 @@ class TariffHistoryController extends BaseController
                 (int) $payload->get('setSale'),
                 (int) $payload->get('buy'),
                 (int) $payload->get('burn'),
+                (bool) $payload->get('paused'),
                 $payload->get('transactionId'),
                 $payload->get('txSignature'),
             );

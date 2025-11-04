@@ -112,13 +112,14 @@ readonly class TariffHistoryService
     /**
      * @throws NodeServer\NodeServerApiException
      */
-    public function getTransaction(
+    public function getTariffsTransaction(
         string $authorityPublicKey,
         string $targetWallet,
         int $mint,
         int $setSale,
         int $buy,
-        int $burn
+        int $burn,
+        bool $paused
     ): array {
         $transaction = $this->nodeApi->getTariffTransaction(
             $authorityPublicKey,
@@ -126,7 +127,8 @@ readonly class TariffHistoryService
             $mint,
             $setSale,
             $buy,
-            $burn
+            $burn,
+            $paused
         );
 
         return [
@@ -145,6 +147,7 @@ readonly class TariffHistoryService
         int $setSale,
         int $buy,
         int $burn,
+        bool $paused,
         string $transactionId,
         string $txSignature
     ): void {
@@ -158,6 +161,7 @@ readonly class TariffHistoryService
         $tariffHistory->setSetSale($setSale);
         $tariffHistory->setBuy($buy);
         $tariffHistory->setBurn($burn);
+        $tariffHistory->setPaused($paused);
         $this->em->persist($tariffHistory);
         $this->em->flush();
     }

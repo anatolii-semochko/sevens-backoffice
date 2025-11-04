@@ -22,7 +22,8 @@ readonly class NodeServerApiClient extends NodeServerApi
         int $mint,
         int $setSale,
         int $buy,
-        int $burn
+        int $burn,
+        bool $paused
     ): string {
         return $this->get('/manage/tariffs/transaction', [
             'authorityPublicKey' => $authorityPublicKey,
@@ -31,6 +32,7 @@ readonly class NodeServerApiClient extends NodeServerApi
             'setSale' => $setSale,
             'buy' => $buy,
             'burn' => $burn,
+            'paused' => $paused,
         ]);
     }
 

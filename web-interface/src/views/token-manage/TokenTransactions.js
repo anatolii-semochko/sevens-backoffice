@@ -109,7 +109,7 @@ const TransactionTable = ({items}) => {
 
 
   return (
-    <CTable className="no-border-last" striped hover responsive align={'middle'}>
+    <CTable className="no-border-last" hover responsive align={'middle'}>
       <CTableHead>
         <CTableRow>
           <CTableHeaderCell>Date</CTableHeaderCell>
