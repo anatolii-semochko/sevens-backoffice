@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import TokenManagementApi from '@js/api/tokenManagementApi'
 import { roles, AccessDeniedBlock } from 'src/components/utils/Permissions'
-import { fetchTariffHistory, fetchError } from 'src/api/tariff-history'
-import { fetchCurrentTariffs } from 'src/api/tariffs'
-import { CButton, CCard, CCardBody, CCardHeader } from '@coreui/react'
+import { CButton, CCardBody } from '@coreui/react'
 import { TariffHistoryTable } from '@js/views/tariffs-management/components/TariffHistoryTable'
 import { EditTariffModal } from '@js/views/tariffs-management/components/TariffForm'
 import { CurrentTariffs } from '@js/views/tariffs-management/components/TariffsManagementHeader'
+
+const tokenManagementApi = new TokenManagementApi()
 
 const TariffsManagement = () => {
   const [items, setItems] = useState([])
@@ -23,10 +24,10 @@ const TariffsManagement = () => {
 
   const loadCurrentTariffs = async () => {
     try {
-      const tariffs = await fetchCurrentTariffs()
+      const tariffs = await tokenManagementApi.fetchCurrentTariffs()
       setCurrentTariffs(tariffs)
     } catch (error) {
-      console.error('Failed to load current tariffs:', error)
+      setCurrentTariffs({})
     }
   }
 
@@ -37,11 +38,11 @@ const TariffsManagement = () => {
   const loadHistory = async () => {
     try {
       setLoading(true)
-      const data = await fetchTariffHistory(itemsFilter)
+      const data = await tokenManagementApi.fetchTariffHistory(itemsFilter)
       setItems(data.items)
       setTotalItems(data.total)
     } catch (error) {
-      window.toast.error(fetchError(error))
+      window.toast.error(error)
     }
     setLoading(false)
   }

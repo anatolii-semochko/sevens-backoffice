@@ -54,27 +54,17 @@ export const TariffHistoryTable = ({items, totalItems, currentPage, setCurrentPa
           </CTableHead>
           <CTableBody>
             {items.map((item, index) => (
-              <CTableRow key={index}>
-                <CTableDataCell className={item.paused ? 'bg-danger-subtle' : ''}>
-                  {formatedDateTime(item.createdAt)}
-                </CTableDataCell>
-                <CTableDataCell className={item.paused ? 'bg-danger-subtle' : ''}>
+              <CTableRow key={index} className={item.paused ? 'child-background-danger' : ''}>
+                <CTableDataCell >{formatedDateTime(item.createdAt)}</CTableDataCell>
+                <CTableDataCell>
                   <UserAvatar user={item.adminUser} showStatus={true} />
                   <span className="ms-3">{item.adminUser?.fullName}</span>
                 </CTableDataCell>
-                <CTableDataCell className={item.paused ? 'bg-danger-subtle text-primary' : 'text-primary'}>
-                  {item.buy}%
-                </CTableDataCell>
-                <CTableDataCell className={item.paused ? 'bg-danger-subtle' : ''}>
-                  <FormattedSevens sevens={item.mint} />
-                </CTableDataCell>
-                <CTableDataCell className={item.paused ? 'bg-danger-subtle' : ''}>
-                  <FormattedSevens sevens={item.setSale} />
-                </CTableDataCell>
-                <CTableDataCell className={item.paused ? 'bg-danger-subtle' : ''}>
-                  <FormattedSevens sevens={item.burn} />
-                </CTableDataCell>
-                <CTableDataCell className={item.paused ? 'bg-danger-subtle' : ''}>
+                <CTableDataCell className={'text-primary'}>{item.buy}%</CTableDataCell>
+                <CTableDataCell><FormattedSevens sevens={item.mint} /></CTableDataCell>
+                <CTableDataCell><FormattedSevens sevens={item.setSale} /></CTableDataCell>
+                <CTableDataCell><FormattedSevens sevens={item.burn} /></CTableDataCell>
+                <CTableDataCell>
                   <small className="font-monospace text-break">
                     {item.paused ? 'Token operations on pause' : item.targetWallet}
                   </small>

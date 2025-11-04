@@ -7,33 +7,39 @@ const api = axios.create({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-});
+})
 
 export const objectToFormData = (obj, form = new FormData(), namespace = '') => {
   for (let key in obj) {
-    if (obj[key] === undefined || obj[key] === null) continue;
-    const formKey = namespace ? `${namespace}[${key}]` : key;
+    if (obj[key] === undefined || obj[key] === null) continue
+    const formKey = namespace ? `${namespace}[${key}]` : key
 
     if (obj[key] instanceof File) {
-      form.append(formKey, obj[key]);
+      form.append(formKey, obj[key])
     } else if (typeof obj[key] === 'object' && !(obj[key] instanceof Date)) {
-      objectToFormData(obj[key], form, formKey);
+      objectToFormData(obj[key], form, formKey)
     } else {
-      form.append(formKey, obj[key]);
+      form.append(formKey, obj[key])
     }
   }
-  return form;
-};
+  return form
+}
 
-export const fetchErrorMessage = (error) => error?.response?.data?.detail ||
+export const fetchErrorMessage = (error) =>
+  error?.response?.data?.detail ||
   error?.response?.data?.message ||
-  error.message ||
-  'Unknown API error'
+  error?.response?.data?.error ||
+  error?.message ||
+  'Error occurred'
 
 export const handleApiError = (error) => {
   const message = fetchErrorMessage(error)
   window.toast.error(message)
-  return message;
-};
+  return message
+}
 
-export default api;
+export const throwErrorMessage = (error) => {
+  throw new Error(fetchErrorMessage(error))
+}
+
+export default api

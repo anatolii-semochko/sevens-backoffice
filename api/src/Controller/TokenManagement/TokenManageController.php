@@ -2,22 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\TokenManagement;
 
-use App\Exception\NotFoundException;
-use App\Repository\TokenManage\ManageTariffHistoryRepository;
-use App\Service\Management\TariffHistoryService;
+use App\Controller\BaseController;
 use App\Service\NodeServer\NodeServerApiClient;
+use App\Service\TokenManagement\TokenManagementTariffsService;
+use App\Service\TokenManagement\TokenManagementService;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/tariff-history')]
+#[Route('/token-management')]
 #[IsGranted('ROLE_ADMIN')]
-class TariffHistoryController extends BaseController
+class TokenManageController extends BaseController
 {
     public const array TARIFF_HISTORY_GROUPS = [
         'groups' => [
@@ -26,18 +25,35 @@ class TariffHistoryController extends BaseController
         ]
     ];
 
+    public const array MANAGE_TRANSACTION_GROUPS = [
+        'groups' => [
+            'manage-transaction:read',
+            'user:read',
+        ]
+    ];
+
     public function __construct(
-        private readonly ManageTariffHistoryRepository $repository,
-        private readonly TariffHistoryService $service,
-        private readonly NodeServerApiClient $nodeApi,
+        private readonly NodeServerApiClient           $nodeApi,
+        private readonly TokenManagementTariffsService $tokenManagementTariffsService,
+        private readonly TokenManagementService        $tokenManageService,
     ) {}
 
-    #[Route('', name: 'tariff_history_fetch', methods: ['GET'])]
+    #[Route('/current-tariffs', name: 'get_current_tariffs', methods: ['GET'])]
+    public function getCurrentTariffs(): JsonResponse
+    {
+        try {
+            return $this->json($this->tokenManagementTariffsService->getCurrentTariffs());
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    #[Route('/tariffs-history', name: 'tariffs-history', methods: ['GET'])]
     public function fetch(Request $request): JsonResponse
     {
         try {
             return $this->json(
-                $this->service->fetchByFilter($request->query->all() ?? []),
+                $this->tokenManagementTariffsService->fetchByFilter($request->query->all() ?? []),
                 context: self::TARIFF_HISTORY_GROUPS
             );
         } catch (\Exception $e) {
@@ -45,38 +61,12 @@ class TariffHistoryController extends BaseController
         }
     }
 
-    #[Route('/current', name: 'tariff_get_current', methods: ['GET'])]
-    public function getCurrent(): JsonResponse
-    {
-        try {
-            return $this->json($this->nodeApi->getTariffs());
-        } catch (\Exception $e) {
-            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    #[Route('/{id}', name: 'tariff_history_get', methods: ['GET'])]
-    public function get(string $id): JsonResponse
-    {
-        try {
-            $tariffHistory = $this->repository->find($id);
-
-            if (!$tariffHistory) {
-                throw new NotFoundException('Token manage history record not found', Response::HTTP_NOT_FOUND);
-            }
-
-            return $this->json($tariffHistory, context: self::TARIFF_HISTORY_GROUPS);
-        } catch (\Exception $e) {
-            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    #[Route('/transaction/get', name: 'tariff_get_transaction', methods: ['POST'])]
-    public function getTransaction(Request $request): JsonResponse
+    #[Route('/get-tariffs-transaction', name: 'tariff_get_transaction', methods: ['POST'])]
+    public function getTariffsTransaction(Request $request): JsonResponse
     {
         try {
             $payload = $request->getPayload();
-            $transaction = $this->service->getTariffsTransaction(
+            $transaction = $this->tokenManagementTariffsService->getTariffsTransaction(
                 $payload->get('authorityPublicKey'),
                 $payload->get('targetWallet'),
                 (int) $payload->get('mint'),
@@ -92,12 +82,12 @@ class TariffHistoryController extends BaseController
         }
     }
 
-    #[Route('/transaction/post', name: 'tariff_post_transaction', methods: ['POST'])]
+    #[Route('/post-tariffs-transaction', name: 'tariff_post_transaction', methods: ['POST'])]
     public function postTransaction(Request $request): JsonResponse
     {
         try {
             $payload = $request->getPayload();
-            $this->service->postTransaction(
+            $this->tokenManagementTariffsService->postTransaction(
                 $this->getUser(),
                 $payload->get('targetWallet'),
                 (int) $payload->get('mint'),
@@ -110,6 +100,19 @@ class TariffHistoryController extends BaseController
             );
 
             return $this->json(null);
+        } catch (\Exception $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    #[Route('/token-transactions', name: 'token_manage_transactions_fetch', methods: ['GET'])]
+    public function getTokenTransactions(Request $request): JsonResponse
+    {
+        try {
+            return $this->json(
+                $this->tokenManageService->fetchByFilter($request->query->all() ?? []),
+                context: self::MANAGE_TRANSACTION_GROUPS,
+            );
         } catch (\Exception $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }

@@ -2,18 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\TokenManagement;
 
 use App\Repository\TokenManage\ManageTransactionRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 
-readonly class TokenManageService
+readonly class TokenManagementService
 {
     public function __construct(
         private ManageTransactionRepository $repository,
-        private EntityManagerInterface $em,
     ) {}
 
     /**

@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Management;
+namespace App\Service\TokenManagement;
 
 use App\Entity\TokenManage\ManageTariffHistory;
+use App\Exception\NotFoundException;
 use App\Repository\TokenManage\ManageTariffHistoryRepository;
 use App\Service\NodeServer;
 use App\Service\NodeServer\NodeServerApiClient;
@@ -14,7 +15,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-readonly class TariffHistoryService
+readonly class TokenManagementTariffsService
 {
     public function __construct(
         private ManageTariffHistoryRepository $repository,
@@ -22,6 +23,20 @@ readonly class TariffHistoryService
         private EntityManagerInterface        $em,
         private WalletService                 $walletService,
     ) {}
+
+    /**
+     * @return array
+     * @throws NodeServer\NodeServerApiException
+     */
+    public function getCurrentTariffs(): array
+    {
+        $tariffs = $this->nodeApi->getTariffs();
+        if (!$tariffs) {
+            throw new NotFoundException('Tariffs are not available');
+        }
+
+        return $tariffs;
+    }
 
     /**
      * @throws \DateMalformedStringException

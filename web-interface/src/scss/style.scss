@@ -159,6 +159,6 @@ body {
   cursor: pointer;
 }
 
-.child-background-danger > {
-  background-color: #f9d4d4;
+.child-background-danger > * {
+  background-color: #f9d4d4 !important;
 }

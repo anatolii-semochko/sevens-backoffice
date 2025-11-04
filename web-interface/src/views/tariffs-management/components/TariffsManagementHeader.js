@@ -75,46 +75,60 @@ export const Filter = ({filter, setFilter, dateFrom, setDateFrom, dateTo, setDat
   )
 }
 
-export const CurrentTariffs = ({currentTariffs}) => currentTariffs && (
-  <CRow className="mb-3">
-    <CCol>
-      {currentTariffs.paused ? (
-        <div className="alert-danger alert text-break p-4 mb-0">
-          <h3 className="text-center mb-0">
-            Token management is on pause. All token operations (mint, buy, sell, burn) are blocked.
-          </h3>
-        </div>
-      ) : (
-        <CCard className="border-primary">
-          <CCardHeader className="bg-light">
-            <strong>Current Tariffs</strong>
-          </CCardHeader>
-          <CCardBody className="fw-bold d-grid gap-2" style={{gridTemplateColumns: 'auto 1fr'}}>
+export const CurrentTariffs = ({currentTariffs}) => {
+  if (!currentTariffs) return
 
-            <div>Sale token operation fee:</div>
-            <div className="text-primary ms-3">{currentTariffs.buy}%</div>
+  if (!currentTariffs.authority) return (
+    <div className="alert-danger alert text-break p-4 mb-3">
+      <h3 className="text-center mb-0">
+        Tariffs are not available. Check if tariffs PDA is initialized.
+      </h3>
+    </div>
+  )
 
-            <div>Mint token fee:</div>
-            <div className="ms-3">
-              <FormattedSevens sevens={currentTariffs.mint} showUsd={true} />
-            </div>
+  if (currentTariffs.paused) return (
+    <div className="alert-danger alert text-break p-4 mb-3">
+      <h3 className="text-center mb-0">
+        Token management is on pause. All token operations (mint, buy, sell, burn) are blocked.
+      </h3>
+    </div>
+  )
 
-            <div>Set token for sale operation fee:</div>
-            <div className="ms-3">
-              <FormattedSevens sevens={currentTariffs.setSale} showUsd={true} />
-            </div>
+  return (
+    (
+      <CRow className="mb-3">
+        <CCol>
+          <CCard className="border-primary">
+            <CCardHeader className="bg-light">
+              <strong>Current Tariffs</strong>
+            </CCardHeader>
+            <CCardBody className="fw-bold d-grid gap-2" style={{gridTemplateColumns: 'auto 1fr'}}>
 
-            <div>Burn token operation fee:</div>
-            <div className="ms-3">
-              <FormattedSevens sevens={currentTariffs.burn} showUsd={true} />
-            </div>
+              <div>Sale token operation fee:</div>
+              <div className="text-primary ms-3">{currentTariffs.buy}%</div>
 
-            <div>Target wallet for fees income:</div>
-            <div className="text-primary ms-3">{currentTariffs.targetWallet}</div>
+              <div>Mint token fee:</div>
+              <div className="ms-3">
+                <FormattedSevens sevens={currentTariffs.mint} showUsd={true} />
+              </div>
 
-          </CCardBody>
-        </CCard>
-      )}
-    </CCol>
-  </CRow>
-)
+              <div>Set token for sale operation fee:</div>
+              <div className="ms-3">
+                <FormattedSevens sevens={currentTariffs.setSale} showUsd={true} />
+              </div>
+
+              <div>Burn token operation fee:</div>
+              <div className="ms-3">
+                <FormattedSevens sevens={currentTariffs.burn} showUsd={true} />
+              </div>
+
+              <div>Target wallet for fees income:</div>
+              <div className="text-primary ms-3">{currentTariffs.targetWallet}</div>
+
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+    )
+  )
+}

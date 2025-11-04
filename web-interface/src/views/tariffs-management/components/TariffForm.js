@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from 'react'
+import TokenManagementApi from '@js/api/tokenManagementApi'
 import { Transaction } from '@solana/web3.js'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { formattedSevensToUsd, getFloat } from '@js/components/utils/Currency'
 import { deserializeTransaction, serializeTransaction } from '@js/components/utils/Blockchain'
-import { fetchError, getTariffTransaction, postTariffTransaction } from '@js/api/tariff-history'
 import { WalletForm, WalletWrapper } from '@js/components/input-fields/WalletForm'
 import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 import { ErrorMessageBlock } from '@js/components/utils/Messages'
 import { CButton, CCol, CFormInput, CFormLabel, CFormSwitch, CModal, CModalBody, CModalHeader, CRow, CModalTitle } from '@coreui/react'
+
+const tokenManagementApi = new TokenManagementApi()
 
 const EditTariffForm = ({ onSuccess, onClose, initialData, setPaused }) => {
   const wallet = useWallet()
@@ -69,7 +71,7 @@ const EditTariffForm = ({ onSuccess, onClose, initialData, setPaused }) => {
 
       const { mint, setSale, buy, burn } = validateForm()
 
-      const transactionData = await getTariffTransaction({
+      const transactionData = await tokenManagementApi.getTariffTransaction({
         authorityPublicKey: wallet.publicKey.toString(),
         targetWallet: formData.targetWallet,
         mint,
@@ -86,7 +88,7 @@ const EditTariffForm = ({ onSuccess, onClose, initialData, setPaused }) => {
       setWaitingSignature(false)
 
       setSubmitting(true)
-      await postTariffTransaction({
+      await tokenManagementApi.postTariffTransaction({
         targetWallet: formData.targetWallet,
         mint,
         setSale,
@@ -100,8 +102,8 @@ const EditTariffForm = ({ onSuccess, onClose, initialData, setPaused }) => {
       window.toast.success('Tariffs updated successfully')
       onSuccess()
       onClose()
-    } catch (err) {
-      setError({ message: fetchError(err) })
+    } catch (error) {
+      setError(error)
     } finally {
       setSubmitting(false)
       setWaitingSignature(false)

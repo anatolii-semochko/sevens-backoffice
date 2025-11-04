@@ -8,7 +8,7 @@ readonly class NodeServerApiClient extends NodeServerApi
      * Get tariffs from blockchain
      * @throws NodeServerApiException
      */
-    public function getTariffs(): array
+    public function getTariffs(): ?array
     {
         return $this->get('/manage/tariffs', null);
     }

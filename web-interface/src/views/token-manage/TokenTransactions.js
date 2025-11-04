@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { fetchTokenTransactions, fetchError } from 'src/api/tokenManageApi'
+import TokenManagementApi from '@js/api/tokenManagementApi'
 import { formatedDateTime } from 'src/components/utils/DateTime'
 import {
   CTable,
@@ -16,6 +16,8 @@ import { EmptyDataRow } from 'src/components/table/CustomTableElements'
 import { PaginatorControls, PaginatorInfo } from 'src/components/table/Paginator'
 import { FormattedSevens } from '@js/components/utils/Currency'
 
+const tokenManagementApi = new TokenManagementApi()
+
 const TokenTransactions = () => {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
@@ -27,12 +29,12 @@ const TokenTransactions = () => {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const data = await fetchTokenTransactions({ page: currentPage, pageSize })
+      const data = await tokenManagementApi.fetchTokenTransactions({ page: currentPage, pageSize })
       setItems(Array.isArray(data.items) ? data.items : [])
       setTotalItems(data.total || 0)
       setIncomeSum(data.incomeSum || 0)
     } catch (error) {
-      window.toast.error(fetchError(error))
+      window.toast.error(error)
     } finally {
       setLoading(false)
     }

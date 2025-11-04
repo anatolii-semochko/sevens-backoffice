@@ -1,5 +1,6 @@
-import { fetchCurrentTariffs } from 'src/api/tariffs'
 import { Connection } from '@solana/web3.js'
+import TokenManagementApi from '@js/api/tokenManagementApi'
+const tokenManagementApi = new TokenManagementApi()
 
 export const testBlockchainStatus = async () => {
   const url = import.meta.env.VITE_ANCHOR_PROVIDER_URL
@@ -54,7 +55,7 @@ export const testTokenManageIdl = async () => {
 }
 
 export const testTokenManagePda = async () => {
-  const tariffs = await fetchCurrentTariffs()
+  const tariffs = await tokenManagementApi.fetchCurrentTariffs()
   if (!tariffs.authority) {
     throw new Error('Authority is not set')
   }
