@@ -1,6 +1,6 @@
 import React from 'react'
 import { CCard, CCardBody, CCardHeader, CCol, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react'
-import { FormattedSevens } from '@js/components/utils/Currency'
+import { $Sevens, $Usd } from '@js/components/utils/Currency'
 
 export const Filter = ({filter, setFilter, dateFrom, setDateFrom, dateTo, setDateTo, setCurrentPage}) => {
   const handleFilterChange = (e) => {
@@ -109,17 +109,17 @@ export const CurrentTariffs = ({currentTariffs}) => {
 
               <div>Mint token fee:</div>
               <div className="ms-3">
-                <FormattedSevens sevens={currentTariffs.mint} showUsd={true} />
+                <$Sevens sevens={currentTariffs.mint} label color /> - <$Usd sevens={currentTariffs.mint} label color />
               </div>
 
               <div>Set token for sale operation fee:</div>
               <div className="ms-3">
-                <FormattedSevens sevens={currentTariffs.setSale} showUsd={true} />
+                <$Sevens sevens={currentTariffs.setSale} label color /> - <$Usd sevens={currentTariffs.setSale} label color />
               </div>
 
               <div>Burn token operation fee:</div>
               <div className="ms-3">
-                <FormattedSevens sevens={currentTariffs.burn} showUsd={true} />
+                <$Sevens sevens={currentTariffs.burn} label color /> - <$Usd sevens={currentTariffs.burn} label color />
               </div>
 
               <div>Target wallet for fees income:</div>

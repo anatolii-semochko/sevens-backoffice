@@ -1,27 +1,52 @@
 import store from '@js/store'
+import clsx from 'clsx'
 
 export const getFloat = (value) => value === '' || value === null || value === undefined ? 0 : parseFloat(value)
 
-export const formattedSevens = (sevens) => {
-  if (!sevens || sevens === 0) return '0'
-  return parseFloat(parseFloat(sevens).toFixed(9)).toString()
+const formatUsd = (n) => {
+  if (n === null || n === undefined || isNaN(n)) return ''
+
+  let num = Number(n).toFixed(2)
+  let [int, dec] = num.split('.')
+  int = int.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+
+  return int + '.' + dec
 }
 
-export const formattedSevensToUsd = (sevens) => {
-  if (!sevens || sevens === 0) return '0.00'
-  const usdRate = store.getState().sevensUsdRate || 1
-  return (parseFloat(sevens) / usdRate).toFixed(2)
+const formatSevens = (n) =>  {
+  if (n === null || n === undefined || isNaN(n)) return ''
+
+  let num = Number(n).toString()
+  let [int, dec = ''] = num.split('.')
+  int = int.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  if (dec === '') dec = '00'
+  else if (dec.length === 1) dec = dec + '0'
+
+  return int + '.' + dec
 }
 
-export const FormattedSevens = ({sevens, showUsd}) => {
-  const TextUsd = () => showUsd && (
-    <span className="text-dark-red"> - {formattedSevensToUsd(sevens)} USD</span>
+export const $Sevens = ({sevens, label, color, bold}) => {
+  if (sevens === null || sevens === undefined || isNaN(sevens)) return null
+
+  const formatted = formatSevens(sevens)
+  return (
+    <span className={clsx(color && 'text-primary', bold && 'fw-bold')}>
+      {formatted}{label && ' $SEV'}
+    </span>
   )
+}
+
+export const $Usd = ({usd, sevens, label, color, bold}) => {
+  const rate = store.getState().sevensUsdRate
+  const sum = sevens ? sevens / rate : usd
+
+  if (sum === null || sum === undefined || isNaN(sum)) return null
+
+  const formatted = formatUsd(sum)
 
   return (
-    <span className="text-primary">
-      {formattedSevens(sevens)} <span className="fst-italic">$SEV</span>
-      <TextUsd />
+    <span className={clsx(color && 'text-dark-red', bold && 'fw-bold')}>
+      {formatted}{label && ' $USD'}
     </span>
   )
 }

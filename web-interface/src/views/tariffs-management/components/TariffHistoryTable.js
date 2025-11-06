@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import { formatedDateTime } from '@js/components/utils/DateTime'
 import { CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react'
-import { FormattedSevens } from '@js/components/utils/Currency'
+import { $Sevens } from '@js/components/utils/Currency'
 import { EmptyDataRow } from '@js/components/table/CustomTableElements'
 import { PaginatorControls, PaginatorInfo } from '@js/components/table/Paginator'
 import { UserAvatar } from '@js/components/table/UserAvatar'
@@ -61,9 +61,9 @@ export const TariffHistoryTable = ({items, totalItems, currentPage, setCurrentPa
                   <span className="ms-3">{item.adminUser?.fullName}</span>
                 </CTableDataCell>
                 <CTableDataCell className={'text-primary'}>{item.buy}%</CTableDataCell>
-                <CTableDataCell><FormattedSevens sevens={item.mint} /></CTableDataCell>
-                <CTableDataCell><FormattedSevens sevens={item.setSale} /></CTableDataCell>
-                <CTableDataCell><FormattedSevens sevens={item.burn} /></CTableDataCell>
+                <CTableDataCell><$Sevens sevens={item.mint} label={true} color={true} /></CTableDataCell>
+                <CTableDataCell><$Sevens sevens={item.setSale} label={true} color={true} /></CTableDataCell>
+                <CTableDataCell><$Sevens sevens={item.burn} label={true} color={true} /></CTableDataCell>
                 <CTableDataCell>
                   <small className="font-monospace text-break">
                     {item.paused ? 'Token operations on pause' : item.targetWallet}

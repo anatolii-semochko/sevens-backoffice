@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react'
 import TokenManagementApi from '@js/api/tokenManagementApi'
 import { Transaction } from '@solana/web3.js'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { formattedSevensToUsd, getFloat } from '@js/components/utils/Currency'
 import { deserializeTransaction, serializeTransaction } from '@js/components/utils/Blockchain'
+import { $Usd, getFloat } from '@js/components/utils/Currency'
 import { WalletForm, WalletWrapper } from '@js/components/input-fields/WalletForm'
 import { SecureFormInput } from 'src/components/input-fields/SecureFormInput'
 import { ErrorMessageBlock } from '@js/components/utils/Messages'
@@ -125,7 +125,6 @@ const EditTariffForm = ({ onSuccess, onClose, initialData, setPaused }) => {
             type="number"
             value={formData.buy}
             onChange={(e) => handleChange('buy', e.target.value)}
-            placeholder="0"
             min="0"
             max="99"
           />
@@ -146,14 +145,11 @@ const EditTariffForm = ({ onSuccess, onClose, initialData, setPaused }) => {
             step="0.000000001"
             value={formData.mint}
             onChange={(e) => handleChange('mint', e.target.value)}
-            placeholder="0"
             min="0"
           />
         </CCol>
         <CCol md={7}>
-          <span className="text-dark-red">
-            {formData.mint ? `${formattedSevensToUsd(formData.mint)} USD` : '0.00 USD'}
-          </span>
+          <$Usd sevens={formData.mint} label color />
         </CCol>
       </CRow>
 
@@ -168,14 +164,11 @@ const EditTariffForm = ({ onSuccess, onClose, initialData, setPaused }) => {
             step="0.000000001"
             value={formData.setSale}
             onChange={(e) => handleChange('setSale', e.target.value)}
-            placeholder="0"
             min="0"
           />
         </CCol>
         <CCol md={7}>
-          <span className="text-dark-red">
-            {formData.setSale ? `${formattedSevensToUsd(formData.setSale)} USD` : '0.00 USD'}
-          </span>
+          <$Usd sevens={formData.setSale} label color />
         </CCol>
       </CRow>
 
@@ -190,14 +183,11 @@ const EditTariffForm = ({ onSuccess, onClose, initialData, setPaused }) => {
             step="0.000000001"
             value={formData.burn}
             onChange={(e) => handleChange('burn', e.target.value)}
-            placeholder="0"
             min="0"
           />
         </CCol>
         <CCol md={7}>
-          <span className="text-dark-red">
-            {formData.burn ? `${formattedSevensToUsd(formData.burn)} USD` : '0.00 USD'}
-          </span>
+          <$Usd sevens={formData.burn} label color />
         </CCol>
       </CRow>
 

@@ -12,9 +12,9 @@ import {
   CButton,
 } from '@coreui/react'
 import { TfiReload } from 'react-icons/tfi'
+import { $Sevens, $Usd } from '@js/components/utils/Currency'
 import { EmptyDataRow } from 'src/components/table/CustomTableElements'
 import { PaginatorControls, PaginatorInfo } from 'src/components/table/Paginator'
-import { FormattedSevens } from '@js/components/utils/Currency'
 
 const tokenManagementApi = new TokenManagementApi()
 
@@ -51,7 +51,7 @@ const TokenTransactions = () => {
         <div className="d-flex gap-2 align-items-center">
           <div className="me-3 fw-bold">
             <strong className="me-2">Total Income:</strong>
-            <FormattedSevens sevens={incomeSum} showUsd={true} />
+            <$Sevens sevens={incomeSum} label color bold /> - <$Usd sevens={incomeSum} label color bold />
           </div>
           <CButton size="sm" className={'btn-warning btn-sm px-4'} title="Reload" onClick={() => fetchData()}>
             <TfiReload />
@@ -100,16 +100,6 @@ const TransactionTable = ({items}) => {
     'token-burn': 'Burn',
   }
 
-
-
-  // TODO - Create utils formatter !!!
-  const formatNumber = (value) => {
-    if (!value && value !== 0) return '0.000000000'
-    return parseFloat(value).toFixed(9)
-  }
-
-
-
   return (
     <CTable className="no-border-last" hover responsive align={'middle'}>
       <CTableHead>
@@ -155,8 +145,8 @@ const TransactionTable = ({items}) => {
             <CTableDataCell>
               <small className="font-monospace text-break">{item.targetWallet}</small>
             </CTableDataCell>
-            <CTableDataCell>{formatNumber(item.income)}</CTableDataCell>
-            <CTableDataCell>{formatNumber(item.targetWalletBalance)}</CTableDataCell>
+            <CTableDataCell><$Sevens sevens={item.income} color /></CTableDataCell>
+            <CTableDataCell><$Sevens sevens={item.targetWalletBalance} color /></CTableDataCell>
           </CTableRow>
         ))}
       </CTableBody>
