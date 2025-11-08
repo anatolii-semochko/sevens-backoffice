@@ -20,6 +20,7 @@ const initialState = {
   theme: 'light',
   languages: [],
   selectedLanguage: null,
+  sevensUsdRate: 5,
 }
 
 const changeState = (state = initialState, { type, ...rest }) => {

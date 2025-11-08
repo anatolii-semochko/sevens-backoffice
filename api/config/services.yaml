@@ -6,6 +6,7 @@
 parameters:
     path_help_translations: '%env(PATH_HELP_TRANSLATIONS)%'
     user_time_invalidation: '%env(JWT_TIME_INVALIDATION)%'
+    node_server_base_url: '%env(NODE_SERVER_BASE_URL)%'
 
 services:
     # default configuration for services in *this* file
@@ -37,6 +38,10 @@ services:
         $invalidationSeconds: '%user_time_invalidation%'
       tags:
         - { name: kernel.event_subscriber }
+
+    App\Service\NodeServer\NodeServerApiClient:
+      arguments:
+        $nodeServerBaseUrl: '%node_server_base_url%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

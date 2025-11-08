@@ -44,6 +44,7 @@ import {
 } from '@coreui/icons'
 
 import MainChart from './MainChart'
+import { FunctionalTests } from '@js/components/functionsl-tests/FunctionalTests'
 
 const Dashboard = () => {
   const progressExample = [
@@ -169,6 +170,7 @@ const Dashboard = () => {
 
   return (
     <>
+      <FunctionalTests />
       <CCard className="mb-4">
         <CCardBody>
           <CRow>
