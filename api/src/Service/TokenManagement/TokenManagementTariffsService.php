@@ -10,6 +10,7 @@ use App\Repository\TokenManage\ManageTariffHistoryRepository;
 use App\Service\NodeServer;
 use App\Service\NodeServer\NodeServerApiClient;
 use App\Service\WalletService;
+use App\Utils\Filters;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -47,33 +48,40 @@ readonly class TokenManagementTariffsService
     {
         $page = max(1, (int) ($criteria['page'] ?? 1));
         $pageSize = max(1, min(100, (int) ($criteria['pageSize'] ?? 20)));
-        $filter = $criteria['filter'] ?? 'last-month';
-        $dateFrom = $criteria['dateFrom'] ?? null;
-        $dateTo = $criteria['dateTo'] ?? null;
 
-        $dateRange = $this->getDateRange($filter, $dateFrom, $dateTo);
+        // Use universal date filter helper
+        $dateRange = Filters::dateFilter('createdAt', $criteria);
 
         $offset = ($page - 1) * $pageSize;
 
-        $items = $this->repository->createQueryBuilder('th')
-            ->where('th.createdAt >= :dateFrom')
-            ->andWhere('th.createdAt <= :dateTo')
-            ->setParameter('dateFrom', $dateRange['from'])
-            ->setParameter('dateTo', $dateRange['to'])
-            ->orderBy('th.createdAt', 'DESC')
+        // Build query with conditional date filtering
+        $qb = $this->repository->createQueryBuilder('th');
+
+        if ($dateRange !== null) {
+            $qb->where('th.createdAt >= :dateFrom')
+               ->andWhere('th.createdAt <= :dateTo')
+               ->setParameter('dateFrom', $dateRange['from'])
+               ->setParameter('dateTo', $dateRange['to']);
+        }
+
+        $items = $qb->orderBy('th.createdAt', 'DESC')
             ->setMaxResults($pageSize)
             ->setFirstResult($offset)
             ->getQuery()
             ->getResult();
 
-        $total = $this->repository->createQueryBuilder('th')
-            ->select('COUNT(th.id)')
-            ->where('th.createdAt >= :dateFrom')
-            ->andWhere('th.createdAt <= :dateTo')
-            ->setParameter('dateFrom', $dateRange['from'])
-            ->setParameter('dateTo', $dateRange['to'])
-            ->getQuery()
-            ->getSingleScalarResult();
+        // Build count query with conditional date filtering
+        $countQb = $this->repository->createQueryBuilder('th')
+            ->select('COUNT(th.id)');
+
+        if ($dateRange !== null) {
+            $countQb->where('th.createdAt >= :dateFrom')
+                    ->andWhere('th.createdAt <= :dateTo')
+                    ->setParameter('dateFrom', $dateRange['from'])
+                    ->setParameter('dateTo', $dateRange['to']);
+        }
+
+        $total = $countQb->getQuery()->getSingleScalarResult();
 
         return [
             'items' => $items,
@@ -83,46 +91,6 @@ readonly class TokenManagementTariffsService
         ];
     }
 
-    /**
-     * @throws \DateMalformedStringException
-     */
-    private function getDateRange(string $filter, ?string $dateFrom, ?string $dateTo): array
-    {
-        $now = new \DateTimeImmutable();
-        $to = $now;
-
-        switch ($filter) {
-            case 'last-day':
-                $from = $now->modify('-1 day');
-                break;
-            case 'last-week':
-                $from = $now->modify('-1 week');
-                break;
-            case 'last-month':
-                $from = $now->modify('-1 month');
-                break;
-            case 'last-year':
-                $from = $now->modify('-1 year');
-                break;
-            case 'custom':
-                if ($dateFrom) {
-                    $from = new \DateTimeImmutable($dateFrom);
-                } else {
-                    $from = $now->modify('-1 month');
-                }
-                if ($dateTo) {
-                    $to = new \DateTimeImmutable($dateTo)->setTime(23, 59, 59);
-                }
-                break;
-            default:
-                $from = $now->modify('-1 month');
-        }
-
-        return [
-            'from' => $from,
-            'to' => $to,
-        ];
-    }
 
     /**
      * @throws NodeServer\NodeServerApiException

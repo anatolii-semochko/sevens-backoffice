@@ -7,13 +7,13 @@ const dateTime = (dateTime) => {
 }
 
 export const formatedDateTime = (dateString) => {
-  return new Date(dateString).toLocaleString('uk-UA', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  const date = new Date(dateString)
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const hour = String(date.getUTCHours()).padStart(2, '0')
+  const minute = String(date.getUTCMinutes()).padStart(2, '0')
+  return `${day}.${month}.${year}, ${hour}:${minute} UTC`
 }
 
 const timeAgo = (dateTime) => {

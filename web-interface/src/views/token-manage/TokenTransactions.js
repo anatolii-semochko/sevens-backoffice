@@ -15,6 +15,7 @@ import { TfiReload } from 'react-icons/tfi'
 import { $Sevens, $Usd } from '@js/components/utils/Currency'
 import { EmptyDataRow } from 'src/components/table/CustomTableElements'
 import { PaginatorControls, PaginatorInfo } from 'src/components/table/Paginator'
+import { DateRangeFilter } from '@js/components/table/Filters'
 
 const tokenManagementApi = new TokenManagementApi()
 
@@ -25,11 +26,21 @@ const TokenTransactions = () => {
   const [pageSize, setPageSize] = useState(50)
   const [totalItems, setTotalItems] = useState(0)
   const [incomeSum, setIncomeSum] = useState(0)
+  const [filterParams, setFilterParams] = useState(null)
 
   const fetchData = async () => {
+    // Only load if filterParams is initialized
+    if (filterParams === null) {
+      return
+    }
+
     try {
       setLoading(true)
-      const data = await tokenManagementApi.fetchTokenTransactions({ page: currentPage, pageSize })
+      const data = await tokenManagementApi.fetchTokenTransactions({
+        page: currentPage,
+        pageSize,
+        ...filterParams
+      })
       setItems(Array.isArray(data.items) ? data.items : [])
       setTotalItems(data.total || 0)
       setIncomeSum(data.incomeSum || 0)
@@ -42,7 +53,7 @@ const TokenTransactions = () => {
 
   useEffect(() => {
     fetchData().catch()
-  }, [currentPage, pageSize])
+  }, [currentPage, pageSize, filterParams])
 
   return (
     <div className="card p-4 pb-0 mb-4">
@@ -66,6 +77,14 @@ const TokenTransactions = () => {
             pageSize={pageSize}
             onPageSizeChange={(newSize) => {
               setPageSize(newSize)
+              setCurrentPage(1)
+            }}
+          />
+          <DateRangeFilter
+            propertyName="createdAt"
+            defaultFilter="this-month"
+            onChange={(params) => {
+              setFilterParams(params)
               setCurrentPage(1)
             }}
           />

@@ -1,25 +1,21 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { formatedDateTime } from '@js/components/utils/DateTime'
 import { CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react'
 import { $Sevens } from '@js/components/utils/Currency'
 import { EmptyDataRow } from '@js/components/table/CustomTableElements'
 import { PaginatorControls, PaginatorInfo } from '@js/components/table/Paginator'
 import { UserAvatar } from '@js/components/table/UserAvatar'
-import { Filter } from '@js/views/tariffs-management/components/TariffsManagementHeader'
+import { DateRangeFilter } from '@js/components/table/Filters'
 
 export const TariffHistoryTable = ({items, totalItems, currentPage, setCurrentPage, setItemsFilter, loading}) => {
   const [pageSize, setPageSize] = useState(20)
-  const [filter, setFilter] = useState('last-month')
-  const [dateFrom, setDateFrom] = useState('')
-  const [dateTo, setDateTo] = useState('')
+  const [filterParams, setFilterParams] = useState(null)
 
   useEffect(() => {
-    setItemsFilter({page: currentPage, pageSize, filter, dateFrom, dateTo})
-  }, [currentPage, pageSize, filter, dateFrom, dateTo])
-
-  useEffect(() => {
-    setItemsFilter({page: 1, pageSize, filter, dateFrom, dateTo})
-  }, [])
+    if (filterParams !== null) {
+      setItemsFilter({page: currentPage, pageSize, ...filterParams})
+    }
+  }, [currentPage, pageSize, filterParams])
 
   return (
     <div>
@@ -33,7 +29,14 @@ export const TariffHistoryTable = ({items, totalItems, currentPage, setCurrentPa
             setCurrentPage(1)
           }}
         />
-        <Filter {...{filter, setFilter, dateFrom, setDateFrom, dateTo, setDateTo, setCurrentPage}} />
+        <DateRangeFilter
+          propertyName="createdAt"
+          defaultFilter="this-month"
+          onChange={(params) => {
+            setFilterParams(params)
+            setCurrentPage(1)
+          }}
+        />
       </div>
       {loading ? (
         <EmptyDataRow loading={true} text={'Loading...'} />
@@ -61,9 +64,9 @@ export const TariffHistoryTable = ({items, totalItems, currentPage, setCurrentPa
                   <span className="ms-3">{item.adminUser?.fullName}</span>
                 </CTableDataCell>
                 <CTableDataCell className={'text-primary'}>{item.buy}%</CTableDataCell>
-                <CTableDataCell><$Sevens sevens={item.mint} label={true} color={true} /></CTableDataCell>
-                <CTableDataCell><$Sevens sevens={item.setSale} label={true} color={true} /></CTableDataCell>
-                <CTableDataCell><$Sevens sevens={item.burn} label={true} color={true} /></CTableDataCell>
+                <CTableDataCell><$Sevens sevens={item.mint} color /></CTableDataCell>
+                <CTableDataCell><$Sevens sevens={item.setSale} color /></CTableDataCell>
+                <CTableDataCell><$Sevens sevens={item.burn} color /></CTableDataCell>
                 <CTableDataCell>
                   <small className="font-monospace text-break">
                     {item.paused ? 'Token operations on pause' : item.targetWallet}

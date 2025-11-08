@@ -56,7 +56,7 @@ class ManageTariffHistory
     public function __construct()
     {
         $this->id = Uuid::v4()->toRfc4122();
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
 
     public function getId(): string

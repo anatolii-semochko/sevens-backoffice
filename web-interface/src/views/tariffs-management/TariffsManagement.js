@@ -12,7 +12,7 @@ const TariffsManagement = () => {
   const [items, setItems] = useState([])
   const [totalItems, setTotalItems] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsFilter, setItemsFilter] = useState({})
+  const [itemsFilter, setItemsFilter] = useState(null)
   const [loading, setLoading] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentTariffs, setCurrentTariffs] = useState(null)
@@ -36,6 +36,11 @@ const TariffsManagement = () => {
   }, [])
 
   const loadHistory = async () => {
+    // Only load if filterParams is initialized
+    if (itemsFilter === null) {
+      return
+    }
+
     try {
       setLoading(true)
       const data = await tokenManagementApi.fetchTariffHistory(itemsFilter)
