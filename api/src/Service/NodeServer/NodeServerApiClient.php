@@ -19,10 +19,10 @@ readonly class NodeServerApiClient extends NodeServerApi
     public function getTariffTransaction(
         string $authorityPublicKey,
         string $targetWallet,
-        int $mint,
-        int $setSale,
+        float $mint,
+        float $setSale,
         int $buy,
-        int $burn,
+        float $burn,
         bool $paused
     ): string {
         return $this->get('/manage/tariffs/transaction', [

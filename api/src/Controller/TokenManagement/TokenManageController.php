@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller\TokenManagement;
 
 use App\Controller\BaseController;
-use App\Service\NodeServer\NodeServerApiClient;
 use App\Service\TokenManagement\TokenManagementTariffsService;
 use App\Service\TokenManagement\TokenManagementService;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -33,7 +32,6 @@ class TokenManageController extends BaseController
     ];
 
     public function __construct(
-        private readonly NodeServerApiClient           $nodeApi,
         private readonly TokenManagementTariffsService $tokenManagementTariffsService,
         private readonly TokenManagementService        $tokenManageService,
     ) {}
@@ -69,10 +67,10 @@ class TokenManageController extends BaseController
             $transaction = $this->tokenManagementTariffsService->getTariffsTransaction(
                 $payload->get('authorityPublicKey'),
                 $payload->get('targetWallet'),
-                (int) $payload->get('mint'),
-                (int) $payload->get('setSale'),
+                (float) $payload->get('mint'),
+                (float) $payload->get('setSale'),
                 (int) $payload->get('buy'),
-                (int) $payload->get('burn'),
+                (float) $payload->get('burn'),
                 (bool) $payload->get('paused'),
             );
 
@@ -90,10 +88,10 @@ class TokenManageController extends BaseController
             $this->tokenManagementTariffsService->postTransaction(
                 $this->getUser(),
                 $payload->get('targetWallet'),
-                (int) $payload->get('mint'),
-                (int) $payload->get('setSale'),
+                (float) $payload->get('mint'),
+                (float) $payload->get('setSale'),
                 (int) $payload->get('buy'),
-                (int) $payload->get('burn'),
+                (float) $payload->get('burn'),
                 (bool) $payload->get('paused'),
                 $payload->get('transactionId'),
                 $payload->get('txSignature'),

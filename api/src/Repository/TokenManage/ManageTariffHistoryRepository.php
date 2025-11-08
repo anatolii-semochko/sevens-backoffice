@@ -73,10 +73,10 @@ class ManageTariffHistoryRepository extends ServiceEntityRepository
     public function createEntry(
         UserInterface $adminUser,
         string $targetWallet,
-        int $mint,
-        int $setSale,
+        float $mint,
+        float $setSale,
         int $buy,
-        int $burn
+        float $burn
     ): ManageTariffHistory {
         $tariffHistory = $this->create();
         $tariffHistory->setAdminUser($adminUser);
