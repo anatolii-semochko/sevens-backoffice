@@ -59,10 +59,6 @@ export default defineConfig(({ mode }) => {
           replacement: `${path.resolve(__dirname, 'src')}/`,
         },
         {
-          find: '@wallet',
-          replacement: path.resolve(__dirname, 'src/components/wallet'),
-        },
-        {
           find: '@js',
           replacement: path.resolve(__dirname, 'src'),
         },
