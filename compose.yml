@@ -27,7 +27,6 @@ services:
       - ./web-interface:/app
       - ./.env:/app/.env:ro
       - ../sevenstime-storage:/app/public/storage:ro
-      - ../sevens-wallet-react/src:/app/src/components/wallet
     tty: true
 
   web-interface-node-cli:
@@ -39,7 +38,6 @@ services:
       - ./web-interface:/app
       - ./.env:/app/.env:ro
       - ../sevenstime-storage:/app/public/storage:ro
-      - ../sevens-wallet-react/src:/app/src/components/wallet
 
   api:
     build:

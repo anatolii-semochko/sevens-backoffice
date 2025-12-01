@@ -206,3 +206,4 @@ yarn-build:
 
 build-permissions:
 	sudo chmod 777 web-interface/package.json web-interface/yarn.lock web-interface/package-lock.json
+	sudo chmod -R 777 web-interface/node_modules

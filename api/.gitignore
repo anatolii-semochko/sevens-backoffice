@@ -11,3 +11,4 @@
 # Ignore JWT keys in production, but keep in repository for dev
 # /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+/.env

@@ -24,6 +24,8 @@ readonly class NodeServerApi
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_FAILONERROR => false,
+            CURLOPT_SSL_VERIFYPEER => false, // TODO - remove for production
+            CURLOPT_SSL_VERIFYHOST => false, // TODO - remove for production
         ]);
 
         return $this->getCurlResponse($handle)['data'];
@@ -44,6 +46,8 @@ readonly class NodeServerApi
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_FAILONERROR => false,
+            CURLOPT_SSL_VERIFYPEER => false, // TODO - remove for production
+            CURLOPT_SSL_VERIFYHOST => false, // TODO - remove for production
         ]);
 
         return $this->getCurlResponse($handle)['data'];

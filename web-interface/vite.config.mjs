@@ -1,12 +1,14 @@
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import autoprefixer from 'autoprefixer'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
+import { defineConfig, loadEnv } from 'vite'
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill'
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+
   return {
     base: './',
     build: {
@@ -57,10 +59,6 @@ export default defineConfig(() => {
           replacement: `${path.resolve(__dirname, 'src')}/`,
         },
         {
-          find: '@wallet',
-          replacement: path.resolve(__dirname, 'src/components/wallet'),
-        },
-        {
           find: '@js',
           replacement: path.resolve(__dirname, 'src'),
         },
@@ -89,11 +87,16 @@ export default defineConfig(() => {
     },
     server: {
       host: '0.0.0.0',
-      port: 3000,
-      allowedHosts: ['sevenstime-backoffice.local'],
+      port: parseInt(env.VITE_DEV_SERVER_PORT),
+      allowedHosts: env.VITE_ALLOWED_HOSTS.split(','),
+      hmr: {
+        protocol: 'wss',
+        host: env.VITE_HMR_HOST,
+        clientPort: parseInt(env.VITE_HMR_CLIENT_PORT),
+      },
       proxy: {
         '/api': {
-          target: 'http://127.0.0.1:8090',
+          target: env.VITE_API_SERVER_URL,
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path,

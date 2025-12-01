@@ -98,10 +98,10 @@ readonly class TokenManagementTariffsService
     public function getTariffsTransaction(
         string $authorityPublicKey,
         string $targetWallet,
-        int $mint,
-        int $setSale,
+        float $mint,
+        float $setSale,
         int $buy,
-        int $burn,
+        float $burn,
         bool $paused
     ): array {
         $transaction = $this->nodeApi->getTariffTransaction(
@@ -126,10 +126,10 @@ readonly class TokenManagementTariffsService
     public function postTransaction(
         UserInterface $adminUser,
         string $targetWallet,
-        int $mint,
-        int $setSale,
+        float $mint,
+        float $setSale,
         int $buy,
-        int $burn,
+        float $burn,
         bool $paused,
         string $transactionId,
         string $txSignature

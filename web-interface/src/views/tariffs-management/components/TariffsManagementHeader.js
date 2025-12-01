@@ -98,7 +98,7 @@ export const CurrentTariffs = ({currentTariffs}) => {
     (
       <CRow className="mb-3">
         <CCol>
-          <CCard className="border-primary">
+          <CCard>
             <CCardHeader className="bg-light">
               <strong>Current Tariffs</strong>
             </CCardHeader>
