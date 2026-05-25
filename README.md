@@ -1,93 +1,395 @@
-# web-app-skeleton
+# Sevens Backoffice Platform
 
+**Enterprise-grade administrative dashboard for blockchain token ecosystem management**
 
+## Overview
 
-## Getting started
+The Sevens Backoffice serves as the comprehensive administrative control center for the [Sevens Platform](https://github.com/anatolii-semochko/sevens-platform) - a blockchain-based digital asset tokenization ecosystem. This sophisticated web application provides administrators with powerful tools to manage token operations, user activities, and platform economics across the entire Sevens infrastructure.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## System Architecture
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### Role in Sevens Ecosystem
 
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+The Sevens Backoffice is the **administrative nerve center** that orchestrates three interconnected systems:
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/anatolii-semochko/web-app-skeleton.git
-git branch -M main
-git push -uf origin main
+┌────────────────────────────────────────────┐
+│         Sevens Ecosystem                   │
+│                                            │
+│  ┌─────────────────────────────────────┐   │
+│  │     ️  BACKOFFICE                    │   │
+│  │   Administrative Control            │   │
+│  │   • Token Management                │   │
+│  │   • Fee Configuration               │   │
+│  │   • System Monitoring               │   │
+│  │   • User Administration             │   │
+│  └─────────────┬───────────────────────┘   │
+│                │                           │
+│      ┌─────────┴─────────┐                 │
+│      │                   │                 │
+│  ┌───▼────────────┐  ┌───▼───────────────┐ │
+│  │   PLATFORM     │  │   ️  SMART         │ │
+│  │ User Interface │  │  CONTRACTS        │ │
+│  │ • Material     │  │ • Token Minting   │ │
+│  │   Publishing   │  │ • Marketplace     │ │
+│  │ • Trading      │  │ • Fee Collection  │ │
+│  │ • Wallets      │  │ • Governance      │ │
+│  └────────────────┘  └───────────────────┘ │
+└────────────────────────────────────────────┘
 ```
 
-## Integrate with your tools
+## Key Features
 
-- [ ] [Set up project integrations](https://gitlab.com/anatolii-semochko/web-app-skeleton/-/settings/integrations)
+### 🎛️ **Token Operations Management**
+- **Transaction Monitoring**: Real-time tracking of token mint, burn, buy, and sell operations
+- **Revenue Analytics**: Comprehensive income reporting with date range filtering
+- **Fee Management**: Dynamic configuration of blockchain transaction fees
+- **System Pause Controls**: Emergency system-wide operation suspension
 
-## Collaborate with your team
+### 🏢 **Platform Administration**
+- **User Management**: Role-based access control and user activity monitoring
+- **Content Management**: Language support, categories, and help content administration
+- **Tariff Configuration**: Flexible pricing models for platform operations
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### 📊 **Business Intelligence**
+- **Financial Reporting**: Detailed revenue tracking and transaction analytics
+- **Operational Metrics**: System usage statistics and performance monitoring
+- **Data Export**: Comprehensive reporting for business analysis
 
-## Test and Deploy
+### 🔐 **Security & Access Control**
+- **JWT Authentication**: Secure admin access with token-based authentication
+- **Role-Based Permissions**: Granular access control for different admin levels
+- **Audit Trails**: Complete logging of administrative actions
 
-Use the built-in continuous integration in GitLab.
+## Technology Stack
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### Backend Architecture
+- **PHP 8.3** with **Symfony 7** framework
+- **MySQL** database with Doctrine ORM
+- **JWT Authentication** for secure admin access
+- **RESTful API** design for frontend integration
 
-***
+### Frontend Technologies
+- **React 18** with modern hooks architecture
+- **Redux** for centralized state management
+- **CoreUI** component library for admin interfaces
+- **Real-time Updates** via WebSocket connections
 
-# Editing this README
+### Infrastructure
+- **Docker** containerization for consistent deployment
+- **Nginx** web server with SSL termination
+- **Multi-environment** support (development, production)
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## Core Functionality
 
-## Suggestions for a good README
+### Token Management Dashboard
+```php
+// Token operations monitoring
+class TokenManageController extends BaseController
+{
+    #[Route('/token-management')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function dashboard(): JsonResponse
+    {
+        // Real-time transaction monitoring
+        // Fee collection analytics
+        // System health checks
+    }
+}
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### Financial Analytics
+```javascript
+// Revenue tracking and reporting
+const TokenTransactions = () => {
+  const [items, setItems] = useState([])
+  const [incomeSum, setIncomeSum] = useState(0)
+  const [filterParams, setFilterParams] = useState(null)
 
-## Name
-Choose a self-explaining name for your project.
+  // Date range filtering
+  // Revenue calculations
+  // Export functionality
+}
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## Integration with Smart Contracts
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+The backoffice directly interfaces with the [Sevens Smart Contracts](https://github.com/anatolii-semochko/sevens-smartcontracts) system to:
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+- **Monitor Token Operations**: Track all minting, burning, and trading activities
+- **Configure Economics**: Update fee structures and operational parameters
+- **Emergency Controls**: Pause/resume system operations when needed
+- **Revenue Collection**: Monitor and analyze fee collection from token operations
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## Screenshots & User Interface
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Administrative Dashboard
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+#### Token Operations Management
+![Token Operations Control](docs/images/Token%20operations%20control%20and%20accounting.png)
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+*Real-time token transaction monitoring with comprehensive analytics including transaction types (Buy, Sell, Mint, Burn), revenue tracking, and detailed operation history. The dashboard provides complete visibility into blockchain operations with filtering capabilities and income reporting.*
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+#### Tariff Management System
+![Tariffs Management](docs/images/Tarrifs%20management%20page.png)
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+*Dynamic fee configuration interface allowing administrators to set and monitor transaction fees across all token operations. Features historical tariff tracking, operator audit trails, and flexible percentage/fixed fee models.*
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+#### Fee Configuration Interface
+![Edit Tariffs Form](docs/images/Edit%20tarifd%20form.png)
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+*Secure tariff editing interface with wallet integration for blockchain-based fee updates. Administrators can modify mint fees, sale fees, burn fees, and target wallet configurations with real-time wallet signature verification.*
 
-## License
-For open source projects, say how it is licensed.
+### End-to-End Token Workflow Integration
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+#### Token Purchase Process
+![Buy Permanent Token](docs/images/Buy%20Permanent%20Token.png)
+
+*Integration with the main Sevens Platform showing the complete token purchase workflow. Displays token metadata, pricing information, sales history analytics, and wallet integration for secure transactions.*
+
+#### Successful Transaction Completion
+![Bought Permanent Token](docs/images/Bought%20Permanent%20Token.png)
+
+*Post-purchase interface demonstrating successful token acquisition with download capabilities for associated digital materials. Shows complete transaction verification and blockchain integration.*
+
+These screenshots demonstrate the sophisticated administrative capabilities of the Sevens Backoffice, from high-level transaction monitoring to granular fee management, all integrated seamlessly with blockchain operations and user-facing platform functionality.
+
+## Quick Start
+
+### Prerequisites
+```bash
+# Required software
+Docker 24+                # Container runtime
+Docker Compose 2.20+      # Multi-container orchestration
+Node.js 20+               # Frontend asset compilation
+PHP 8.3+                  # Backend runtime
+MySQL 8+                  # Database server
+```
+
+### Installation
+
+1. **Repository Setup**
+   ```bash
+   git clone https://github.com/anatolii-semochko/sevens-backoffice.git
+   cd sevens-backoffice
+   ```
+
+2. **Environment Configuration**
+   ```bash
+   cp .env.dist .env
+   # Configure database, JWT secrets, and service endpoints
+   ```
+
+3. **SSL Certificates** (Development)
+   ```bash
+   # Generate local development certificates
+   mkcert example-backoffice.local "*.example-backoffice.local" localhost 127.0.0.1 ::1
+   ```
+
+4. **Development Startup**
+   ```bash
+   # Start all services
+   make up
+
+   # Install dependencies
+   make composer-install
+   make yarn-install
+
+   # Database setup
+   make migration-migrate
+
+   # Build frontend assets
+   make encore-dev
+   ```
+
+5. **Access the Application**
+   - **Admin Interface**: https://example-backoffice.local:8090
+   - **API Endpoints**: https://example-backoffice.local:8090/api
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - Admin authentication
+- `POST /api/auth/logout` - Session termination
+
+### Token Management
+- `GET /api/token-management/transactions` - Transaction history
+- `GET /api/token-management/tariffs` - Current fee configuration
+- `POST /api/token-management/update-tariffs` - Update fee structure
+- `POST /api/token-management/pause` - Emergency system control
+
+### Administration
+- `GET /api/users` - User management
+- `GET /api/categories` - Content categories
+- `GET /api/languages` - Platform localization
+- `POST /api/pages/generate` - Content generation
+
+## Database Architecture
+
+### Core Entities
+
+**ManageTransaction**
+- Token operation tracking (mint, burn, buy, sell)
+- Revenue calculation and fee collection
+- User association and timestamp logging
+
+**ManageTariffHistory**
+- Fee structure versioning
+- Historical pricing analysis
+- Administrative change tracking
+
+**User & PlatformUser**
+- Administrative user management
+- Role-based access control
+- Activity monitoring and authentication
+
+## Security Features
+
+### Administrative Access Control
+- **JWT Token Authentication**: Secure session management
+- **Role-Based Authorization**: Granular permission system
+- **IP Restrictions**: Optional IP-based access control
+- **Session Management**: Automatic timeout and security logging
+
+### Data Protection
+- **Input Validation**: Comprehensive sanitization of all inputs
+- **CSRF Protection**: Cross-site request forgery prevention
+- **SQL Injection Prevention**: Parameterized queries via Doctrine ORM
+- **XSS Protection**: Output escaping and content security policies
+
+### Operational Security
+- **Audit Logging**: Complete administrative action tracking
+- **Emergency Controls**: System-wide pause capabilities
+- **Rate Limiting**: API abuse prevention
+- **Secure Headers**: HTTPS enforcement and security headers
+
+## Production Deployment
+
+### Environment Setup
+```bash
+# Production environment variables
+APP_ENV=prod
+APP_SECRET=your-production-secret
+DATABASE_URL=mysql://admin:secure-password@db-host:3306/sevens_backoffice
+JWT_PASSPHRASE=production-jwt-secret
+
+# External service integration
+NODE_SERVER_BASE_URL=https://your-node-server/api
+MAIN_SITE_URL=https://your-sevens-platform.com
+```
+
+### Deployment Steps
+```bash
+# Build production assets
+yarn encore production
+
+# Database migration
+php bin/console doctrine:migrations:migrate --env=prod
+
+# Clear caches
+php bin/console cache:clear --env=prod
+
+# Generate JWT keys
+php bin/console lexik:jwt:generate-keypair --env=prod
+```
+
+## Performance Characteristics
+
+### Optimizations
+- **Database Indexing**: Optimized queries for transaction history
+- **Caching Strategy**: Redis integration for session and data caching
+- **Asset Optimization**: Webpack bundling and minification
+- **CDN Integration**: Static asset delivery optimization
+
+### Scalability
+- **Horizontal Scaling**: Docker-based architecture supports load balancing
+- **Database Optimization**: Connection pooling and query optimization
+- **API Rate Limiting**: Prevents abuse and ensures fair usage
+- **Resource Monitoring**: Comprehensive performance metrics
+
+## Development Standards
+
+### Code Quality
+- **PSR-12 Compliance**: PHP coding standards
+- **TypeScript**: Type-safe frontend development
+- **Unit Testing**: PHPUnit for backend testing
+- **Integration Testing**: API endpoint validation
+
+### Documentation
+- **API Documentation**: OpenAPI/Swagger specifications
+- **Code Comments**: Comprehensive inline documentation
+- **Architecture Diagrams**: System design documentation
+- **Deployment Guides**: Production setup instructions
+
+## Business Impact
+
+### Operational Efficiency
+- **Automated Monitoring**: Reduces manual oversight requirements
+- **Real-time Analytics**: Immediate visibility into system performance
+- **Streamlined Administration**: Centralized control interface
+- **Comprehensive Reporting**: Data-driven business decisions
+
+### Revenue Management
+- **Dynamic Fee Configuration**: Flexible pricing strategies
+- **Revenue Tracking**: Detailed financial analytics
+- **Cost Optimization**: Efficient resource utilization
+- **Fraud Prevention**: Transaction monitoring and anomaly detection
+
+## Integration Examples
+
+### Smart Contract Fee Updates
+```php
+// Update token management fees
+public function updateTariffs(Request $request): JsonResponse
+{
+    $tariffs = $this->tokenManagementTariffsService->updateTariffs(
+        mintFee: $request->get('mint_fee'),
+        saleFee: $request->get('sale_fee'),
+        buyFee: $request->get('buy_fee'),
+        burnFee: $request->get('burn_fee')
+    );
+
+    return $this->json($tariffs, groups: self::TARIFF_HISTORY_GROUPS);
+}
+```
+
+### Real-time Transaction Monitoring
+```javascript
+// Live transaction dashboard
+const TransactionMonitor = () => {
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const response = await tokenManagementApi.getTransactions({
+        page: currentPage,
+        limit: pageSize,
+        dateFrom: filterParams?.dateFrom,
+        dateTo: filterParams?.dateTo
+      });
+
+      setItems(response.data);
+      setIncomeSum(response.income_sum);
+    };
+
+    fetchTransactions();
+  }, [currentPage, filterParams]);
+};
+```
+
+## License & Contact
+
+**License**: Educational and portfolio demonstration project
+
+**Developer**: [Anatolii Semochko](https://linkedin.com/in/anatolii-semochko)
+**GitHub**: [github.com/anatolii-semochko](https://github.com/anatolii-semochko)
+**Email**: anatoliy.semochko@gmail.com
+
+---
+
+## Related Projects
+
+- **[Sevens Platform](https://github.com/anatolii-semochko/sevens-platform)** - Main user-facing application for token creation and trading
+- **[Sevens Smart Contracts](https://github.com/anatolii-semochko/sevens-smartcontracts)** - Solana blockchain smart contracts for token operations
+
+**Built with**: PHP/Symfony, React/Redux, MySQL, Docker, Blockchain Integration
+**Architecture**: Administrative control center for enterprise blockchain token ecosystem
+**Security**: Enterprise-grade authentication, authorization, and audit capabilities
