@@ -17,7 +17,7 @@ The Sevens Backoffice is the **administrative nerve center** that orchestrates t
 │         Sevens Ecosystem                   │
 │                                            │
 │  ┌─────────────────────────────────────┐   │
-│  │     ️  BACKOFFICE                    │   │
+│  │      BACKOFFICE                     │   │
 │  │   Administrative Control            │   │
 │  │   • Token Management                │   │
 │  │   • Fee Configuration               │   │
@@ -28,7 +28,7 @@ The Sevens Backoffice is the **administrative nerve center** that orchestrates t
 │      ┌─────────┴─────────┐                 │
 │      │                   │                 │
 │  ┌───▼────────────┐  ┌───▼───────────────┐ │
-│  │   PLATFORM     │  │   ️  SMART         │ │
+│  │   PLATFORM     │  │     SMART         │ │
 │  │ User Interface │  │  CONTRACTS        │ │
 │  │ • Material     │  │ • Token Minting   │ │
 │  │   Publishing   │  │ • Marketplace     │ │
@@ -131,14 +131,19 @@ The backoffice directly interfaces with the [Sevens Smart Contracts](https://git
 *Real-time token transaction monitoring with comprehensive analytics including transaction types (Buy, Sell, Mint, Burn), revenue tracking, and detailed operation history. The dashboard provides complete visibility into blockchain operations with filtering capabilities and income reporting.*
 
 #### Tariff Management System
-![Tariffs Management](docs/images/Tarrifs%20management%20page.png)
+![Tariffs Management](docs/images/Tariffs%20management%20page.png)
 
 *Dynamic fee configuration interface allowing administrators to set and monitor transaction fees across all token operations. Features historical tariff tracking, operator audit trails, and flexible percentage/fixed fee models.*
 
 #### Fee Configuration Interface
-![Edit Tariffs Form](docs/images/Edit%20tarifd%20form.png)
+![Edit Tariffs Form](docs/images/Edit%20tariffs%20form.png)
 
 *Secure tariff editing interface with wallet integration for blockchain-based fee updates. Administrators can modify mint fees, sale fees, burn fees, and target wallet configurations with real-time wallet signature verification.*
+
+#### Emergency System Control
+![Stop All Operations](docs/images/Stop%20all%20operation.png)
+
+*Emergency system control interface that provides administrators with the ability to temporarily halt all smart contract operations on tokens. This critical safety feature ensures system integrity during maintenance, security updates, or emergency situations by suspending all token-related blockchain transactions.*
 
 ### End-to-End Token Workflow Integration
 
@@ -153,6 +158,53 @@ The backoffice directly interfaces with the [Sevens Smart Contracts](https://git
 *Post-purchase interface demonstrating successful token acquisition with download capabilities for associated digital materials. Shows complete transaction verification and blockchain integration.*
 
 These screenshots demonstrate the sophisticated administrative capabilities of the Sevens Backoffice, from high-level transaction monitoring to granular fee management, all integrated seamlessly with blockchain operations and user-facing platform functionality.
+
+## Technical Architecture & Workflow
+
+### Tariff Management System Flow
+
+The Sevens Backoffice implements a sophisticated multi-layer blockchain integration for secure tariff management. The complete technical workflow involves:
+
+**Phase 1: UI Input & Validation**
+- Admin configures fees (mint, sale, buy, burn) and target wallet
+- Wallet connection for authority verification
+
+**Phase 2: Transaction Generation**
+- Backoffice API requests unsigned transaction from NodeJS service
+- NodeJS queries blockchain state and builds appropriate instructions
+- Transaction serialized and stored with unique ID for verification
+
+**Phase 3: Wallet Signature**
+- User signs transaction in connected wallet (Phantom/Solflare)
+- Client-side transaction serialization for secure transmission
+
+**Phase 4: Verification & Execution**
+- Backend verifies transaction integrity against stored data
+- Signed transaction broadcast to Solana blockchain
+- Smart contract validates authority and updates tariffs PDA
+- Complete audit trail recorded in database
+
+This architecture ensures **cryptographic security**, **transaction integrity**, and **complete audit trails** while maintaining usability for administrative operations.
+
+### Visual Architecture Overview
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   FRONTEND      │    │    BACKEND      │    │   BLOCKCHAIN    │
+│                 │    │                 │    │                 │
+│ ┌─────────────┐ │    │ ┌─────────────┐ │    │ ┌─────────────┐ │
+│ │ React UI    │ │    │ │ PHP/Symfony │ │    │ │ Node.js     │ │
+│ │ TariffForm  │◄├────┤►│ API Layer   │◄├────┤►│ Service     │ │
+│ └─────────────┘ │    │ └─────────────┘ │    │ └─────────────┘ │
+│                 │    │                 │    │                 │
+│ ┌─────────────┐ │    │ ┌─────────────┐ │    │ ┌─────────────┐ │
+│ │ Wallet      │ │    │ │ MySQL       │ │    │ │ Solana      │ │
+│ │ Connector   │ │    │ │ Database    │ │    │ │ Blockchain  │ │
+│ └─────────────┘ │    │ └─────────────┘ │    │ └─────────────┘ │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+**[View Complete Technical Workflow →](docs/TARIFF_MANAGEMENT_WORKFLOW.md)**
 
 ## Quick Start
 
@@ -375,6 +427,66 @@ const TransactionMonitor = () => {
 };
 ```
 
+## Sevens Ecosystem
+
+The Sevens platform consists of four interconnected projects that work together to provide a complete blockchain tokenization solution:
+
+### **[Sevens Backoffice](https://github.com/anatolii-semochko/sevens-backoffice)**
+*Administrative control center and revenue management platform*
+- **Technology**: PHP/Symfony, React/Redux, MySQL, Docker
+- **Purpose**: Administrative dashboard for token operations monitoring, fee configuration, user management, and financial analytics
+- **Key Features**: Real-time transaction monitoring, emergency system controls, tariff management, comprehensive reporting
+
+### **[Sevens Platform](https://github.com/anatolii-semochko/sevens-platform)**
+*Main user-facing application for digital material tokenization and trading*
+- **Technology**: PHP/Symfony, React/TypeScript, MySQL, AWS S3, Docker
+- **Purpose**: Complete web platform for creating, managing, and trading blockchain tokens representing digital materials
+- **Key Features**: Token creation & management, marketplace functionality, wallet integration, file storage & CDN
+
+### **[Sevens Smart Contracts](https://github.com/anatolii-semochko/sevens-smartcontracts)**
+*Enterprise-grade NFT marketplace infrastructure built on Solana*
+- **Technology**: Rust, Anchor Framework, Solana blockchain
+- **Purpose**: Dual-contract token ecosystem with hash-validated NFTs and built-in marketplace functionality
+- **Key Features**: Hash-based uniqueness validation, dynamic fee collection, inter-contract communication, governance layer
+
+### **[Sevens Wallet React](https://github.com/anatolii-semochko/custom-solana-wallet-react)**
+*Custom Solana wallet interface library with extended functionality*
+- **Technology**: React, TypeScript, Solana Web3.js, CryptoJS
+- **Purpose**: Comprehensive React library for building custom wallet interfaces compatible with Phantom API
+- **Key Features**: Multi-language support, encrypted storage, transaction validation, modular architecture
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      SEVENS ECOSYSTEM                           │
+│                                                                 │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌──────────────┐ │
+│  │   BACKOFFICE    │    │    PLATFORM     │    │   WALLET     │ │
+│  │   (Admin)       │◄──►│  (User App)     │◄──►│  (Library)   │ │
+│  │ • Fee Config    │    │ • Token Trading │    │ • UI Comps   │ │
+│  │ • Monitoring    │    │ • Marketplace   │    │ • Security   │ │
+│  │ • Analytics     │    │ • File Storage  │    │ • Multi-lang │ │
+│  └─────────────────┘    └─────────────────┘    └──────────────┘ │
+│           │                        │                   │        │
+│           │                        │                   │        │
+│           └────────────────────────┼───────────────────┘        │
+│                                    │                            │
+│                    ┌───────────────▼───────────────┐            │
+│                    │        SMART CONTRACTS        │            │
+│                    │         (Blockchain)          │            │
+│                    │ • Token Operations            │            │
+│                    │ • Marketplace Logic           │            │
+│                    │ • Fee Collection              │            │
+│                    │ • Hash Validation             │            │
+│                    └───────────────────────────────┘            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+This integrated ecosystem provides a complete solution for blockchain-based digital asset tokenization, from smart contract infrastructure to user interfaces and administrative tools.
+
+---
+
 ## License & Contact
 
 **License**: Educational and portfolio demonstration project
@@ -382,13 +494,6 @@ const TransactionMonitor = () => {
 **Developer**: [Anatolii Semochko](https://linkedin.com/in/anatolii-semochko)
 **GitHub**: [github.com/anatolii-semochko](https://github.com/anatolii-semochko)
 **Email**: anatoliy.semochko@gmail.com
-
----
-
-## Related Projects
-
-- **[Sevens Platform](https://github.com/anatolii-semochko/sevens-platform)** - Main user-facing application for token creation and trading
-- **[Sevens Smart Contracts](https://github.com/anatolii-semochko/sevens-smartcontracts)** - Solana blockchain smart contracts for token operations
 
 **Built with**: PHP/Symfony, React/Redux, MySQL, Docker, Blockchain Integration
 **Architecture**: Administrative control center for enterprise blockchain token ecosystem
