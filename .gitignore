@@ -1,7 +1,60 @@
-/.idea
+# Environment files
 /.env
 /.env.local
 /.env.*.local
+
+# SSL Certificates and Private Keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# IDE Configuration
+/.idea
+/.vscode
+*.swp
+*.swo
+
+# Docker secrets
+/docker/*/secrets/
+/docker/development/secrets/
+/docker/production/secrets/
+
+# JWT Keys
+/api/config/jwt/private.pem
+/api/config/jwt/public.pem
+
+# Build artifacts
 /web-interface/.ready
-sevenstime-backoffice.local.crt
-sevenstime-backoffice.local.key
+dist/
+build/
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Cache directories
+/api/var/cache/
+/api/var/log/
+.cache/
+
+# Development artifacts
+*test*.yml
+compose-test.yml
+xdebug.ini
+coverage/
+
+# OS Files
+.DS_Store
+Thumbs.db
+*~
+
+# Backup files
+*.bak
+*.backup
