@@ -40,23 +40,23 @@ The Sevens Backoffice is the **administrative nerve center** that orchestrates t
 
 ## Key Features
 
-### 🎛️ **Token Operations Management**
+### **Token Operations Management**
 - **Transaction Monitoring**: Real-time tracking of token mint, burn, buy, and sell operations
 - **Revenue Analytics**: Comprehensive income reporting with date range filtering
 - **Fee Management**: Dynamic configuration of blockchain transaction fees
 - **System Pause Controls**: Emergency system-wide operation suspension
 
-### 🏢 **Platform Administration**
+### **Platform Administration**
 - **User Management**: Role-based access control and user activity monitoring
 - **Content Management**: Language support, categories, and help content administration
 - **Tariff Configuration**: Flexible pricing models for platform operations
 
-### 📊 **Business Intelligence**
+### **Business Intelligence**
 - **Financial Reporting**: Detailed revenue tracking and transaction analytics
 - **Operational Metrics**: System usage statistics and performance monitoring
 - **Data Export**: Comprehensive reporting for business analysis
 
-### 🔐 **Security & Access Control**
+### **Security & Access Control**
 - **JWT Authentication**: Secure admin access with token-based authentication
 - **Role-Based Permissions**: Granular access control for different admin levels
 - **Audit Trails**: Complete logging of administrative actions
